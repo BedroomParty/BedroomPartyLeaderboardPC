@@ -1,5 +1,23 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
 	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+	
+	<horizontal pref-width="90"
+				pref-height="8"
+				anchor-pos-y="41.5"
+				id="myHeader"
+				horizontal-fit="PreferredSize"
+				background="round-rect-panel">
+		<stack>
+			<horizontal>
+				<text id="headerText"
+					  text="QS LEADERBOARD"
+					  font-size="6"
+					  align="Midline"
+					  italics="true"/>
+			</horizontal>
+		</stack>
+	</horizontal>
+
 	<!-- Leaderboard scrollers -->
 	<bg anchor-pos-x="-40" anchor-pos-y="-15">
 		<page-button id="up_button"
@@ -42,6 +60,23 @@
 				  italics="true"
 				  color="red"
 				  active="false"/>
+			<modal child-expand-height="false" id='infoModal' show-event='showInfoModal' hide-event='hideInfoModal' size-delta-x='80' size-delta-y='55' clickerino-offerino-closerino='true'
+					move-to-center='true'>
+				<vertical spacing='1'
+					vertical-fit='PreferredSize' pad='6'>
+					<horizontal spacing='4'>
+						<image align='Left' id="QSLeaderboard_logo" src="QSLeaderboard.Images.QSLeaderboard_logo.png" preserve-aspect="true" pref-width="15" pref-height="15"/>
+						<text font-size="10" text='QS Leaderboard' align='Right'/>
+					</horizontal>
+					<text font-size='5' align='Center' text='QS Leaderboard by Speecil and Nuggo!'/>
+					<text text-wrap='true' align='Center' text='A leaderboard for the best server'/>
+					<horizontal spacing='2'>
+						<text align='Right' text='Your ID: '/>
+						<text align='Left' id='userIDHere' text='TEST DATA' font-size='5'/>
+					</horizontal>
+					<text id='linkText' align='Center' rich-text='true' text='Link your account with /link in the QS server!' word-wrapping='true'/>
+				</vertical>
+			</modal>
 			<button id="retryButton" text="Retry" on-click="Retry" active="false" anchor-pos-x="-5" align="Center"/>
 		</leaderboard>
 	</vertical>

@@ -9,8 +9,10 @@ using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
+using QSLeaderboard.Utils;
 using TMPro;
 using UnityEngine;
+using Zenject;
 
 namespace QSLeaderboard.UI.Leaderboard
 {
@@ -18,6 +20,8 @@ namespace QSLeaderboard.UI.Leaderboard
     [ViewDefinition("QSLeaderboard.UI.Leaderboard.BSML.PanelView.bsml")]
     internal class PanelView : BSMLAutomaticViewController
     {
+        [Inject] LeaderboardView _leaderboardView;
+
         private const float _skew = 0.18f;
         private ImageView _background;
         public ImageView _imgView;
@@ -50,7 +54,7 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIAction("FunnyModalMoment")]
         public void FunnyModalMoment()
         {
-            Plugin.Log.Info("FunnyModalMoment");
+            _leaderboardView.showInfoModal();
         }
 
         [UIAction("#post-parse")]
@@ -60,7 +64,7 @@ namespace QSLeaderboard.UI.Leaderboard
             _imgView = _container.background as ImageView;
             _imgView.transform.position.Set(-5f, _imgView.transform.position.y, _imgView.transform.position.z);
 
-            _imgView.color = Color.magenta;
+            _imgView.color = Constants.QS_COLOR;
             _imgView.color0 = Color.white;
             _imgView.color1 = new Color(1, 1, 1, 0);
 

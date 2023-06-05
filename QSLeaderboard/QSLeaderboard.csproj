@@ -40,6 +40,7 @@
     <DisableZipRelease>True</DisableZipRelease>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BeatmapCore, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="BSML, Version=1.6.10.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
@@ -133,8 +134,10 @@
     <Compile Include="UI\Leaderboard\LeaderboardView.cs" />
     <Compile Include="UI\Leaderboard\PanelView.cs" />
     <Compile Include="Utils\Constants.cs" />
+    <Compile Include="Utils\LeaderboardData.cs" />
     <Compile Include="Utils\LeaderboardUtils.cs" />
     <Compile Include="Utils\PlayerUtils.cs" />
+    <Compile Include="Utils\RequestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -150,6 +153,9 @@
       <Version>2.0.0-beta1</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

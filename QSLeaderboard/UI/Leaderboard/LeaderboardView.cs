@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
@@ -27,6 +29,9 @@ namespace QSLeaderboard.UI.Leaderboard
         [Inject] PlatformLeaderboardViewController _plvc;
         [Inject] PlayerUtils _playerUtils;
         [Inject] PanelView _panelView;
+        [Inject] RequestUtils _requestUtils;
+        [Inject] LeaderboardData _leaderboardData;
+
         public int page = 0;
         public int totalPages;
         public int sortMethod;
@@ -39,8 +44,17 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIComponent("leaderboardTableView")]
         private Transform leaderboardTransform = null;
 
+        [UIComponent("myHeader")]
+        private Backgroundable myHeader;
+
         [UIComponent("errorText")]
         private TextMeshProUGUI errorText;
+
+        [UIComponent("userIDHere")]
+        public TextMeshProUGUI userIDHere;
+
+        [UIComponent("linkText")]
+        public TextMeshProUGUI linkText;
 
         [UIComponent("up_button")]
         private Button up_button;
@@ -53,6 +67,9 @@ namespace QSLeaderboard.UI.Leaderboard
 
         [UIAction("OnPageDown")]
         private void OnPageDown() => UpdatePageChanged(1);
+
+        [UIParams]
+        BSMLParserParams parserParams;
 
         private void UpdatePageButtons()
         {
@@ -69,15 +86,29 @@ namespace QSLeaderboard.UI.Leaderboard
         private ImageView _imgView;
         private GameObject _loadingControl;
 
+        internal static readonly FieldAccessor<ImageView, float>.Accessor ImageSkew = FieldAccessor<ImageView, float>.GetAccessor("_skew");
+        internal static readonly FieldAccessor<ImageView, bool>.Accessor ImageGradient = FieldAccessor<ImageView, bool>.GetAccessor("_gradient");
+
         [UIAction("#post-parse")]
         private void PostParse()
         {
+            myHeader.background.material = Utilities.ImageResources.NoGlowMat;
             _loadingControl = leaderboardTransform.Find("LoadingControl").gameObject;
             var loadingContainer = _loadingControl.transform.Find("LoadingContainer");
             loadingContainer.gameObject.SetActive(false);
             Destroy(loadingContainer.Find("Text").gameObject);
             Destroy(_loadingControl.transform.Find("RefreshContainer").gameObject);
             Destroy(_loadingControl.transform.Find("DownloadingContainer").gameObject);
+
+            _imgView = myHeader.background as ImageView;
+            _imgView.color = Constants.QS_COLOR;
+            _imgView.color0 = Constants.QS_COLOR;
+            _imgView.color1 = Constants.QS_COLOR;
+            ImageSkew(ref _imgView) = 0.18f;
+            ImageGradient(ref _imgView) = true;
+
+            linkText.text = "Link your account with <size=110%><color=green>/link</color></size> in the QS server!";
+
         }
 
         [UIAction("OnIconSelected")]
@@ -102,6 +133,11 @@ namespace QSLeaderboard.UI.Leaderboard
             }
         }
 
+        public void showInfoModal()
+        {
+            parserParams.EmitEvent("showInfoModal");
+        }
+
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
@@ -110,9 +146,6 @@ namespace QSLeaderboard.UI.Leaderboard
             OnLeaderboardSet(currentDifficultyBeatmap);
             if (firstActivation)
             {
-                _panelView.promptText.text = "Signing In...";
-                _panelView.prompt_loader.gameObject.SetActive(true);
-
                 _playerUtils.GetAuthStatus(result =>
                 {
                     bool isAuthenticated = result.Item1;
@@ -120,23 +153,55 @@ namespace QSLeaderboard.UI.Leaderboard
 
                     if (isAuthenticated)
                     {
-                        Console.WriteLine("Authenticated! Username: " + username);
-                        _panelView.promptText.text = $"Successfully signed {username} in!";
+                        Plugin.Log.Info("Authenticated! Username: " + username);
                         _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
                     }
                     else
                     {
-                        _panelView.promptText.text = $"Failed to Authenticate! Report to Speecil or Nuggo if you are whitelisted!";
+                        _panelView.promptText.text = "<color=red>Error Authenticating</color>";
                         _panelView.prompt_loader.SetActive(false);
-                        Console.WriteLine("Not authenticated! Username: " + username);
+                        Plugin.Log.Error("Not authenticated! Username: " + username);
                     }
                 });
+
+
+                _panelView.currentRank.text = $"Current Rank: #1";
+
+                _panelView.isMapRanked.text = $"Ranked Status: Ranked";
             }
+        }
+
+
+
+        protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+        {
+            base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
+            if (!_plvc) return;
+            if (!_plvc.isActivated) return;
+            parserParams.EmitEvent("hideInfoModal");
         }
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
             currentDifficultyBeatmap = difficultyBeatmap;
+            string mapId = difficultyBeatmap.level.levelID;
+            int difficulty = difficultyBeatmap.difficultyRank;
+            string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
+            string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+
+            Plugin.Log.Info("BEFORE REQUEST");
+            _requestUtils.GetBeatMapData(balls, result =>
+            {
+                leaderboardTableView.SetScores(_leaderboardData.CreateLeaderboardData(result.Item2, 1), -1);
+                Plugin.Log.Info("WITHIN RESULT");
+                if (!result.Item1)
+                {
+                    Plugin.Log.Info("NO SCORES FOUND");
+                    errorText.gameObject.SetActive(true);
+                }
+            });
+            Plugin.Log.Info("AFTER REQUEST");
         }
     }
 }
