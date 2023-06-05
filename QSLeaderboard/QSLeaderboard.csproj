@@ -50,6 +50,16 @@
       <HintPath>$(BeatSaberDir)\Plugins\LeaderboardCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="Oculus.Platform, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Oculus.Platform.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Oculus.VR, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Oculus.VR.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="SiraUtil, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
@@ -122,8 +132,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Leaderboard\LeaderboardView.cs" />
     <Compile Include="UI\Leaderboard\PanelView.cs" />
-    <Compile Include="UI\SettingsMenu\SettingsMenu.cs" />
+    <Compile Include="Utils\Constants.cs" />
     <Compile Include="Utils\LeaderboardUtils.cs" />
+    <Compile Include="Utils\PlayerUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -131,9 +142,8 @@
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="QSLeaderboard.csproj.user" Condition="Exists('QSLeaderboard.csproj.user')" />
-    <EmbeddedResource Include="UI\SettingsMenu\Settings.bsml" />
     <EmbeddedResource Include="UI\Leaderboard\BSML\PanelView.bsml" />
-    <EmbeddedResource Include="UI\Leaderboard\BSML\LeaderboardView - Copy.bsml" />
+    <EmbeddedResource Include="UI\Leaderboard\BSML\LeaderboardView.bsml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
@@ -144,6 +154,17 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\Player.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\arrow.png" />
+    <EmbeddedResource Include="Images\Globe.png" />
+    <EmbeddedResource Include="Images\pixel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\QSLeaderboard_logo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

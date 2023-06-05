@@ -1,0 +1,48 @@
+﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+	<!-- Leaderboard scrollers -->
+	<bg anchor-pos-x="-40" anchor-pos-y="-15">
+		<page-button id="up_button"
+					 icon="QSLeaderboard.Images.arrow.png"
+					 dir="Up"
+					 anchor-pos-y="12"
+					 pref-width="10"
+					 pref-height="10"
+					 on-click="OnPageUp"/>
+		<vertical-icon-segments id="scopeSegmentedControl"
+								contents='leaderboardIcons'
+								select-cell='OnIconSelected'
+								anchor-pos-y="20"
+								size-delta-x="10"
+								size-delta-y="16.5"/>
+
+		<page-button id="down_button"
+				   icon="QSLeaderboard.Images.arrow.png"
+				   dir="Down"
+				   anchor-pos-y="-12"
+				   pref-width="10"
+				   pref-height="10"
+				   on-click="OnPageDown"/>
+	</bg>
+
+	<!-- Leaderboard table -->
+	<vertical pref-width='76'
+			  pref-height='60'
+			  anchor-pos-x="7"
+			  anchor-pos-y="5.5"
+			  horizontal-fit='PreferredSize'
+			  vertical-fit='PreferredSize'>
+		<leaderboard id='leaderboardTableView'
+					 cell-size='6.05'>
+			<text id="errorText"
+				  text="No scores on this map!"
+				  font-size="8"
+				  anchor-pos-x="-5"
+				  align="Center"
+				  italics="true"
+				  color="red"
+				  active="false"/>
+			<button id="retryButton" text="Retry" on-click="Retry" active="false" anchor-pos-x="-5" align="Center"/>
+		</leaderboard>
+	</vertical>
+</bg>

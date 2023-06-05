@@ -1,7 +1,6 @@
 ﻿using IPA;
 using IPALogger = IPA.Logging.Logger;
 using SiraUtil.Zenject;
-using QSLeaderboard.UI.SettingsMenu;
 using QSLeaderboard.Installers;
 
 namespace QSLeaderboard
@@ -11,11 +10,13 @@ namespace QSLeaderboard
     {
         internal static IPALogger Log { get; private set; }
 
+        public static string userName;
+
+
         [Init]
         public Plugin(IPALogger logger, Zenjector zenjector)
         {
             Log = logger;
-            SettingsMenu.instance.Init();
             zenjector.Install<MenuInstaller>(Location.Menu);
         }
     }

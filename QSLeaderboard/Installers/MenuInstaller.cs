@@ -11,6 +11,7 @@ namespace QSLeaderboard.Installers
             Container.BindInterfacesAndSelfTo<LeaderboardView>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<PanelView>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesTo<LeaderboardUtils>().AsSingle();
+            Container.Bind<PlayerUtils>().AsSingle();
         }
     }
 }
