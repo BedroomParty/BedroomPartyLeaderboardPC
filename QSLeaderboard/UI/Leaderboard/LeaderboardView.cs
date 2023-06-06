@@ -34,44 +34,6 @@ namespace QSLeaderboard.UI.Leaderboard
         [Inject] RequestUtils _requestUtils;
         [Inject] LeaderboardData _leaderboardData;
 
-        List<LeaderboardData.LeaderboardEntry> leaderboardDataTEST = new List<LeaderboardData.LeaderboardEntry>
-        {
-            new LeaderboardData.LeaderboardEntry
-            (
-                "123456789",
-                "speeicl",
-                10,
-                20,
-                0f,
-                true,
-                5151112,
-                "FM"
-            ),
-            new LeaderboardData.LeaderboardEntry
-            (
-                "123456789",
-                "nugg",
-                10,
-                20,
-                0f,
-                true,
-                1234,
-                "NM"
-            ),
-            new LeaderboardData.LeaderboardEntry
-            (
-                "123456789",
-                "Player1",
-                10,
-                20,
-                0f,
-                true,
-                1234567,
-                "NM"
-            )
-        };
-
-
         public int page = 0;
         public int totalPages;
         public int sortMethod;
@@ -102,24 +64,37 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIComponent("down_button")]
         private Button down_button;
 
+        [UIObject("loadingLB")]
+        private GameObject loadingLB;
+
         [UIAction("OnPageUp")]
-        private void OnPageUp() => UpdatePageChanged(-1);
+        public void OnPageUp(bool tooFar)
+        {
+            page--;
+            if (tooFar) totalPages = page;
+            UpdatePageChanged();
+            UpdatePageButtons();
+        }
 
         [UIAction("OnPageDown")]
-        private void OnPageDown() => UpdatePageChanged(1);
+        public void OnPageDown()
+        {
+            page++;
+            UpdatePageChanged();
+            UpdatePageButtons();
+        }
 
         [UIParams]
         BSMLParserParams parserParams;
 
-        private void UpdatePageButtons()
+        public void UpdatePageButtons()
         {
             up_button.interactable = (page > 0);
-            down_button.interactable = (page < totalPages - 1);
+            down_button.interactable = (page < totalPages);
         }
 
-        private void UpdatePageChanged(int inc)
+        public void UpdatePageChanged()
         {
-            page = Mathf.Clamp(page + inc, 0, totalPages - 1);
             OnLeaderboardSet(currentDifficultyBeatmap);
         }
 
@@ -181,9 +156,10 @@ namespace QSLeaderboard.UI.Leaderboard
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            if (!this.isActiveAndEnabled) return;
+            if (!base.isActiveAndEnabled) return;
             if (!_plvc) return;
-            OnLeaderboardSet(currentDifficultyBeatmap);
+
+            if (currentDifficultyBeatmap != null) OnLeaderboardSet(currentDifficultyBeatmap);
             if (firstActivation)
             {
                 _playerUtils.GetAuthStatus(result =>
@@ -193,6 +169,8 @@ namespace QSLeaderboard.UI.Leaderboard
 
                     if (isAuthenticated)
                     {
+                        Plugin.Authed = true;
+                        Plugin.userName = username;
                         Plugin.Log.Info("Authenticated! Username: " + username);
                         _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
@@ -207,8 +185,12 @@ namespace QSLeaderboard.UI.Leaderboard
 
 
                 _panelView.currentRank.text = $"Current Rank: #1";
-
                 _panelView.isMapRanked.text = $"Ranked Status: Ranked";
+
+                if(Plugin.Authed)
+                {
+                    OnLeaderboardSet(currentDifficultyBeatmap);
+                }
             }
         }
 
@@ -225,8 +207,13 @@ namespace QSLeaderboard.UI.Leaderboard
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
+
+            if (!Plugin.Authed) return;
+
             currentDifficultyBeatmap = difficultyBeatmap;
             
+            loadingLB.gameObject.SetActive(true);
+            leaderboardTableView.SetScores(null, -1);
             errorText.gameObject.SetActive(false);
 
 
@@ -236,42 +223,39 @@ namespace QSLeaderboard.UI.Leaderboard
             string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
 
-            Plugin.Log.Info("BEFORE REQUEST");
-            _requestUtils.GetBeatMapData(balls, result =>
+            _requestUtils.GetBeatMapData(balls, page, result =>
             {
-                UnityMainThreadTaskScheduler.Factory.StartNew((Action)(() =>
+                UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     if (!_plvc || !_plvc.isActiveAndEnabled) return;
-                    Plugin.Log.Info("WITHIN RESULT");
-                    if (!result.Item1)
+                    if (result.Item2 != null)
                     {
-                        Plugin.Log.Info("NO SCORES FOUND");
-                        errorText.gameObject.SetActive(true);
-                    }
-                    else if (result.Item2 != null)
-                    {
-                        if(result.Item2.Count == 0)
+                        if (result.Item2.Count == 0)
                         {
                             leaderboardTableView.SetScores(null, -1);
                             errorText.gameObject.SetActive(true);
                         }
                         else
                         {
-                            leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, 1), -1);
+                            leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
                             RichMyText(leaderboardTableView);
+                            loadingLB.gameObject.SetActive(false);   
                         }
                     }
-                }));
+                    else
+                    {
+                        loadingLB.gameObject.SetActive(false);
+                        leaderboardTableView.SetScores(null, -1);
+                        errorText.gameObject.SetActive(true);
+                    }
+                });
             });
-
-            Plugin.Log.Info("AFTER REQUEST");
         }
 
         void RichMyText(LeaderboardTableView tableView) 
         {
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
             {
-                Plugin.Log.Info("RICHMYTEXT");
                 cell.showSeparator = true;
                 var nameText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText");
                 var rankText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText");
@@ -299,7 +283,7 @@ namespace QSLeaderboard.UI.Leaderboard
             {
                 Plugin.Log.Notice($"Creating LB DATA at - {i}");
                 int score = leaderboard[i].score;
-                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + 1, score));
+                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + (page * 10) + 1, score));
             }
 
             return tableData;
@@ -321,7 +305,6 @@ namespace QSLeaderboard.UI.Leaderboard
 
             result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedMods + "</size>";
 
-            Plugin.Log.Notice(result);
             return new ScoreData(score, result, rank, false);
         }
     }

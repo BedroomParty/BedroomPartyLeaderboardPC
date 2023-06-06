@@ -24,6 +24,7 @@ namespace QSLeaderboard.Utils
             var steamName = "loser";
             //steamID = Steamworks.SteamUser.GetSteamID().ToString();
             //steamName = Steamworks.SteamFriends.GetPersonaName();
+            Plugin.userID = steamID;
             return (steamID, steamName);
         }
 
@@ -40,8 +41,14 @@ namespace QSLeaderboard.Utils
             else
             {
                 Plugin.Log.Info("OCULUS USER");
-                Oculus.Platform.Users.GetLoggedInUser().OnComplete(user => taskCompletionSource.SetResult((user.Data.ID.ToString(), user.Data.OculusID)));
+
+                Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
+                {
+                    Plugin.userID = user.Data.ID.ToString();
+                    taskCompletionSource.SetResult((user.Data.ID.ToString(), user.Data.OculusID));
+                });
             }
+        
             return taskCompletionSource.Task;
         }
 

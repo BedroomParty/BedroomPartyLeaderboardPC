@@ -60,6 +60,7 @@
 				  italics="true"
 				  color="red"
 				  active="false"/>
+			<loading anchor-pos-x="-5" align="Center" active="false" id="loadingLB" pref-width='20' pref-height='20' preserve-aspect='true'/>
 			<modal child-expand-height="false" id='infoModal' show-event='showInfoModal' hide-event='hideInfoModal' size-delta-x='80' size-delta-y='55' clickerino-offerino-closerino='true'
 					move-to-center='true'>
 				<vertical spacing='1'

@@ -7,6 +7,7 @@ namespace QSLeaderboard.Utils
     {
         public struct LeaderboardEntry
         {
+            public int rank;
             public string userID;
             public string userName;
             public int missCount;
@@ -16,8 +17,9 @@ namespace QSLeaderboard.Utils
             public int score;
             public string mods;
 
-            public LeaderboardEntry(string userID, string userName, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
+            public LeaderboardEntry(int rank, string userID, string userName, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
             {
+                this.rank = rank;
                 this.userID = userID;
                 this.userName = userName;
                 this.missCount = missCount;
@@ -38,6 +40,7 @@ namespace QSLeaderboard.Utils
             foreach (var scoreData in jsonArray)
             {
                 Plugin.Log.Info("IM LOADING BEATMAP INFO");
+                int? rank = scoreData["Rank"]?.Value<int>();
                 string userID = scoreData["UserID"]?.Value<string>();
                 string userName = scoreData["Username"]?.Value<string>();
                 int? missCount = scoreData["Misses"]?.Value<int>();
@@ -57,6 +60,7 @@ namespace QSLeaderboard.Utils
                 Plugin.Log.Info($"modifiers - {modifiers}");
 
                 leaderboard.Add(new LeaderboardEntry(
+                    rank ?? 0,
                     userID ?? "balls",
                     userName ?? "balls",
                     missCount ?? 0,
