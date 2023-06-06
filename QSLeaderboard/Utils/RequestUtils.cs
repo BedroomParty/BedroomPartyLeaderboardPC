@@ -1,4 +1,5 @@
-﻿using QSLeaderboard.UI.Leaderboard;
+﻿using IPA.Utilities.Async;
+using QSLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +27,14 @@ namespace QSLeaderboard.Utils
                     if (isSuccessful)
                     {
                         var jsonResponse = await response.Content.ReadAsStringAsync();
-                        Plugin.Log.Info($"{jsonResponse}"); 
+                        Plugin.Log.Info($"{jsonResponse}");
                         var leaderboardData = _leaderboardData.LoadBeatMapInfo(jsonResponse);
                         callback((isSuccessful, leaderboardData));
                     }
                     else
                     {
-                        Plugin.Log.Info("error");
-                        callback((isSuccessful, default));
+                        Plugin.Log.Info("Map Not found");
+                        callback((isSuccessful, null));
                     }
                 }
                 catch (HttpRequestException)
@@ -46,7 +47,7 @@ namespace QSLeaderboard.Utils
 
         public void GetBeatMapData(string balls, Action<(bool, List<LeaderboardData.LeaderboardEntry>)> callback)
         {
-            Task.Run(() => GetLeaderboardData(balls, callback));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, callback));
         }
     }
 }

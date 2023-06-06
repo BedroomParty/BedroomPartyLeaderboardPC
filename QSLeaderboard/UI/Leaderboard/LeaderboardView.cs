@@ -11,6 +11,7 @@ using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
+using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
 using QSLeaderboard.Utils;
 using TMPro;
@@ -18,6 +19,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static LeaderboardTableView;
 using Button = UnityEngine.UI.Button;
 
 namespace QSLeaderboard.UI.Leaderboard
@@ -31,6 +33,44 @@ namespace QSLeaderboard.UI.Leaderboard
         [Inject] PanelView _panelView;
         [Inject] RequestUtils _requestUtils;
         [Inject] LeaderboardData _leaderboardData;
+
+        List<LeaderboardData.LeaderboardEntry> leaderboardDataTEST = new List<LeaderboardData.LeaderboardEntry>
+        {
+            new LeaderboardData.LeaderboardEntry
+            (
+                "123456789",
+                "speeicl",
+                10,
+                20,
+                0f,
+                true,
+                5151112,
+                "FM"
+            ),
+            new LeaderboardData.LeaderboardEntry
+            (
+                "123456789",
+                "nugg",
+                10,
+                20,
+                0f,
+                true,
+                1234,
+                "NM"
+            ),
+            new LeaderboardData.LeaderboardEntry
+            (
+                "123456789",
+                "Player1",
+                10,
+                20,
+                0f,
+                true,
+                1234567,
+                "NM"
+            )
+        };
+
 
         public int page = 0;
         public int totalPages;
@@ -184,24 +224,105 @@ namespace QSLeaderboard.UI.Leaderboard
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
+            if (!_plvc || !_plvc.isActiveAndEnabled) return;
             currentDifficultyBeatmap = difficultyBeatmap;
+            
+            errorText.gameObject.SetActive(false);
+
+
             string mapId = difficultyBeatmap.level.levelID;
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
+
             Plugin.Log.Info("BEFORE REQUEST");
             _requestUtils.GetBeatMapData(balls, result =>
             {
-                leaderboardTableView.SetScores(_leaderboardData.CreateLeaderboardData(result.Item2, 1), -1);
-                Plugin.Log.Info("WITHIN RESULT");
-                if (!result.Item1)
+                UnityMainThreadTaskScheduler.Factory.StartNew((Action)(() =>
                 {
-                    Plugin.Log.Info("NO SCORES FOUND");
-                    errorText.gameObject.SetActive(true);
-                }
+                    if (!_plvc || !_plvc.isActiveAndEnabled) return;
+                    Plugin.Log.Info("WITHIN RESULT");
+                    if (!result.Item1)
+                    {
+                        Plugin.Log.Info("NO SCORES FOUND");
+                        errorText.gameObject.SetActive(true);
+                    }
+                    else if (result.Item2 != null)
+                    {
+                        if(result.Item2.Count == 0)
+                        {
+                            leaderboardTableView.SetScores(null, -1);
+                            errorText.gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, 1), -1);
+                            RichMyText(leaderboardTableView);
+                        }
+                    }
+                }));
             });
+
             Plugin.Log.Info("AFTER REQUEST");
+        }
+
+        void RichMyText(LeaderboardTableView tableView) 
+        {
+            foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
+            {
+                Plugin.Log.Info("RICHMYTEXT");
+                cell.showSeparator = true;
+                var nameText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText");
+                var rankText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText");
+                var scoreText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText");
+                nameText.richText = true;
+            }
+        }
+
+        public List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page)
+        {
+            Plugin.Log.Notice("Creating LB DATA");
+            List<ScoreData> tableData = new List<ScoreData>();
+            /*
+            int pageIndex = page * 10;
+            for (int i = pageIndex; i < leaderboard.Count && i < pageIndex + 10; i++)
+            {
+
+                Plugin.Log.Notice($"Creating LB DATA at - {i}");
+                int score = leaderboard[i].score;
+                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + 1, score));
+            }
+            */
+
+            for (int i = 0; i < leaderboard.Count; i++)
+            {
+                Plugin.Log.Notice($"Creating LB DATA at - {i}");
+                int score = leaderboard[i].score;
+                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + 1, score));
+            }
+
+            return tableData;
+        }
+
+        public ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int rank, int score)
+        {
+
+            Plugin.Log.Notice("Creating LB ENTRY");
+
+            string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
+            string formattedCombo = "";
+            if (entry.fullCombo) formattedCombo = " -<color=green> FC </color>";
+            else formattedCombo = string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
+
+            string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
+
+            string result;
+
+            result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedMods + "</size>";
+
+            Plugin.Log.Notice(result);
+            return new ScoreData(score, result, rank, false);
         }
     }
 }

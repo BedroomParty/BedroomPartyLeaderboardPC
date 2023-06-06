@@ -1,11 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LeaderboardTableView;
 
 namespace QSLeaderboard.Utils
 {
@@ -35,23 +29,32 @@ namespace QSLeaderboard.Utils
             }
         }
 
-        public  List<LeaderboardEntry> LoadBeatMapInfo(string json)
+        public List<LeaderboardEntry> LoadBeatMapInfo(string json)
         {
             var leaderboard = new List<LeaderboardEntry>();
 
-            var jsonObject = JObject.Parse(json);
+            JArray jsonArray = JArray.Parse(json);
 
-            foreach (var scoreData in jsonObject)
+            foreach (var scoreData in jsonArray)
             {
                 Plugin.Log.Info("IM LOADING BEATMAP INFO");
-                string userID = scoreData.Value["userID"]?.Value<string>();
-                string userName = scoreData.Value["username"]?.Value<string>();
-                int? missCount = scoreData.Value["misses"]?.Value<int>();
-                int? badCutCount = scoreData.Value["badCuts"]?.Value<int>();
-                float? acc = scoreData.Value["accuracy"]?.Value<float>();
-                bool? fullCombo = scoreData.Value["fullCombo"]?.Value<bool>();
-                int? score = scoreData.Value["score"]?.Value<int>();
-                string modifiers = scoreData.Value["modifiers"]?.Value<string>();
+                string userID = scoreData["UserID"]?.Value<string>();
+                string userName = scoreData["Username"]?.Value<string>();
+                int? missCount = scoreData["Misses"]?.Value<int>();
+                int? badCutCount = scoreData["BadCuts"]?.Value<int>();
+                float? acc = scoreData["Accuracy"]?.Value<float>();
+                bool? fullCombo = scoreData["FullCombo"]?.Value<bool>();
+                int? score = scoreData["Score"]?.Value<int>();
+                string modifiers = scoreData["Modifiers"]?.Value<string>();
+
+                Plugin.Log.Info($"userID - {userID}");
+                Plugin.Log.Info($"userName - {userName}");
+                Plugin.Log.Info($"missCount - {missCount}");
+                Plugin.Log.Info($"badCutCount - {badCutCount}");
+                Plugin.Log.Info($"acc - {acc}");
+                Plugin.Log.Info($"fullCombo - {fullCombo}");
+                Plugin.Log.Info($"score - {score}");
+                Plugin.Log.Info($"modifiers - {modifiers}");
 
                 leaderboard.Add(new LeaderboardEntry(
                     userID ?? "balls",
@@ -69,35 +72,5 @@ namespace QSLeaderboard.Utils
         }
 
 
-        public List<ScoreData> CreateLeaderboardData(List<LeaderboardEntry> leaderboard, int page)
-        {
-            List<ScoreData> tableData = new List<ScoreData>();
-            int pageIndex = page * 10;
-            for (int i = pageIndex; i < leaderboard.Count && i < pageIndex + 10; i++)
-            {
-                Plugin.Log.Notice("Creating LB DATA");
-                int score = leaderboard[i].score;
-                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + 1, score));
-            }
-            return tableData;
-        }
-
-        public ScoreData CreateLeaderboardEntryData(LeaderboardEntry entry, int rank, int score)
-        {
-            string formattedUsername = $"{entry.userName}";
-
-            string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
-            score = entry.score;
-            string formattedCombo = "";
-            if (entry.fullCombo) formattedCombo = " -<color=green> FC </color>";
-            else formattedCombo = string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
-
-            string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
-
-            string result;
-
-            result = "<size=100%>" + formattedUsername + formattedAcc + formattedCombo + formattedMods + "</size>";
-            return new ScoreData(score, result, rank, false);
-        }
     }
 }
