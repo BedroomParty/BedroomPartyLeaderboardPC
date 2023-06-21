@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using QSLeaderboard.UI.Leaderboard;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,7 +27,6 @@ namespace QSLeaderboard.Utils
         {
             using (var httpClient = new HttpClient())
             {
-                var url = $"http://168.138.9.99:5000/api/leaderboard/scores";
                 try
                 {
                     Plugin.Log.Info("GETLEADERBOARDDATA");
@@ -37,7 +37,7 @@ namespace QSLeaderboard.Utils
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
 
-                    HttpResponseMessage response = await httpClient.PostAsync(url, content);
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_DOWNLOAD_END_POINT, content);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -95,7 +95,6 @@ namespace QSLeaderboard.Utils
             _panelView.promptText.text = "Uploading Score...";
             using (var httpClient = new HttpClient())
             {
-                var url = $"http://168.138.9.99:5000/api/leaderboard/upload";
                 try
                 {
                     Plugin.Log.Info("UPLOAD LEADERBOARDDATA");
@@ -109,7 +108,7 @@ namespace QSLeaderboard.Utils
 
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await httpClient.PostAsync(url, content);
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT, content);
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
@@ -117,7 +116,7 @@ namespace QSLeaderboard.Utils
                         Plugin.Log.Info($"{jsonResponse}");
                         callback(response.IsSuccessStatusCode);
                         _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=green>Successfully uploaded score!</score>";
+                        _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
                         await Task.Delay(3000);
                         _panelView.promptText.gameObject.SetActive(false);
                         _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
@@ -128,7 +127,7 @@ namespace QSLeaderboard.Utils
                         Plugin.Log.Info("Map Not found");
                         callback(response.IsSuccessStatusCode);
                         _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=red>Failed to upload score</score>";
+                        _panelView.promptText.text = "<color=red>Failed to upload score</color>";
                         await Task.Delay(3000);
                         _panelView.promptText.gameObject.SetActive(false);
                         _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
@@ -140,7 +139,7 @@ namespace QSLeaderboard.Utils
                     Plugin.Log.Error("EXCEPTION: " + e.ToString());
                     callback(false);
                     _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = "<color=red>EXCEPTION ERROR</score>";
+                    _panelView.promptText.text = "<color=red>EXCEPTION ERROR</color>";
                     await Task.Delay(3000);
                     _panelView.promptText.gameObject.SetActive(false);
                 }

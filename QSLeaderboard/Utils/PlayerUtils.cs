@@ -65,7 +65,6 @@ namespace QSLeaderboard.Utils
             _panelView.promptText.text = "Authenticating...";
             (string id, string username) = await GetPlayerInfo();
 
-            const string url = "http://168.138.9.99:5000/api/login/";
             _leaderboardView.userIDHere.text = id;
             var idBytes = Encoding.UTF8.GetBytes(id);
             var authKey = Convert.ToBase64String(idBytes);
@@ -83,7 +82,7 @@ namespace QSLeaderboard.Utils
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
 
-                    HttpResponseMessage response = await httpClient.PostAsync(url, content);
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.authEndPoint, content);
                     bool isAuthed = response.StatusCode == HttpStatusCode.OK;
                     await Task.Delay(2000);
                     callback((isAuthed, username));
