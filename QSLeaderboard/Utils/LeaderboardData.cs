@@ -39,7 +39,6 @@ namespace QSLeaderboard.Utils
 
             foreach (var scoreData in jsonArray)
             {
-                Plugin.Log.Info("IM LOADING BEATMAP INFO");
                 int? rank = scoreData["Rank"]?.Value<int>();
                 string userID = scoreData["UserID"]?.Value<string>();
                 string userName = scoreData["Username"]?.Value<string>();
@@ -50,14 +49,14 @@ namespace QSLeaderboard.Utils
                 int? score = scoreData["Score"]?.Value<int>();
                 string modifiers = scoreData["Modifiers"]?.Value<string>();
 
-                Plugin.Log.Info($"userID - {userID}");
-                Plugin.Log.Info($"userName - {userName}");
-                Plugin.Log.Info($"missCount - {missCount}");
-                Plugin.Log.Info($"badCutCount - {badCutCount}");
-                Plugin.Log.Info($"acc - {acc}");
-                Plugin.Log.Info($"fullCombo - {fullCombo}");
-                Plugin.Log.Info($"score - {score}");
-                Plugin.Log.Info($"modifiers - {modifiers}");
+                //Plugin.Log.Info($"userID - {userID}");
+                //Plugin.Log.Info($"userName - {userName}");
+                //Plugin.Log.Info($"missCount - {missCount}");
+                //Plugin.Log.Info($"badCutCount - {badCutCount}");
+                //Plugin.Log.Info($"acc - {acc}");
+                //Plugin.Log.Info($"fullCombo - {fullCombo}");
+                //Plugin.Log.Info($"score - {score}");
+                //Plugin.Log.Info($"modifiers - {modifiers}");
 
                 leaderboard.Add(new LeaderboardEntry(
                     rank ?? 0,

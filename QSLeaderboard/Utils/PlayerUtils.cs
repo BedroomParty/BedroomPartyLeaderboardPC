@@ -27,26 +27,22 @@ namespace QSLeaderboard.Utils
         {
             var steamID = "0";
             var steamName = "loser";
-            steamID = Steamworks.SteamUser.GetSteamID().ToString();
-            steamName = Steamworks.SteamFriends.GetPersonaName();
+            //steamID = Steamworks.SteamUser.GetSteamID().ToString();
+            //steamName = Steamworks.SteamFriends.GetPersonaName();
             Plugin.userID = steamID;
             return (steamID, steamName);
         }
 
         public Task<(string, string)> GetPlayerInfo()
         {
-            Plugin.Log.Info("COLLECTING PLAYER INFO");
             TaskCompletionSource<(string, string)> taskCompletionSource = new TaskCompletionSource<(string, string)>();
             if (File.Exists(Constants.STEAM_API_PATH))
             {
-                Plugin.Log.Info("STEAM USER");
                 (string steamID, string steamName) = OculusSkillIssue();
                 taskCompletionSource.SetResult((steamID, steamName));
             }
             else
             {
-                Plugin.Log.Info("OCULUS USER");
-
                 Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
                 {
                     Plugin.userID = user.Data.ID.ToString();
@@ -82,7 +78,7 @@ namespace QSLeaderboard.Utils
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
 
-                    HttpResponseMessage response = await httpClient.PostAsync(Constants.authEndPoint, content);
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
                     bool isAuthed = response.StatusCode == HttpStatusCode.OK;
                     await Task.Delay(2000);
                     callback((isAuthed, username));

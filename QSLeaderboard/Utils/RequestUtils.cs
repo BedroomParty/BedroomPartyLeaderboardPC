@@ -29,7 +29,6 @@ namespace QSLeaderboard.Utils
             {
                 try
                 {
-                    Plugin.Log.Info("GETLEADERBOARDDATA");
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                     string requestBody = getLBDownloadJSON(balls, page, 10);
 
@@ -42,14 +41,12 @@ namespace QSLeaderboard.Utils
                     if (response.IsSuccessStatusCode)
                     {
                         var jsonResponse = await response.Content.ReadAsStringAsync();
-                        Plugin.Log.Info($"{jsonResponse}");
                         var leaderboardData = _leaderboardData.LoadBeatMapInfo(jsonResponse);
                         callback((response.IsSuccessStatusCode, leaderboardData));
                         return;
                     }
                     else
                     {
-                        Plugin.Log.Info("Map Not found");
                         callback((response.IsSuccessStatusCode, null));
                         return;
                     }
@@ -82,14 +79,12 @@ namespace QSLeaderboard.Utils
 
         public void SetBeatMapData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
         {
-            Plugin.Log.Info("SetBeatMapData");
             UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback));
         }
 
 
         private async Task UploadLeaderboardData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
         {
-            Plugin.Log.Info("UploadLeaderboardData");
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
             _panelView.promptText.text = "Uploading Score...";
@@ -97,7 +92,6 @@ namespace QSLeaderboard.Utils
             {
                 try
                 {
-                    Plugin.Log.Info("UPLOAD LEADERBOARDDATA");
                     _leaderboardView.userIDHere.text = userID;
                     var idBytes = Encoding.UTF8.GetBytes(userID);
                     var authKey = Convert.ToBase64String(idBytes);
@@ -113,7 +107,6 @@ namespace QSLeaderboard.Utils
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
                         var jsonResponse = await response.Content.ReadAsStringAsync();
-                        Plugin.Log.Info($"{jsonResponse}");
                         callback(response.IsSuccessStatusCode);
                         _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
@@ -124,7 +117,6 @@ namespace QSLeaderboard.Utils
                     }
                     else
                     {
-                        Plugin.Log.Info("Map Not found");
                         callback(response.IsSuccessStatusCode);
                         _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.text = "<color=red>Failed to upload score</color>";
