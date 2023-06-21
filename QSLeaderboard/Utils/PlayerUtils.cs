@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 using Zenject;
 
 namespace QSLeaderboard.Utils
@@ -22,8 +24,8 @@ namespace QSLeaderboard.Utils
         {
             var steamID = "0";
             var steamName = "loser";
-            //steamID = Steamworks.SteamUser.GetSteamID().ToString();
-            //steamName = Steamworks.SteamFriends.GetPersonaName();
+            steamID = Steamworks.SteamUser.GetSteamID().ToString();
+            steamName = Steamworks.SteamFriends.GetPersonaName();
             Plugin.userID = steamID;
             return (steamID, steamName);
         }
@@ -52,20 +54,34 @@ namespace QSLeaderboard.Utils
             return taskCompletionSource.Task;
         }
 
+
         private async Task GetAuth(Action<(bool, string)> callback)
         {
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
             _panelView.promptText.text = "Authenticating...";
             (string id, string username) = await GetPlayerInfo();
+
+            const string url = "http://168.138.9.99:5000/api/login/";
+            _leaderboardView.userIDHere.text = id;
+            var idBytes = Encoding.UTF8.GetBytes(id);
+            var authKey = Convert.ToBase64String(idBytes);
+
+
             using (var httpClient = new HttpClient())
             {
-                var url = $"http://168.138.9.99:5000/api/login?id={id}";
                 try
                 {
-                    _leaderboardView.userIDHere.text = id;
-                    var response = await httpClient.GetAsync(url);
-                    bool isAuthed = response.StatusCode == System.Net.HttpStatusCode.OK;
+                    httpClient.DefaultRequestHeaders.Add("Authorization", authKey);
+                    httpClient.DefaultRequestHeaders.Add("Content-Type", "application/json");
+                    string requestBody = $"{{\"ID\": \"{id}\"}}";
+
+
+                    HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+
+                    HttpResponseMessage response = await httpClient.PostAsync(url, content);
+                    bool isAuthed = response.StatusCode == HttpStatusCode.OK;
                     await Task.Delay(2000);
                     callback((isAuthed, username));
                     await Task.Delay(3000);
