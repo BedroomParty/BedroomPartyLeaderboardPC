@@ -38,7 +38,7 @@ namespace QSLeaderboard.UI.Leaderboard
         public int totalPages;
         public int sortMethod;
 
-        private IDifficultyBeatmap currentDifficultyBeatmap;
+        public IDifficultyBeatmap currentDifficultyBeatmap;
 
         [UIComponent("leaderboardTableView")]
         private LeaderboardTableView leaderboardTableView = null;
@@ -68,12 +68,10 @@ namespace QSLeaderboard.UI.Leaderboard
         private GameObject loadingLB;
 
         [UIAction("OnPageUp")]
-        public void OnPageUp(bool tooFar)
+        public void OnPageUp()
         {
             page--;
-            if (tooFar) totalPages = page;
             UpdatePageChanged();
-            UpdatePageButtons();
         }
 
         [UIAction("OnPageDown")]
@@ -81,7 +79,6 @@ namespace QSLeaderboard.UI.Leaderboard
         {
             page++;
             UpdatePageChanged();
-            UpdatePageButtons();
         }
 
         [UIParams]
@@ -130,7 +127,6 @@ namespace QSLeaderboard.UI.Leaderboard
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
         {
             sortMethod = index;
-            OnLeaderboardSet(currentDifficultyBeatmap);
         }
 
         [UIValue("leaderboardIcons")]
@@ -159,7 +155,6 @@ namespace QSLeaderboard.UI.Leaderboard
             if (!base.isActiveAndEnabled) return;
             if (!_plvc) return;
 
-            if (currentDifficultyBeatmap != null) OnLeaderboardSet(currentDifficultyBeatmap);
             if (firstActivation)
             {
                 _playerUtils.GetAuthStatus(result =>
@@ -174,6 +169,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         Plugin.Log.Info("Authenticated! Username: " + username);
                         _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
+                        if (currentDifficultyBeatmap != null) OnLeaderboardSet(currentDifficultyBeatmap);
                     }
                     else
                     {
@@ -182,15 +178,8 @@ namespace QSLeaderboard.UI.Leaderboard
                         Plugin.Log.Error("Not authenticated! Username: " + username);
                     }
                 });
-
-
                 _panelView.currentRank.text = $"Current Rank: #1";
                 _panelView.isMapRanked.text = $"Ranked Status: Ranked";
-
-                if(Plugin.Authed)
-                {
-                    OnLeaderboardSet(currentDifficultyBeatmap);
-                }
             }
         }
 
@@ -199,6 +188,7 @@ namespace QSLeaderboard.UI.Leaderboard
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
+            page = 0;
             if (!_plvc) return;
             if (!_plvc.isActivated) return;
             parserParams.EmitEvent("hideInfoModal");
@@ -206,11 +196,18 @@ namespace QSLeaderboard.UI.Leaderboard
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
+            currentDifficultyBeatmap = difficultyBeatmap;
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
 
-            if (!Plugin.Authed) return;
+            if (!Plugin.Authed)
+            {
+                errorText.gameObject.SetActive(true);
+                errorText.text = "Unable to authenticate, please restart";
+                return;
+            }
 
-            currentDifficultyBeatmap = difficultyBeatmap;
+            Plugin.Log.Info($"Page = {page}");
+
             
             loadingLB.gameObject.SetActive(true);
             leaderboardTableView.SetScores(null, -1);
@@ -222,6 +219,10 @@ namespace QSLeaderboard.UI.Leaderboard
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
+            if(page < 0)
+            {
+                page = 0;
+            }
 
             _requestUtils.GetBeatMapData(balls, page, result =>
             {

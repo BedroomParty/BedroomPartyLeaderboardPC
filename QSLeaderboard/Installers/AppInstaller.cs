@@ -13,8 +13,7 @@ namespace QSLeaderboard.Installers
     {
         public override void InstallBindings()
         {
-            Container.Bind<RequestUtils>().AsSingle();
-            Container.BindInterfacesTo<Results>().AsSingle();
+            //Container.Bind<RequestUtils>().AsSingle();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using IPA.Utilities.Async;
+using Newtonsoft.Json.Linq;
 using QSLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Playables;
 using Zenject;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QSLeaderboard.Utils
 {
@@ -72,9 +75,9 @@ namespace QSLeaderboard.Utils
             {
                 try
                 {
-                    httpClient.DefaultRequestHeaders.Add("Authorization", authKey);
-                    httpClient.DefaultRequestHeaders.Add("Content-Type", "application/json");
-                    string requestBody = $"{{\"ID\": \"{id}\"}}";
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                    string requestBody = getLoginString(id);
 
 
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
@@ -95,6 +98,17 @@ namespace QSLeaderboard.Utils
                     callback((false, username));
                 }
             }
+        }
+
+        private string getLoginString(string id)
+        {
+            var Data = new JObject
+            {
+                { "ID", id }
+            };
+
+            return Data.ToString();
+            return string.Empty;
         }
 
         public void GetAuthStatus(Action<(bool, string)> callback)

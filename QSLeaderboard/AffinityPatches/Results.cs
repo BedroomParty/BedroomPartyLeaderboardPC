@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 namespace QSLeaderboard.AffinityPatches
@@ -104,11 +105,14 @@ namespace QSLeaderboard.AffinityPatches
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = playerLevelStats.beatmapCharacteristic.serializedName;
 
-            string balls = mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+            string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
             string mods = GetModifiersString(levelCompletionResults);
 
-            _requestUtils.PushLBData(balls, Plugin.userID, Plugin.userName, badCut, misses, fc, acc, score, mods);
+            _requestUtils.SetBeatMapData(balls, Plugin.userID, Plugin.userName, badCut, misses, fc, acc, score, mods, result =>
+            {
+                Plugin.Log.Info("_requestUtils.SetBeatMapData");
+            });
         }
     }
 }

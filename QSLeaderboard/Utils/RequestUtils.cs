@@ -1,4 +1,5 @@
 ﻿using IPA.Utilities.Async;
+using Newtonsoft.Json.Linq;
 using QSLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using UnityEngine.Playables;
 using Zenject;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QSLeaderboard.Utils
 {
@@ -23,44 +26,52 @@ namespace QSLeaderboard.Utils
         {
             using (var httpClient = new HttpClient())
             {
-                var url = $"http://168.138.9.99:5000/api/leaderboard?hash={balls}&page={page}";
+                var url = $"http://168.138.9.99:5000/api/leaderboard/scores";
                 try
                 {
                     Plugin.Log.Info("GETLEADERBOARDDATA");
-                    var response = await httpClient.GetAsync(url);
-
-                    bool tooFar = response.StatusCode == System.Net.HttpStatusCode.Gone;
-                    bool isSuccessful = response.StatusCode == System.Net.HttpStatusCode.OK;
-
-                    if (tooFar)
-                    {
-                        _leaderboardView.OnPageUp(tooFar);
-                        callback((false, null));
-                        return;
-                    }
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                    string requestBody = getLBDownloadJSON(balls, page, 10);
 
 
-                    if (isSuccessful)
+                    HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+
+                    HttpResponseMessage response = await httpClient.PostAsync(url, content);
+
+                    if (response.IsSuccessStatusCode)
                     {
                         var jsonResponse = await response.Content.ReadAsStringAsync();
                         Plugin.Log.Info($"{jsonResponse}");
                         var leaderboardData = _leaderboardData.LoadBeatMapInfo(jsonResponse);
-                        callback((isSuccessful, leaderboardData));
+                        callback((response.IsSuccessStatusCode, leaderboardData));
                         return;
                     }
                     else
                     {
                         Plugin.Log.Info("Map Not found");
-                        callback((isSuccessful, null));
+                        callback((response.IsSuccessStatusCode, null));
                         return;
                     }
                 }
-                catch (HttpRequestException)
+                catch (HttpRequestException e)
                 {
-                    Plugin.Log.Error("EXCEPTION");
+                    Plugin.Log.Error("EXCEPTION: " +  e.ToString());
                     callback((false, null));
                 }
             }
+        }
+
+        private string getLBDownloadJSON(string balls, int page, int limit)
+        {
+            var Data = new JObject
+            {
+                { "limit", limit },
+                { "page", page },
+                { "hash", balls },
+            };
+            return Data.ToString();
+            return string.Empty;
         }
 
         public void GetBeatMapData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>)> callback)
@@ -69,52 +80,89 @@ namespace QSLeaderboard.Utils
         }
 
 
-        public void PushLBData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods)
+        public void SetBeatMapData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
         {
-            Plugin.Log.Info("PushLBData");
-            _panelView.promptText.text = "Saving...";
-            _panelView.promptText.gameObject.SetActive(true);
+            Plugin.Log.Info("SetBeatMapData");
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback));
+        }
+
+
+        private async Task UploadLeaderboardData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
+        {
+            Plugin.Log.Info("UploadLeaderboardData");
             _panelView.prompt_loader.SetActive(true);
-
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://url");
-            httpWebRequest.ContentType = "application/json";
-            httpWebRequest.Method = "POST";
-
-            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            _panelView.promptText.gameObject.SetActive(true);
+            _panelView.promptText.text = "Uploading Score...";
+            using (var httpClient = new HttpClient())
             {
-                string json = new JavaScriptSerializer().Serialize(new
+                var url = $"http://168.138.9.99:5000/api/leaderboard/upload";
+                try
                 {
-                    hash = balls,
-                    UserID = userID,
-                    Username = username,
-                    BadCuts = badCuts,
-                    Misses = misses,
-                    FullCombo = fullCOmbo,
-                    Accuracy = acc,
-                    Score = score,
-                    Modifiers = mods
-                });
+                    Plugin.Log.Info("UPLOAD LEADERBOARDDATA");
+                    _leaderboardView.userIDHere.text = userID;
+                    var idBytes = Encoding.UTF8.GetBytes(userID);
+                    var authKey = Convert.ToBase64String(idBytes);
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                    string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
 
-                streamWriter.Write(json);
+
+                    HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await httpClient.PostAsync(url, content);
+
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var jsonResponse = await response.Content.ReadAsStringAsync();
+                        Plugin.Log.Info($"{jsonResponse}");
+                        callback(response.IsSuccessStatusCode);
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = "<color=green>Successfully uploaded score!</score>";
+                        await Task.Delay(3000);
+                        _panelView.promptText.gameObject.SetActive(false);
+                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                        return;
+                    }
+                    else
+                    {
+                        Plugin.Log.Info("Map Not found");
+                        callback(response.IsSuccessStatusCode);
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = "<color=red>Failed to upload score</score>";
+                        await Task.Delay(3000);
+                        _panelView.promptText.gameObject.SetActive(false);
+                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                        return;
+                    }
+                }
+                catch (HttpRequestException e)
+                {
+                    Plugin.Log.Error("EXCEPTION: " + e.ToString());
+                    callback(false);
+                    _panelView.prompt_loader.SetActive(false);
+                    _panelView.promptText.text = "<color=red>EXCEPTION ERROR</score>";
+                    await Task.Delay(3000);
+                    _panelView.promptText.gameObject.SetActive(false);
+                }
             }
+        }
 
-            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-            
-            if(httpResponse.StatusCode == HttpStatusCode.OK)
+        private string getLBUploadJSON(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods)
+        {
+            var Data = new JObject
             {
-                _panelView.promptText.text = "<color=green>Successfully saved data!</color>";
-                _panelView.promptText.gameObject.SetActive(false);
-                _panelView.prompt_loader.SetActive(false);
-                Plugin.Log.Info("200 Response on post");
-            }
-            else
-            {
-                _panelView.promptText.text = "<color=red>Failed to save data!</color>";
-                _panelView.prompt_loader.SetActive(false);
-                _panelView.promptText.gameObject.SetActive(false);
-                Plugin.Log.Info("410 Response on post");
-            }
-
+                { "Hash", balls },
+                { "UserID", userID },
+                { "Username", username },
+                { "BadCuts", badCuts },
+                { "Misses", misses },
+                { "FullCombo", fullCOmbo },
+                { "Accuracy", acc },
+                { "Score", score },
+                { "Modifiers", mods },
+            };
+            return Data.ToString();
+            return string.Empty;
         }
 
     }

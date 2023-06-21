@@ -1,4 +1,5 @@
-﻿using QSLeaderboard.UI.Leaderboard;
+﻿using QSLeaderboard.AffinityPatches;
+using QSLeaderboard.UI.Leaderboard;
 using QSLeaderboard.Utils;
 using Zenject;
 
@@ -13,6 +14,7 @@ namespace QSLeaderboard.Installers
             Container.BindInterfacesTo<LeaderboardUtils>().AsSingle();
             Container.Bind<PlayerUtils>().AsSingle();
             Container.Bind<RequestUtils>().AsSingle();
+            Container.BindInterfacesTo<Results>().AsSingle();
             Container.Bind<LeaderboardData>().AsSingle();
         }
     }
