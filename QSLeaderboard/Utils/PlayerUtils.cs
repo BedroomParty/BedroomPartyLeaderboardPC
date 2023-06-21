@@ -27,8 +27,8 @@ namespace QSLeaderboard.Utils
         {
             var steamID = "0";
             var steamName = "loser";
-            //steamID = Steamworks.SteamUser.GetSteamID().ToString();
-            //steamName = Steamworks.SteamFriends.GetPersonaName();
+            steamID = Steamworks.SteamUser.GetSteamID().ToString();
+            steamName = Steamworks.SteamFriends.GetPersonaName();
             Plugin.userID = steamID;
             return (steamID, steamName);
         }
