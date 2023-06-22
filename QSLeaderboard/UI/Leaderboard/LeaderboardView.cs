@@ -16,6 +16,7 @@ using LeaderboardCore.Interfaces;
 using QSLeaderboard.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -34,11 +35,13 @@ namespace QSLeaderboard.UI.Leaderboard
         [Inject] RequestUtils _requestUtils;
         [Inject] LeaderboardData _leaderboardData;
 
-        public int page = 0;
-        public int totalPages;
-        public int sortMethod;
-
         public IDifficultyBeatmap currentDifficultyBeatmap;
+        public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
+
+
+        public static ImageView[] profileImageArray = new ImageView[10];
+
+        private Sprite transparentSprite;
 
         [UIComponent("leaderboardTableView")]
         private LeaderboardTableView leaderboardTableView = null;
@@ -58,6 +61,9 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIComponent("linkText")]
         public TextMeshProUGUI linkText;
 
+        [UIValue("imageHolders")]
+        [Inject] private List<ImageHolder> holders;
+
         [UIComponent("up_button")]
         private Button up_button;
 
@@ -67,33 +73,31 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIObject("loadingLB")]
         private GameObject loadingLB;
 
+        public int page = 0;
+        public int totalPages;
+        public int sortMethod;
+
         [UIAction("OnPageUp")]
-        public void OnPageUp()
-        {
-            page--;
-            UpdatePageChanged();
-        }
+        private void OnPageUp() => UpdatePageChanged(-1);
 
         [UIAction("OnPageDown")]
-        public void OnPageDown()
+        private void OnPageDown() => UpdatePageChanged(1);
+
+        private void UpdatePageChanged(int inc)
         {
-            page++;
-            UpdatePageChanged();
+            page = Mathf.Clamp(page + inc, 0, totalPages - 1);
+            UpdatePageButtons();
+            OnLeaderboardSet(currentDifficultyBeatmap);
+        }
+
+        private void UpdatePageButtons()
+        {
+            up_button.interactable = (page > 0);
+            down_button.interactable = (page < totalPages - 1);
         }
 
         [UIParams]
         BSMLParserParams parserParams;
-
-        public void UpdatePageButtons()
-        {
-            up_button.interactable = (page > 0);
-            down_button.interactable = (page < totalPages);
-        }
-
-        public void UpdatePageChanged()
-        {
-            OnLeaderboardSet(currentDifficultyBeatmap);
-        }
 
         private ImageView _imgView;
         private GameObject _loadingControl;
@@ -120,13 +124,48 @@ namespace QSLeaderboard.UI.Leaderboard
             ImageGradient(ref _imgView) = true;
 
             linkText.text = "Link your account with <size=110%><color=green>/link</color></size> in the QS server!";
-
         }
+
+        private async void SetProfileImage(string url, int index)
+        {
+            ImageView image = holders[index].profileImage;
+            GameObject loader = holders[index].profileloading;
+
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+            UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
+
+            while (!asyncOperation.isDone)
+            {
+                await Task.Delay(10);
+            }
+
+            if (request.responseCode == 200)
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(request);
+                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+
+                // Use Unity's main thread scheduler factory to update the image on the main thread
+                await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                {
+                    image.sprite = sprite;
+                    loader.SetActive(false);
+                });
+            }
+            else
+            {
+                Debug.LogError("Failed to retrieve profile image: " + request.error);
+            }
+
+            request.Dispose();
+        }
+
 
         [UIAction("OnIconSelected")]
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
         {
             sortMethod = index;
+            page = 0;
+            UpdatePageButtons();
         }
 
         [UIValue("leaderboardIcons")]
@@ -154,7 +193,6 @@ namespace QSLeaderboard.UI.Leaderboard
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
             if (!base.isActiveAndEnabled) return;
             if (!_plvc) return;
-
             if (firstActivation)
             {
                 _playerUtils.GetAuthStatus(result =>
@@ -169,7 +207,11 @@ namespace QSLeaderboard.UI.Leaderboard
                         Plugin.Log.Info("Authenticated! Username: " + username);
                         _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
-                        if (currentDifficultyBeatmap != null) OnLeaderboardSet(currentDifficultyBeatmap);
+                        if (currentDifficultyBeatmap != null)
+                        {
+                            OnLeaderboardSet(currentDifficultyBeatmap);
+                            UpdatePageButtons();
+                        }
                     }
                     else
                     {
@@ -180,6 +222,13 @@ namespace QSLeaderboard.UI.Leaderboard
                 });
                 _panelView.currentRank.text = $"Current Rank: #1";
                 _panelView.isMapRanked.text = $"Ranked Status: Ranked";
+                // Create a transparent texture with a size of 1x1
+                Texture2D texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+                texture.SetPixel(0, 0, new Color(1f, 1f, 1f, 0f)); // Set pixel color with alpha = 0 (transparent)
+                texture.Apply();
+
+                // Create a sprite using the transparent texture
+                transparentSprite = Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), Vector2.one * 0.5f);
             }
         }
 
@@ -196,6 +245,15 @@ namespace QSLeaderboard.UI.Leaderboard
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
+            bool shouldUpdatePage;
+            if(currentDifficultyBeatmap != difficultyBeatmap)
+            {
+                shouldUpdatePage = true;
+            }
+            else
+            {
+                shouldUpdatePage = false;
+            }
             currentDifficultyBeatmap = difficultyBeatmap;
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
 
@@ -206,11 +264,7 @@ namespace QSLeaderboard.UI.Leaderboard
                 return;
             }
 
-            Plugin.Log.Info($"Page = {page}");
-
-            
             loadingLB.gameObject.SetActive(true);
-            leaderboardTableView.SetScores(null, -1);
             errorText.gameObject.SetActive(false);
 
 
@@ -219,22 +273,21 @@ namespace QSLeaderboard.UI.Leaderboard
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
-            if(page < 0)
-            {
-                page = 0;
-            }
-
             _requestUtils.GetBeatMapData(balls, page, result =>
             {
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     if (!_plvc || !_plvc.isActiveAndEnabled) return;
+                    FuckOffImages();
+                    HelloLoadImages();
                     if (result.Item2 != null)
                     {
                         if (result.Item2.Count == 0)
                         {
                             leaderboardTableView.SetScores(null, -1);
                             errorText.gameObject.SetActive(true);
+                            FuckLoadImages();
+                            UpdatePageButtons();
                         }
                         else
                         {
@@ -248,9 +301,46 @@ namespace QSLeaderboard.UI.Leaderboard
                         loadingLB.gameObject.SetActive(false);
                         leaderboardTableView.SetScores(null, -1);
                         errorText.gameObject.SetActive(true);
+                        FuckLoadImages();
                     }
+                    SetProfiles(result.Item2);
                 });
             });
+            if (shouldUpdatePage)
+            {
+                _requestUtils.GetOverallData(balls, Plugin.userID, result =>
+                {
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                    {
+                        // rank result.Item1
+                        // totalPages result.Item2
+                        _panelView.currentRank.text = $"Current Rank: {result.Item1}";
+                        totalPages = result.Item2;
+                        Plugin.Log.Info("total Pages: " + totalPages.ToString());
+                        UpdatePageButtons();
+                    });
+                });
+            }
+        }
+
+        private void FuckOffImages() => holders.ForEach(holder => holder.profileImage.sprite = transparentSprite);
+        private void HelloLoadImages() => holders.ForEach(holder => holder.profileloading.SetActive(true));
+        private void FuckLoadImages() => holders.ForEach(holder => holder.profileloading.SetActive(false));
+
+
+
+        void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard)
+        {
+            for (int i = 0; i < leaderboard.Count; i++)
+            {
+                var url = $"{Constants.PROFILE_PICTURE}/{leaderboard[i].userID.ToString()}/avatar";
+                SetProfileImage(url, i);
+            }
+
+            for (int i = leaderboard.Count; i <= 10; i++)
+            {
+                holders[i].profileloading.gameObject.SetActive(false);
+            }
         }
 
         void RichMyText(LeaderboardTableView tableView) 
@@ -267,34 +357,18 @@ namespace QSLeaderboard.UI.Leaderboard
 
         public List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page)
         {
-            Plugin.Log.Notice("Creating LB DATA");
             List<ScoreData> tableData = new List<ScoreData>();
-            /*
-            int pageIndex = page * 10;
-            for (int i = pageIndex; i < leaderboard.Count && i < pageIndex + 10; i++)
-            {
-
-                Plugin.Log.Notice($"Creating LB DATA at - {i}");
-                int score = leaderboard[i].score;
-                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + 1, score));
-            }
-            */
-
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                Plugin.Log.Notice($"Creating LB DATA at - {i}");
                 int score = leaderboard[i].score;
                 tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + (page * 10) + 1, score));
+                holders[i].profileImage.gameObject.SetActive(true);
             }
-
             return tableData;
         }
 
         public ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int rank, int score)
         {
-
-            Plugin.Log.Notice("Creating LB ENTRY");
-
             string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
             string formattedCombo = "";
             if (entry.fullCombo) formattedCombo = " -<color=green> FC </color>";
@@ -308,5 +382,22 @@ namespace QSLeaderboard.UI.Leaderboard
 
             return new ScoreData(score, result, rank, false);
         }
+    }
+
+
+    internal class ImageHolder
+    {
+        private int index;
+
+        public ImageHolder(int index)
+        {
+            this.index = index;
+        }
+
+        [UIComponent("profileImage")]
+        public ImageView profileImage;
+
+        [UIObject("profileloading")]
+        public GameObject profileloading;
     }
 }

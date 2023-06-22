@@ -68,30 +68,39 @@ namespace QSLeaderboard.Utils
 
             using (var httpClient = new HttpClient())
             {
-                try
+                int x = 0;
+                while(x < 2)
                 {
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                    string requestBody = getLoginString(id);
+                    try
+                    {
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                        string requestBody = getLoginString(id);
 
 
-                    HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                        HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-
-                    HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
-                    bool isAuthed = response.StatusCode == HttpStatusCode.OK;
-                    await Task.Delay(2000);
-                    callback((isAuthed, username));
-                    await Task.Delay(3000);
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.gameObject.SetActive(false);
+                        HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
+                        bool isAuthed = response.StatusCode == HttpStatusCode.OK;
+                        if(isAuthed)
+                        {
+                            await Task.Delay(2000);
+                            callback((isAuthed, username));
+                            await Task.Delay(3000);
+                            _panelView.prompt_loader.SetActive(false);
+                            _panelView.promptText.gameObject.SetActive(false);
+                            break;
+                        }
+                    }
+                    catch (HttpRequestException)
+                    {
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
+                        x++;
+                        await Task.Delay(500);
+                    }
                 }
-                catch (HttpRequestException)
-                {
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = "<color=red>Error Authenticating</color>";
-                    callback((false, username));
-                }
+                if(x == 2) callback((false, username));
             }
         }
 

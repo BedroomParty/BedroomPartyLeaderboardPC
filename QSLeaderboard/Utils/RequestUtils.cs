@@ -1,5 +1,7 @@
-﻿using IPA.Utilities.Async;
+﻿using BeatSaberAPI.DataTransferObjects;
+using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
+using OVRSimpleJSON;
 using QSLeaderboard.UI.Leaderboard;
 using System;
 using System.CodeDom;
@@ -11,8 +13,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using UnityEngine;
 using UnityEngine.Playables;
 using Zenject;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QSLeaderboard.Utils
@@ -82,44 +86,43 @@ namespace QSLeaderboard.Utils
             UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback));
         }
 
-
-        private async Task UploadLeaderboardData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
+        public void GetOverallData(string balls, string userID, Action<(int, int)> callback)
         {
-            _panelView.prompt_loader.SetActive(true);
-            _panelView.promptText.gameObject.SetActive(true);
-            _panelView.promptText.text = "Uploading Score...";
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => GetOverallLBData(balls, userID, callback));
+        }
+
+        private async Task GetOverallLBData(string balls, string userID, Action<(int, int)> callback)
+        {
+            _panelView.isMapRanked.text = "Ranked Status: Loading...";
             using (var httpClient = new HttpClient())
             {
                 try
                 {
                     _leaderboardView.userIDHere.text = userID;
-                    var idBytes = Encoding.UTF8.GetBytes(userID);
-                    var authKey = Convert.ToBase64String(idBytes);
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                    string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
 
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                    string requestBody = getLBOverallJSON(balls, userID);
 
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT, content);
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_OVERALL_END_POINT, content);
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
                         var jsonResponse = await response.Content.ReadAsStringAsync();
-                        callback(response.IsSuccessStatusCode);
-                        _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
-                        await Task.Delay(3000);
-                        _panelView.promptText.gameObject.SetActive(false);
-                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                        JObject jsonArray = JObject.Parse(jsonResponse);
+                        int rank = jsonArray["UserRank"].Value<int>();
+                        int pages = jsonArray["ScoreCount"].Value<int>();
+                        var totalPages = Mathf.CeilToInt((float)pages / 10);
+                        _panelView.isMapRanked.text = $"Ranked Status: Ranked";
+                        callback((rank, totalPages));
                         return;
                     }
                     else
                     {
-                        callback(response.IsSuccessStatusCode);
+                        callback((0, 0));
                         _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=red>Failed to upload score</color>";
+                        _panelView.promptText.text = "<color=red>Failed to get overall leaderboard data</color>";
                         await Task.Delay(3000);
                         _panelView.promptText.gameObject.SetActive(false);
                         _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
@@ -129,7 +132,7 @@ namespace QSLeaderboard.Utils
                 catch (HttpRequestException e)
                 {
                     Plugin.Log.Error("EXCEPTION: " + e.ToString());
-                    callback(false);
+                    callback((0, 0));
                     _panelView.prompt_loader.SetActive(false);
                     _panelView.promptText.text = "<color=red>EXCEPTION ERROR</color>";
                     await Task.Delay(3000);
@@ -138,8 +141,85 @@ namespace QSLeaderboard.Utils
             }
         }
 
+        private string getLBOverallJSON(string balls, string userID)
+        {
+            var Data = new JObject
+            {
+                { "Hash", balls },
+                { "ID", userID },
+            };
+            return Data.ToString();
+            return string.Empty;
+        }
+
+
+        private async Task UploadLeaderboardData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
+        {
+
+            using (var httpClient = new HttpClient())
+            {
+                int x = 0;
+                while(x < 2)
+                {
+                    _panelView.prompt_loader.SetActive(true);
+                    _panelView.promptText.gameObject.SetActive(true);
+                    _panelView.promptText.text = "Uploading Score...";
+                    try
+                    {
+                        _leaderboardView.userIDHere.text = userID;
+                        var idBytes = Encoding.UTF8.GetBytes(userID);
+                        var authKey = Convert.ToBase64String(idBytes);
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                        string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
+
+                        HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+                        HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT, content);
+
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            var jsonResponse = await response.Content.ReadAsStringAsync();
+                            callback(response.IsSuccessStatusCode);
+                            _panelView.prompt_loader.SetActive(false);
+                            _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
+                            await Task.Delay(3000);
+                            _panelView.promptText.gameObject.SetActive(false);
+                            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                            break;
+                        }
+
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = "<color=red>Failed to upload score... Retrying!</color>";
+                        await Task.Delay(500);
+                        _panelView.promptText.gameObject.SetActive(false);
+                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        Plugin.Log.Error("EXCEPTION: " + e.ToString());
+                        callback(false);
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = "<color=red>EXCEPTION ERROR</color>";
+                        await Task.Delay(3000);
+                        _panelView.promptText.gameObject.SetActive(false);
+                    }
+                    x++;
+                }
+                if (x == 2)
+                {
+                    callback(false);
+                    _panelView.promptText.text = "<color=red>Failed to upload score... Retrying!</color>";
+                    await Task.Delay(3000);
+                    _panelView.promptText.gameObject.SetActive(false);
+                    _panelView.prompt_loader.SetActive(false);
+                }
+            }
+        }
+
         private string getLBUploadJSON(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods)
         {
+            Plugin.Log.Info(username);
             var Data = new JObject
             {
                 { "Hash", balls },

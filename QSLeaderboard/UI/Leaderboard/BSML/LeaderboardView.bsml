@@ -42,7 +42,17 @@
 				   pref-height="10"
 				   on-click="OnPageDown"/>
 	</bg>
-
+	<vertical anchor-pos-x="-24.5"
+			  anchor-pos-y="5.3" spacing="-19.4">
+		<macro.for-each hosts="imageHolders">
+			<horizontal child-expand-height="true" child-align="MiddleCenter">
+				<stack>
+					<image id="profileImage" src="QSLeaderboard.Images.blank.png" pref-width="5.5" pref-height="5.5" preserve-aspect="true"/>
+					<loading-indicator id="profileloading" pref-width="4" pref-height="4" preserve-aspect="true"/>
+				</stack>
+			</horizontal>
+		</macro.for-each>
+	</vertical>
 	<!-- Leaderboard table -->
 	<vertical pref-width='76'
 			  pref-height='60'
