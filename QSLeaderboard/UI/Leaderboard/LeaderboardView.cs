@@ -301,26 +301,20 @@ namespace QSLeaderboard.UI.Leaderboard
                         loadingLB.gameObject.SetActive(false);
                         leaderboardTableView.SetScores(null, -1);
                         errorText.gameObject.SetActive(true);
+                        _panelView.isMapRanked.text = "Ranked Status: Unranked";
                         FuckLoadImages();
                     }
                     SetProfiles(result.Item2);
+                    _panelView.currentRank.text = $"Current Rank: {result.Item3}";
+                    totalPages = result.Item4;
+                    Plugin.Log.Info("total Pages: " + totalPages.ToString());
+                    Plugin.Log.Info($"stars: {result.Item5}");
+                    bool isUnRanked = result.Item5 == 0;
+                    Plugin.Log.Info($"Ranked: {isUnRanked.ToString()}");
+                    _panelView.isMapRanked.text = isUnRanked ? "Ranked Status: Unranked" : "Ranked Status: Ranked";
+                    UpdatePageButtons();
                 });
             });
-            if (shouldUpdatePage)
-            {
-                _requestUtils.GetOverallData(balls, Plugin.userID, result =>
-                {
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
-                    {
-                        // rank result.Item1
-                        // totalPages result.Item2
-                        _panelView.currentRank.text = $"Current Rank: {result.Item1}";
-                        totalPages = result.Item2;
-                        Plugin.Log.Info("total Pages: " + totalPages.ToString());
-                        UpdatePageButtons();
-                    });
-                });
-            }
         }
 
         private void FuckOffImages() => holders.ForEach(holder => holder.profileImage.sprite = transparentSprite);
@@ -374,11 +368,13 @@ namespace QSLeaderboard.UI.Leaderboard
             if (entry.fullCombo) formattedCombo = " -<color=green> FC </color>";
             else formattedCombo = string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
 
+            string formattedPP = string.Empty;
+            if(entry.PP > 0) formattedPP = $" - <color=blue>{entry.PP}</color>";
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;
 
-            result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedMods + "</size>";
+            result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedPP + formattedMods + "</size>";
 
             return new ScoreData(score, result, rank, false);
         }

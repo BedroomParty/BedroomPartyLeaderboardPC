@@ -10,6 +10,7 @@ namespace QSLeaderboard.Utils
             public int rank;
             public string userID;
             public string userName;
+            public float PP;
             public int missCount;
             public int badCutCount;
             public float acc;
@@ -17,11 +18,12 @@ namespace QSLeaderboard.Utils
             public int score;
             public string mods;
 
-            public LeaderboardEntry(int rank, string userID, string userName, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
+            public LeaderboardEntry(int rank, string userID, string userName, float PP, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
             {
                 this.rank = rank;
                 this.userID = userID;
                 this.userName = userName;
+                this.PP = PP;
                 this.missCount = missCount;
                 this.badCutCount = badCutCount;
                 this.acc = acc;
@@ -31,17 +33,17 @@ namespace QSLeaderboard.Utils
             }
         }
 
-        public List<LeaderboardEntry> LoadBeatMapInfo(string json)
+        public List<LeaderboardEntry> LoadBeatMapInfo(JArray jsonArray)
         {
             var leaderboard = new List<LeaderboardEntry>();
 
-            JArray jsonArray = JArray.Parse(json);
-
             foreach (var scoreData in jsonArray)
             {
+                Plugin.Log.Info("LOADBEATMAPINFO");
                 int? rank = scoreData["Rank"]?.Value<int>();
                 string userID = scoreData["UserID"]?.Value<string>();
                 string userName = scoreData["Username"]?.Value<string>();
+                float? PP = scoreData["PP"]?.Value<float>();
                 int? missCount = scoreData["Misses"]?.Value<int>();
                 int? badCutCount = scoreData["BadCuts"]?.Value<int>();
                 float? acc = scoreData["Accuracy"]?.Value<float>();
@@ -49,19 +51,11 @@ namespace QSLeaderboard.Utils
                 int? score = scoreData["Score"]?.Value<int>();
                 string modifiers = scoreData["Modifiers"]?.Value<string>();
 
-                //Plugin.Log.Info($"userID - {userID}");
-                //Plugin.Log.Info($"userName - {userName}");
-                //Plugin.Log.Info($"missCount - {missCount}");
-                //Plugin.Log.Info($"badCutCount - {badCutCount}");
-                //Plugin.Log.Info($"acc - {acc}");
-                //Plugin.Log.Info($"fullCombo - {fullCombo}");
-                //Plugin.Log.Info($"score - {score}");
-                //Plugin.Log.Info($"modifiers - {modifiers}");
-
                 leaderboard.Add(new LeaderboardEntry(
                     rank ?? 0,
                     userID ?? "balls",
                     userName ?? "balls",
+                    PP ?? 0.0f,
                     missCount ?? 0,
                     badCutCount ?? 0,
                     acc ?? 0f,
@@ -73,6 +67,7 @@ namespace QSLeaderboard.Utils
 
             return leaderboard;
         }
+
 
 
     }
