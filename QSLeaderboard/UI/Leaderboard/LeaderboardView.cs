@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using BeatSaberMarkupLanguage;
@@ -10,6 +11,7 @@ using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
+using IPA.Logging;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
@@ -40,6 +42,8 @@ namespace QSLeaderboard.UI.Leaderboard
 
 
         public static ImageView[] profileImageArray = new ImageView[10];
+        private Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
+
 
         private Sprite transparentSprite;
 
@@ -126,9 +130,17 @@ namespace QSLeaderboard.UI.Leaderboard
             linkText.text = "Link your account with <size=110%><color=green>/link</color></size> in the QS server!";
         }
 
-        private async void SetProfileImage(string url, int index)
+        private async void SetProfileImage(string url, int index, string userID)
         {
-            Plugin.Log.Info("SetProfileImage");
+            // Check if the sprite already exists in the dictionary
+            if (userSpriteDictionary.ContainsKey(userID))
+            {
+                Plugin.Log.Info($"Sprite already exists for {userID}, using that!");
+                holders[index].profileImage.sprite = userSpriteDictionary[userID];
+                holders[index].profileloading.SetActive(false);
+                return;
+            }
+
             ImageView image = holders[index].profileImage;
             GameObject loader = holders[index].profileloading;
 
@@ -143,23 +155,62 @@ namespace QSLeaderboard.UI.Leaderboard
             if (request.responseCode == 200)
             {
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                Texture2D roundedTexture = RoundTextureCorners(texture, 60f);
+                Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
 
-                // Use Unity's main thread scheduler factory to update the image on the main thread
+                if (!userSpriteDictionary.ContainsKey(userID))
+                {
+                    userSpriteDictionary.Add(userID, sprite);
+                    Plugin.Log.Info($"Added {userID} to the cache!");
+                }
+                else
+                {
+                    Plugin.Log.Info($"Sprite already exists for {userID}, using that!");
+                    sprite = userSpriteDictionary[userID];
+                }
+
                 await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     image.sprite = sprite;
                     loader.SetActive(false);
-                    Plugin.Log.Info("actually setting");
-
                 });
             }
             else
             {
-                Debug.LogError("Failed to retrieve profile image: " + request.error);
+                Plugin.Log.Error("Failed to retrieve profile image: " + request.error);
             }
 
             request.Dispose();
+        }
+
+
+        private Texture2D RoundTextureCorners(Texture2D texture, float cornerRadius)
+        {
+            int width = texture.width;
+            int height = texture.height;
+            Texture2D roundedTexture = new Texture2D(width, height);
+            Color[] pixels = texture.GetPixels();
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int index = y * width + x;
+                    Color pixel = pixels[index];
+                    Vector2 center = new Vector2(width * 0.5f, height * 0.5f);
+                    float distance = Vector2.Distance(new Vector2(x, y), center);
+
+                    if (distance > cornerRadius)
+                    {
+                        pixel.a = 0f;
+                    }
+
+                    roundedTexture.SetPixel(x, y, pixel);
+                }
+            }
+
+            roundedTexture.Apply();
+            return roundedTexture;
         }
 
 
@@ -223,8 +274,8 @@ namespace QSLeaderboard.UI.Leaderboard
                         Plugin.Log.Error("Not authenticated! Username: " + username);
                     }
                 });
-                _panelView.currentRank.text = $"Current Rank: #1";
-                _panelView.isMapRanked.text = $"Ranked Status: Ranked";
+                //_panelView.currentRank.text = $"Current Rank: #1";
+                //_panelView.isMapRanked.text = $"Ranked Status: Ranked";
                 // Create a transparent texture with a size of 1x1
                 Texture2D texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
                 texture.SetPixel(0, 0, new Color(1f, 1f, 1f, 0f)); // Set pixel color with alpha = 0 (transparent)
@@ -232,6 +283,9 @@ namespace QSLeaderboard.UI.Leaderboard
 
                 // Create a sprite using the transparent texture
                 transparentSprite = Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), Vector2.one * 0.5f);
+
+
+                UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, $"{Constants.PROFILE_PICTURE}/{Plugin.userID}/avatar"));
             }
         }
 
@@ -248,28 +302,64 @@ namespace QSLeaderboard.UI.Leaderboard
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
-            bool shouldUpdatePage;
-            if(currentDifficultyBeatmap != difficultyBeatmap)
+            currentDifficultyBeatmap = difficultyBeatmap;
+
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
+        }
+
+        private async Task SetProfilePic(ImageView image, string url)
+        {
+            _panelView.playerAvatarLoading.SetActive(true);
+            await Task.Delay(1);
+
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+            UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
+
+            while (!asyncOperation.isDone)
             {
-                shouldUpdatePage = true;
+                await Task.Delay(10);
+            }
+
+            if (request.responseCode == 200)
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(request);
+                Texture2D roundedTexture = RoundTextureCorners(texture, 60f);
+                Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
+
+                await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                {
+                    image.sprite = sprite;
+                    _panelView.playerAvatarLoading.SetActive(false);
+                });
             }
             else
             {
-                shouldUpdatePage = false;
+                Plugin.Log.Error("Failed to retrieve profile image: " + request.error);
             }
-            currentDifficultyBeatmap = difficultyBeatmap;
+
+            request.Dispose();
+        }
+
+        private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
+        {
+            string errorReason = "Error";
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
+
+            await Task.Delay(1);
 
             if (!Plugin.Authed)
             {
                 errorText.gameObject.SetActive(true);
-                errorText.text = "Unable to authenticate, please restart";
+                errorReason = "Auth Fail";
                 return;
             }
 
             loadingLB.gameObject.SetActive(true);
             errorText.gameObject.SetActive(false);
 
+            await Task.Delay(1);
+
+            if (!_plvc || !_plvc.isActiveAndEnabled) return;
 
             string mapId = difficultyBeatmap.level.levelID;
             int difficulty = difficultyBeatmap.difficultyRank;
@@ -283,12 +373,22 @@ namespace QSLeaderboard.UI.Leaderboard
                     if (!_plvc || !_plvc.isActiveAndEnabled) return;
                     FuckOffImages();
                     HelloLoadImages();
+
+                    if (result.Item3 != 0)
+                    {
+                        _panelView.playerGlobalRank.text = $"#{result.Item3}";
+                    }
+
+                    _panelView.playerPP.text = $"{result.Item6}pp";
+
                     if (result.Item2 != null)
                     {
                         if (result.Item2.Count == 0)
                         {
+                            errorReason = "No Scores Yet!";
                             leaderboardTableView.SetScores(null, -1);
                             errorText.gameObject.SetActive(true);
+                            loadingLB.gameObject.SetActive(false);
                             FuckLoadImages();
                             UpdatePageButtons();
                         }
@@ -296,25 +396,21 @@ namespace QSLeaderboard.UI.Leaderboard
                         {
                             leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
                             RichMyText(leaderboardTableView);
-                            loadingLB.gameObject.SetActive(false);   
+                            loadingLB.gameObject.SetActive(false);
                         }
                     }
                     else
                     {
-                        loadingLB.gameObject.SetActive(false);
+                        errorReason = "No Scores Yet!";
                         leaderboardTableView.SetScores(null, -1);
                         errorText.gameObject.SetActive(true);
-                        _panelView.isMapRanked.text = "Ranked Status: Unranked";
+                        loadingLB.gameObject.SetActive(false);
                         FuckLoadImages();
+                        errorText.gameObject.SetActive(true);
                     }
+                    errorText.text = errorReason;
                     SetProfiles(result.Item2);
-                    _panelView.currentRank.text = $"Current Rank: {result.Item3}";
                     totalPages = result.Item4;
-                    Plugin.Log.Info("total Pages: " + totalPages.ToString());
-                    Plugin.Log.Info($"stars: {result.Item5}");
-                    bool isUnRanked = result.Item5 == 0;
-                    Plugin.Log.Info($"Ranked: {isUnRanked.ToString()}");
-                    _panelView.isMapRanked.text = isUnRanked ? "Ranked Status: Unranked" : "Ranked Status: Ranked";
                     UpdatePageButtons();
                 });
             });
@@ -325,13 +421,12 @@ namespace QSLeaderboard.UI.Leaderboard
         private void FuckLoadImages() => holders.ForEach(holder => holder.profileloading.SetActive(false));
 
 
-
         void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard)
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
                 var url = $"{Constants.PROFILE_PICTURE}/{leaderboard[i].userID.ToString()}/avatar";
-                SetProfileImage(url, i);
+                SetProfileImage(url, i, leaderboard[i].userID);
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)
@@ -349,6 +444,13 @@ namespace QSLeaderboard.UI.Leaderboard
                 var rankText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText");
                 var scoreText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText");
                 nameText.richText = true;
+                rankText.richText = true;
+                scoreText.richText = true;
+                rankText.text = $"<size=120%><u>{rankText.text}</u></size>";
+                var seperator = cell.GetField<Image, LeaderboardTableCell>("_separatorImage") as ImageView;
+                seperator.color = Constants.QS_COLOR;
+                seperator.color0 = Color.white;
+                seperator.color1 = new Color(1, 1, 1, 0);
             }
         }
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
+using static LocalLeaderboardsModel;
 
 namespace QSLeaderboard.Utils
 {
@@ -17,7 +18,7 @@ namespace QSLeaderboard.Utils
         [Inject] private LeaderboardData _leaderboardData;
         [Inject] private LeaderboardView _leaderboardView;
         [Inject] private PanelView _panelView;
-        private async Task GetLeaderboardData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float)> callback)
+        private async Task GetLeaderboardData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
         {
             using (var httpClient = new HttpClient())
             {
@@ -26,52 +27,58 @@ namespace QSLeaderboard.Utils
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                     string requestBody = getLBDownloadJSON(balls, page, 10);
 
-
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-
-
                     HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_DOWNLOAD_END_POINT, content);
+
+                    int rank = 0;
+                    float pp = 0f;
+                    int scorecount = 0;
+                    float stars = 0;
+                    int totalPages = 0;
+                    List<LeaderboardData.LeaderboardEntry> data = new List<LeaderboardData.LeaderboardEntry>();
 
                     if (response.IsSuccessStatusCode)
                     {
-                        //var jsonResponse = await response.Content.ReadAsStringAsync();
-                        //var leaderboardData = _leaderboardData.LoadBeatMapInfo(jsonResponse);
-
                         var jsonResponse = await response.Content.ReadAsStringAsync();
                         Plugin.Log.Info(jsonResponse.ToString());
                         JObject jsonObject = JObject.Parse(jsonResponse);
-                        Plugin.Log.Info("JSON OBJECT PARSE");
-                        int rank = jsonObject["GlobalRank"].Value<int>();
-                        Plugin.Log.Info("GlobalRank PARSE");
-                        int? scorecount = jsonObject["ScoreCount"]?.Value<int>();
-                        Plugin.Log.Info("ScoreCount PARSE");
-                        float stars = jsonObject["Stars"].Value<float>();
-                        Plugin.Log.Info("Stars PARSE");
-                        var totalPages = Mathf.CeilToInt((float)(scorecount ?? 0) / 10);
-                        Plugin.Log.Info("totalPages calc");
 
+                        if (jsonObject.TryGetValue("GlobalRank", out JToken globalRankToken))
+                            rank = globalRankToken.Value<int>();
+                        else
+                            rank = 0;
 
-                        Plugin.Log.Info($"Rank: {rank}");
-                        Plugin.Log.Info($"stars: {stars}");
-                        Plugin.Log.Info($"totalPages: {totalPages}");
+                        if (jsonObject.TryGetValue("PP", out JToken PP))
+                            pp = PP.Value<float>();
+                        else
+                            pp = 0;
 
-                        JArray scoresArray = jsonObject["Scores"].Value<JArray>();
-                        Plugin.Log.Info(scoresArray[0].ToString());
-                        Plugin.Log.Info(scoresArray[0]["PP"].Value<float>().ToString());
-                        var leaderboardData = _leaderboardData.LoadBeatMapInfo(scoresArray);
-                        callback((response.IsSuccessStatusCode, leaderboardData, rank, totalPages, stars));
-                        return;
+                        if (jsonObject.TryGetValue("ScoreCount", out JToken scoreCountToken))
+                            scorecount = scoreCountToken.Value<int>();
+                        else
+                            scorecount = 0;
+
+                        if (jsonObject.TryGetValue("Stars", out JToken starsToken))
+                            stars = starsToken.Value<float>();
+                        else
+                            stars = 0f;
+
+                        totalPages = Mathf.CeilToInt((float)scorecount / 10);
+
+                        if (jsonObject.TryGetValue("Scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0)
+                            data = _leaderboardData.LoadBeatMapInfo(scoresArray);
+                        else
+                            data = new List<LeaderboardData.LeaderboardEntry>();
+
                     }
-                    else
-                    {
-                        callback((response.IsSuccessStatusCode, null, 0, 0, 0.0f));
-                        return;
-                    }
+
+                    callback((response.IsSuccessStatusCode, data, rank, totalPages, stars, pp));
+                    return;
                 }
                 catch (HttpRequestException e)
                 {
                     Plugin.Log.Error("EXCEPTION: " + e.ToString());
-                    callback((false, null, 0, 0, 0.0f));
+                    callback((false, null, 0, 0, 0f, 0f));
                 }
             }
         }
@@ -89,7 +96,7 @@ namespace QSLeaderboard.Utils
             return string.Empty;
         }
 
-        public void GetBeatMapData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float)> callback)
+        public void GetBeatMapData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
         {
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
@@ -178,7 +185,6 @@ namespace QSLeaderboard.Utils
 
         private string getLBUploadJSON(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods)
         {
-            Plugin.Log.Info(username);
             var Data = new JObject
             {
                 { "Hash", balls },

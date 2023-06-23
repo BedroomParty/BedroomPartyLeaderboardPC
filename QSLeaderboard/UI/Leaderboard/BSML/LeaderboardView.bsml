@@ -42,7 +42,7 @@
 				   pref-height="10"
 				   on-click="OnPageDown"/>
 	</bg>
-	<vertical anchor-pos-x="-24.5"
+	<vertical anchor-pos-x="-23.5"
 			  anchor-pos-y="5.3" spacing="-19.4">
 		<macro.for-each hosts="imageHolders">
 			<horizontal child-expand-height="true" child-align="MiddleCenter">

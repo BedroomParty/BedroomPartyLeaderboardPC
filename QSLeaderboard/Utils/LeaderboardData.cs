@@ -39,9 +39,6 @@ namespace QSLeaderboard.Utils
             Plugin.Log.Info("LOADBEATMAPINFO");
             foreach (var scoreData in jsonArray)
             {
-
-                Plugin.Log.Info("score data in jason array");
-
                 string rank = scoreData["rank"]?.ToString();
                 string userID = scoreData["UserID"]?.ToString();
                 string userName = scoreData["Username"]?.ToString();

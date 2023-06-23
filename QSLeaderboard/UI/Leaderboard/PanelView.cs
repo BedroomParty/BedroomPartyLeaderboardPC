@@ -26,30 +26,34 @@ namespace QSLeaderboard.UI.Leaderboard
         private ImageView _background;
         public ImageView _imgView;
 
-
-        [UIComponent("container")]
-        private Backgroundable _container;
-
         [UIComponent("QSLeaderboard_logo")]
         private ImageView QSLeaderboard_logo;
 
-        [UIComponent("separator")]
-        private ImageView _separator;
 
         internal static readonly FieldAccessor<ImageView, float>.Accessor ImageSkew = FieldAccessor<ImageView, float>.GetAccessor("_skew");
         internal static readonly FieldAccessor<ImageView, bool>.Accessor ImageGradient = FieldAccessor<ImageView, bool>.GetAccessor("_gradient");
 
-        [UIComponent("currentRank")]
-        public TextMeshProUGUI currentRank;
 
-        [UIComponent("isMapRanked")]
-        public TextMeshProUGUI isMapRanked;
+        [UIObject("prompt_loader")]
+        public GameObject prompt_loader;
 
         [UIComponent("promptText")]
         public TextMeshProUGUI promptText;
 
-        [UIObject("prompt_loader")]
-        public GameObject prompt_loader;
+        [UIComponent("playerAvatar")]
+        public HMUI.ImageView playerAvatar;
+
+        [UIObject("playerAvatarLoading")]
+        public GameObject playerAvatarLoading;
+
+        [UIComponent("playerGlobalRank")]
+        public TextMeshProUGUI playerGlobalRank;
+
+        [UIComponent("playerPP")]
+        public TextMeshProUGUI playerPP;
+
+        [UIComponent("playerUsername")]
+        public TextMeshProUGUI playerUsername;
 
         [UIAction("FunnyModalMoment")]
         public void FunnyModalMoment()
@@ -60,20 +64,7 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIAction("#post-parse")]
         private void PostParse()
         {
-            _container.background.material = Utilities.ImageResources.NoGlowMat;
-            _imgView = _container.background as ImageView;
-            _imgView.transform.position.Set(-5f, _imgView.transform.position.y, _imgView.transform.position.z);
-
-            _imgView.color = Constants.QS_COLOR;
-            _imgView.color0 = Color.white;
-            _imgView.color1 = new Color(1, 1, 1, 0);
-
-            ImageSkew(ref _imgView) = _skew;
-            ImageGradient(ref _imgView) = true;
-
-            ImageSkew(ref QSLeaderboard_logo) = _skew;
-            QSLeaderboard_logo.SetVerticesDirty();
-            ImageSkew(ref _separator) = _skew;
+            
         }
     }
 }

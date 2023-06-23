@@ -3,16 +3,40 @@
 		<loading-indicator id="prompt_loader" active="false" preserve-aspect="true" pref-width="4" pref-height="4" />
 		<text rich-text="true" id="promptText" text="" active="false" anchor-pos-x="0" anchor-pos-y="10" align="BottomLeft" italics="true" />
 	</horizontal>
-	<horizontal id="container" pref-width="91" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="3" bg="round-rect-panel" pad="2">
-		<vertical pref-width="10" pref-height="10">
-			<clickable-image on-click="FunnyModalMoment" id="QSLeaderboard_logo" src="QSLeaderboard.Images.QSLeaderboard_logo.png" preserve-aspect="true" pref-width="10" pref-height="10"/>
+	<horizontal anchor-pos-x="-2" anchor-pos-y="0" ignore-layout="true" pref-height="20" horizontal-fit="PreferredSize" spacing="7">
+		<vertical pref-width="20">
+			<horizontal pref-height="14">
+				<clickable-image id="QSLeaderboard_logo" on-click="FunnyModalMoment" src="QSLeaderboard.Images.QSLeaderboard_logo.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
+			</horizontal>
 		</vertical>
-		<vertical pref-width="0.5" pref-height="10">
-			<image id="separator" src="QSLeaderboard.Images.pixel.png" pref-width="0.5" pref-height="10" size-delta-x="0.5" size-delta-y="10" />
+
+		<vertical>
+			<horizontal pref-height="13">
+				<vertical spacing="6" child-expand-width="false" child-control-width="false" child-align="MiddleCenter">
+					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
+						<text id="playerUsername" font-size="6" text="PLAYERNAME" rich-text="false" align="Center"/>
+					</horizontal>
+
+					<horizontal horizontal-fit="PreferredSize" spacing="3">
+						<horizontal pref-height="6" pad="1" spacing="1.5">
+							<image  src="QSLeaderboard.Images.Globe.png" preserve-aspect="true" pref-height="3" preferred-width="3"/>
+							<text id="playerGlobalRank" text="GLOBALRANK" align="Left"/>
+						</horizontal>
+						<horizontal pref-height="6" pad="1">
+							<text id="playerPP" color="teal" text="PLAYERPP" align="Left"/>
+						</horizontal>
+					</horizontal> 
+				</vertical>
+			</horizontal>
 		</vertical>
-		<vertical active="true" pref-width="70" pref-height="10" spacing="-1">
-			<text id="currentRank" text="" font-align="Left" active="true" italics="true"/>
-			<text id="isMapRanked" text="" font-align="Left" active="true" italics="true"/>
+
+		<vertical pref-width="20">
+			<horizontal pref-height="14">
+				<stack>
+					<image id="playerAvatar" src="QSLeaderboard.Images.blank.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
+					<loading-indicator id="playerAvatarLoading" preserve-aspect="true" preferred-height="5" preferred-width="5"/>
+				</stack>
+			</horizontal>
 		</vertical>
 	</horizontal>
 </bg>

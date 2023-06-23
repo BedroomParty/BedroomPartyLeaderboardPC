@@ -60,6 +60,7 @@ namespace QSLeaderboard.Utils
             _panelView.promptText.gameObject.SetActive(true);
             _panelView.promptText.text = "Authenticating...";
             (string id, string username) = await GetPlayerInfo();
+            _panelView.playerUsername.text = username;
 
             _leaderboardView.userIDHere.text = id;
             var idBytes = Encoding.UTF8.GetBytes(id);
