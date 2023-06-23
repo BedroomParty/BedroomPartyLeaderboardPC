@@ -73,6 +73,7 @@ namespace QSLeaderboard.Utils
                 {
                     try
                     {
+                        Plugin.Log.Notice($"LOGIN ATTEMPT {x + 1}");
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLoginString(id);
@@ -91,16 +92,22 @@ namespace QSLeaderboard.Utils
                             _panelView.promptText.gameObject.SetActive(false);
                             break;
                         }
+                        await Task.Delay(2000);
+                        _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
+                        x++;
                     }
                     catch (HttpRequestException)
                     {
-                        _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
                         x++;
-                        await Task.Delay(500);
+                        await Task.Delay(5000);
                     }
+                    x++;
                 }
-                if(x == 2) callback((false, username));
+                if (x == 2)
+                {
+                    callback((false, username));
+                }
             }
         }
 

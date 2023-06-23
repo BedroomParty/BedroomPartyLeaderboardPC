@@ -48,7 +48,7 @@
 			<horizontal child-expand-height="true" child-align="MiddleCenter">
 				<stack>
 					<image id="profileImage" src="QSLeaderboard.Images.blank.png" pref-width="5.5" pref-height="5.5" preserve-aspect="true"/>
-					<loading-indicator id="profileloading" pref-width="4" pref-height="4" preserve-aspect="true"/>
+					<loading-indicator id="profileloading" pref-width="4" pref-height="4" active="false" preserve-aspect="true"/>
 				</stack>
 			</horizontal>
 		</macro.for-each>

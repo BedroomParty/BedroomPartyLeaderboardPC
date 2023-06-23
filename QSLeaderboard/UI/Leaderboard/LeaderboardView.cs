@@ -128,6 +128,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
         private async void SetProfileImage(string url, int index)
         {
+            Plugin.Log.Info("SetProfileImage");
             ImageView image = holders[index].profileImage;
             GameObject loader = holders[index].profileloading;
 
@@ -149,6 +150,8 @@ namespace QSLeaderboard.UI.Leaderboard
                 {
                     image.sprite = sprite;
                     loader.SetActive(false);
+                    Plugin.Log.Info("actually setting");
+
                 });
             }
             else
@@ -369,7 +372,7 @@ namespace QSLeaderboard.UI.Leaderboard
             else formattedCombo = string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
 
             string formattedPP = string.Empty;
-            if(entry.PP > 0) formattedPP = $" - <color=blue>{entry.PP}</color>";
+            if (entry.PP > 0) formattedPP = $" - <color=#AEC6CF>{entry.PP}</color>pp";
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;

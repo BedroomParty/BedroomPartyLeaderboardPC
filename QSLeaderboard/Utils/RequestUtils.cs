@@ -1,25 +1,14 @@
-﻿using BeatSaberAPI.DataTransferObjects;
-using IPA.Utilities.Async;
+﻿using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
-using OnlineServices.API;
-using OVRSimpleJSON;
 using QSLeaderboard.UI.Leaderboard;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using UnityEngine;
-using UnityEngine.Playables;
 using Zenject;
-using static RankModel;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QSLeaderboard.Utils
 {
@@ -49,19 +38,26 @@ namespace QSLeaderboard.Utils
                         //var leaderboardData = _leaderboardData.LoadBeatMapInfo(jsonResponse);
 
                         var jsonResponse = await response.Content.ReadAsStringAsync();
+                        Plugin.Log.Info(jsonResponse.ToString());
                         JObject jsonObject = JObject.Parse(jsonResponse);
+                        Plugin.Log.Info("JSON OBJECT PARSE");
                         int rank = jsonObject["GlobalRank"].Value<int>();
-                        int pages = jsonObject["ScoreCount"].Value<int>();
+                        Plugin.Log.Info("GlobalRank PARSE");
+                        int? scorecount = jsonObject["ScoreCount"]?.Value<int>();
+                        Plugin.Log.Info("ScoreCount PARSE");
                         float stars = jsonObject["Stars"].Value<float>();
-                        var totalPages = Mathf.CeilToInt((float)pages / 10);
+                        Plugin.Log.Info("Stars PARSE");
+                        var totalPages = Mathf.CeilToInt((float)(scorecount ?? 0) / 10);
+                        Plugin.Log.Info("totalPages calc");
+
+
                         Plugin.Log.Info($"Rank: {rank}");
-                        Plugin.Log.Info($"pages: {pages}");
                         Plugin.Log.Info($"stars: {stars}");
                         Plugin.Log.Info($"totalPages: {totalPages}");
 
                         JArray scoresArray = jsonObject["Scores"].Value<JArray>();
                         Plugin.Log.Info(scoresArray[0].ToString());
-                        Plugin.Log.Info(scoresArray[0]["PP"].ToString());
+                        Plugin.Log.Info(scoresArray[0]["PP"].Value<float>().ToString());
                         var leaderboardData = _leaderboardData.LoadBeatMapInfo(scoresArray);
                         callback((response.IsSuccessStatusCode, leaderboardData, rank, totalPages, stars));
                         return;
@@ -74,7 +70,7 @@ namespace QSLeaderboard.Utils
                 }
                 catch (HttpRequestException e)
                 {
-                    Plugin.Log.Error("EXCEPTION: " +  e.ToString());
+                    Plugin.Log.Error("EXCEPTION: " + e.ToString());
                     callback((false, null, 0, 0, 0.0f));
                 }
             }
@@ -122,7 +118,7 @@ namespace QSLeaderboard.Utils
             using (var httpClient = new HttpClient())
             {
                 int x = 0;
-                while(x < 2)
+                while (x < 2)
                 {
                     _panelView.prompt_loader.SetActive(true);
                     _panelView.promptText.gameObject.SetActive(true);

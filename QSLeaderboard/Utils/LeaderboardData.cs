@@ -36,37 +36,40 @@ namespace QSLeaderboard.Utils
         public List<LeaderboardEntry> LoadBeatMapInfo(JArray jsonArray)
         {
             var leaderboard = new List<LeaderboardEntry>();
-
+            Plugin.Log.Info("LOADBEATMAPINFO");
             foreach (var scoreData in jsonArray)
             {
-                Plugin.Log.Info("LOADBEATMAPINFO");
-                int? rank = scoreData["Rank"]?.Value<int>();
-                string userID = scoreData["UserID"]?.Value<string>();
-                string userName = scoreData["Username"]?.Value<string>();
-                float? PP = scoreData["PP"]?.Value<float>();
-                int? missCount = scoreData["Misses"]?.Value<int>();
-                int? badCutCount = scoreData["BadCuts"]?.Value<int>();
-                float? acc = scoreData["Accuracy"]?.Value<float>();
-                bool? fullCombo = scoreData["FullCombo"]?.Value<bool>();
-                int? score = scoreData["Score"]?.Value<int>();
-                string modifiers = scoreData["Modifiers"]?.Value<string>();
+
+                Plugin.Log.Info("score data in jason array");
+
+                string rank = scoreData["rank"]?.ToString();
+                string userID = scoreData["UserID"]?.ToString();
+                string userName = scoreData["Username"]?.ToString();
+                float PP = scoreData["PP"]?.Value<float>() ?? 0.0f;
+                int missCount = scoreData["Misses"]?.Value<int>() ?? 0;
+                int badCutCount = scoreData["BadCuts"]?.Value<int>() ?? 0;
+                float acc = scoreData["Accuracy"]?.Value<float>() ?? 0.0f;
+                bool fullCombo = scoreData["FullCombo"]?.Value<bool>() ?? false;
+                int score = scoreData["Score"]?.Value<int>() ?? 0;
+                string modifiers = scoreData["Modifiers"]?.ToString();
 
                 leaderboard.Add(new LeaderboardEntry(
-                    rank ?? 0,
+                    int.Parse(rank ?? "0"),
                     userID ?? "balls",
                     userName ?? "balls",
-                    PP ?? 0.0f,
-                    missCount ?? 0,
-                    badCutCount ?? 0,
-                    acc ?? 0f,
-                    fullCombo ?? false,
-                    score ?? 0,
+                    PP,
+                    missCount,
+                    badCutCount,
+                    acc,
+                    fullCombo,
+                    score,
                     modifiers ?? ""
                 ));
             }
 
             return leaderboard;
         }
+
 
 
 
