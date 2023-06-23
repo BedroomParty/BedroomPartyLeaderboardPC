@@ -100,12 +100,12 @@ namespace QSLeaderboard.AffinityPatches
             bool fc = levelCompletionResults.fullCombo;
 
 
-            string mapId = difficultyBeatmap.level.levelID;
+            string mapId = difficultyBeatmap.level.levelID.Substring(13);
 
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = playerLevelStats.beatmapCharacteristic.serializedName;
 
-            string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+            string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
             string mods = GetModifiersString(levelCompletionResults);
 

@@ -361,10 +361,10 @@ namespace QSLeaderboard.UI.Leaderboard
 
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
 
-            string mapId = difficultyBeatmap.level.levelID;
+            string mapId = difficultyBeatmap.level.levelID.Substring(13);
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
-            string balls = mapId + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+            string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
             _requestUtils.GetBeatMapData(balls, page, result =>
             {
