@@ -41,6 +41,8 @@
 				   pref-width="10"
 				   pref-height="10"
 				   on-click="OnPageDown"/>
+
+		<clickable-image size-delta-x="6" size-delta-y="6" anchor-pos-y="-5.5" anchor-pos-x="0" id='linkIcon' src="QSLeaderboard.Images.link.png" on-click='openLBWebView'/>
 	</bg>
 	<vertical anchor-pos-x="-23.5"
 			  anchor-pos-y="5.3" spacing="-19.4">

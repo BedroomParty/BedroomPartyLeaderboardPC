@@ -43,7 +43,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
         public static ImageView[] profileImageArray = new ImageView[10];
         private Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
-
+        private string currentSongLinkLBWebView = string.Empty;
 
         private Sprite transparentSprite;
 
@@ -213,6 +213,16 @@ namespace QSLeaderboard.UI.Leaderboard
             return roundedTexture;
         }
 
+        [UIAction("openLBWebView")]
+        public void openLBWebView()
+        {
+            if (String.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" "))
+            {
+                return;
+            }
+            Application.OpenURL(currentSongLinkLBWebView);
+        }
+
 
         [UIAction("OnIconSelected")]
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
@@ -340,6 +350,8 @@ namespace QSLeaderboard.UI.Leaderboard
             request.Dispose();
         }
 
+        
+
         private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
             string errorReason = "Error";
@@ -365,7 +377,7 @@ namespace QSLeaderboard.UI.Leaderboard
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
-
+            currentSongLinkLBWebView = $"https://questsupporters.me/?board={balls}";
             _requestUtils.GetBeatMapData(balls, page, result =>
             {
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>

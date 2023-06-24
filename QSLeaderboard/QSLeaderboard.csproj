@@ -233,5 +233,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Images\blank.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\link.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
