@@ -10,6 +10,7 @@ namespace QSLeaderboard.Utils
             public int rank;
             public string userID;
             public string userName;
+            public long timestamp;
             public float PP;
             public int missCount;
             public int badCutCount;
@@ -18,11 +19,12 @@ namespace QSLeaderboard.Utils
             public int score;
             public string mods;
 
-            public LeaderboardEntry(int rank, string userID, string userName, float PP, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
+            public LeaderboardEntry(int rank, string userID, string userName, long timestamp, float PP, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
             {
                 this.rank = rank;
                 this.userID = userID;
                 this.userName = userName;
+                this.timestamp = timestamp;
                 this.PP = PP;
                 this.missCount = missCount;
                 this.badCutCount = badCutCount;
@@ -49,11 +51,12 @@ namespace QSLeaderboard.Utils
                 bool fullCombo = scoreData["FullCombo"]?.Value<bool>() ?? false;
                 int score = scoreData["Score"]?.Value<int>() ?? 0;
                 string modifiers = scoreData["Modifiers"]?.ToString();
-
+                long timestamp = scoreData["TimeSet"]?.Value<long>() ?? 0;
                 leaderboard.Add(new LeaderboardEntry(
                     int.Parse(rank ?? "0"),
                     userID ?? "balls",
                     userName ?? "balls",
+                    timestamp,
                     PP,
                     missCount,
                     badCutCount,

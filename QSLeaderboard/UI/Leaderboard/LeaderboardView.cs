@@ -31,7 +31,7 @@ namespace QSLeaderboard.UI.Leaderboard
     [ViewDefinition("QSLeaderboard.UI.Leaderboard.BSML.LeaderboardView.bsml")]
     internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet
     {
-        [Inject] PlatformLeaderboardViewController _plvc;
+        [Inject] private PlatformLeaderboardViewController _plvc;
         [Inject] PlayerUtils _playerUtils;
         [Inject] PanelView _panelView;
         [Inject] RequestUtils _requestUtils;
@@ -42,8 +42,9 @@ namespace QSLeaderboard.UI.Leaderboard
 
 
         public static ImageView[] profileImageArray = new ImageView[10];
-        private Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
+        public Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
         private string currentSongLinkLBWebView = string.Empty;
+        public static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
 
         private Sprite transparentSprite;
 
@@ -67,6 +68,12 @@ namespace QSLeaderboard.UI.Leaderboard
 
         [UIValue("imageHolders")]
         [Inject] private List<ImageHolder> holders;
+
+        [UIValue("buttonHolders")]
+        [Inject] private List<ButtonHolder> Buttonholders;
+
+        [UIComponent("scoreInfoModal")]
+        [Inject] private ScoreInfoModal scoreInfoModal;
 
         [UIComponent("up_button")]
         private Button up_button;
@@ -130,7 +137,7 @@ namespace QSLeaderboard.UI.Leaderboard
             linkText.text = "Link your account with <size=110%><color=green>/link</color></size> in the QS server!";
         }
 
-        private async void SetProfileImage(string url, int index, string userID)
+        public async void SetProfileImage(string url, int index, string userID)
         {
             // Check if the sprite already exists in the dictionary
             if (userSpriteDictionary.ContainsKey(userID))
@@ -182,9 +189,9 @@ namespace QSLeaderboard.UI.Leaderboard
 
             request.Dispose();
         }
+        private void FuckOffButtons() => Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
 
-
-        private Texture2D RoundTextureCorners(Texture2D texture, float cornerRadius)
+        public Texture2D RoundTextureCorners(Texture2D texture, float cornerRadius)
         {
             int width = texture.width;
             int height = texture.height;
@@ -257,6 +264,7 @@ namespace QSLeaderboard.UI.Leaderboard
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
             if (!base.isActiveAndEnabled) return;
             if (!_plvc) return;
+            var header = _plvc.transform.Find("HeaderPanel");
             if (firstActivation)
             {
                 _playerUtils.GetAuthStatus(result =>
@@ -275,7 +283,11 @@ namespace QSLeaderboard.UI.Leaderboard
                         {
                             OnLeaderboardSet(currentDifficultyBeatmap);
                             UpdatePageButtons();
+
                         }
+                        var url = $"{Constants.PROFILE_PICTURE}/{Plugin.userID}/avatar/low";
+                        Plugin.Log.Info(url);
+                        UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
                     }
                     else
                     {
@@ -293,32 +305,29 @@ namespace QSLeaderboard.UI.Leaderboard
 
                 // Create a sprite using the transparent texture
                 transparentSprite = Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), Vector2.one * 0.5f);
-
-
-                UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, $"{Constants.PROFILE_PICTURE}/{Plugin.userID}/avatar"));
             }
         }
-
 
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            page = 0;
             if (!_plvc) return;
             if (!_plvc.isActivated) return;
+            var header = _plvc.transform.Find("HeaderPanel");
+            page = 0;
             parserParams.EmitEvent("hideInfoModal");
         }
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
             currentDifficultyBeatmap = difficultyBeatmap;
-
             UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
         }
 
         private async Task SetProfilePic(ImageView image, string url)
         {
+            Plugin.Log.Info(url);
             _panelView.playerAvatarLoading.SetActive(true);
             await Task.Delay(1);
 
@@ -358,6 +367,7 @@ namespace QSLeaderboard.UI.Leaderboard
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
 
             await Task.Delay(1);
+            FuckOffButtons();
 
             if (!Plugin.Authed)
             {
@@ -437,7 +447,7 @@ namespace QSLeaderboard.UI.Leaderboard
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                var url = $"{Constants.PROFILE_PICTURE}/{leaderboard[i].userID.ToString()}/avatar";
+                var url = $"{Constants.PROFILE_PICTURE}/{leaderboard[i].userID.ToString()}/avatar/low";
                 SetProfileImage(url, i, leaderboard[i].userID);
             }
 
@@ -474,6 +484,8 @@ namespace QSLeaderboard.UI.Leaderboard
                 int score = leaderboard[i].score;
                 tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + (page * 10) + 1, score));
                 holders[i].profileImage.gameObject.SetActive(true);
+                buttonEntryArray[i] = leaderboard[i];
+                Buttonholders[i].infoButton.gameObject.SetActive(true);
             }
             return tableData;
         }
@@ -512,5 +524,23 @@ namespace QSLeaderboard.UI.Leaderboard
 
         [UIObject("profileloading")]
         public GameObject profileloading;
+    }
+
+    internal class ButtonHolder
+    {
+        private int index;
+        private Action<LeaderboardData.LeaderboardEntry> onClick;
+
+        public ButtonHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
+        {
+            this.index = index;
+            onClick = endmylife;
+        }
+
+        [UIComponent("infoButton")]
+        public Button infoButton;
+
+        [UIAction("infoClick")]
+        private void infoClick() => onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
     }
 }

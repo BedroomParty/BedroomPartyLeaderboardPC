@@ -90,7 +90,56 @@
 					<text id='linkText' align='Center' rich-text='true' text='Link your account with /link in the QS server!' word-wrapping='true'/>
 				</vertical>
 			</modal>
+			<macro.as-host host="scoreInfoModal">
+				<modal id="scoreInfo" show-event="showScoreInfo" hide-event="hideScoreInfo" size-delta-x="60" size-delta-y="42" clickerino-offerino-closerino="true" move-to-center="true">
+
+
+					<stack>
+						<vertical spacing="1" child-expand-height="true" child-expand-width="true" pad="3">
+
+							<!-- Style -->
+							<macro.define name="font-size" value="3.1"/>
+
+							<horizontal spacing="-2">
+								<text rich-text="true" id="usernameScoreText" font-size="~font-size" text="USERNAME" align="Center"/>
+								<vertical anchor-pos-y="25" pref-width="12" pref-height="12">
+									<stack>
+										<image id="profileImageModal" src="QSLeaderboard.Images.blank.png"  preserve-aspect="true"/>
+										<loading-indicator id="profileImageModalLOADING" preserve-aspect="true" />
+									</stack>
+								</vertical>
+							</horizontal>
+
+							<vertical spacing="1">
+								<text rich-text="true" id="dateScoreText" font-size="~font-size" text="DATE" align="Center"/>
+								<text rich-text="true" id="ppScoreText" font-size="~font-size" text="PP" align="Center"/>
+							</vertical>
+
+							<horizontal spacing="3">
+								<text rich-text="true" id="accScoreText" font-size="~font-size" text="ACC" align="Left"/>
+								<text rich-text="true" id="scoreScoreText" font-size="~font-size" text="SCORE" align="Right"/>
+							</horizontal>
+
+							<horizontal spacing="1">
+								<text rich-text="true" id="modifiersScoreText" font-size="~font-size" text="MODS" align="Center"/>
+							</horizontal>
+
+							<horizontal spacing="1">
+								<text rich-text="true" id="fcScoreText" font-size="~font-size" text="FC" align="Center"/>
+							</horizontal>
+
+						</vertical>
+					</stack>
+				</modal>
+			</macro.as-host>
 			<button id="retryButton" text="Retry" on-click="Retry" active="false" anchor-pos-x="-5" align="Center"/>
 		</leaderboard>
+	</vertical>
+	<vertical anchor-pos-x="47" anchor-pos-y="5.4" spacing="-19.4">
+		<macro.for-each hosts="buttonHolders">
+			<horizontal min-height="8" child-expand-height="true" child-align="MiddleCenter">
+				<button-with-icon id="infoButton" on-click="infoClick" icon ="QSLeaderboard.Images.info.png" hover-hint="Info" pref-width="10" pref-height="7"/>
+			</horizontal>
+		</macro.for-each>
 	</vertical>
 </bg>

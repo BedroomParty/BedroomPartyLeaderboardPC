@@ -7,6 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{ABD0E9FB-95BD-42A1-A33A-39E533D391BD}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <LangVersion>9.0</LangVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>QSLeaderboard</RootNamespace>
     <AssemblyName>QSLeaderboard</AssemblyName>
@@ -191,11 +192,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Leaderboard\LeaderboardView.cs" />
     <Compile Include="UI\Leaderboard\PanelView.cs" />
+    <Compile Include="UI\Leaderboard\ScoreInfoModal.cs" />
     <Compile Include="Utils\Constants.cs" />
     <Compile Include="Utils\LeaderboardData.cs" />
     <Compile Include="Utils\LeaderboardUtils.cs" />
     <Compile Include="Utils\PlayerUtils.cs" />
     <Compile Include="Utils\RequestUtils.cs" />
+    <Compile Include="Utils\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -235,6 +238,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\link.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\info.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
