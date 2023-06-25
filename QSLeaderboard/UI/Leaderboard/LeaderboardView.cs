@@ -29,13 +29,14 @@ namespace QSLeaderboard.UI.Leaderboard
 {
     [HotReload(RelativePathToLayout = @"./BSML/LeaderboardView.bsml")]
     [ViewDefinition("QSLeaderboard.UI.Leaderboard.BSML.LeaderboardView.bsml")]
-    internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet
+    internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet, IInitializable
     {
         [Inject] private PlatformLeaderboardViewController _plvc;
         [Inject] PlayerUtils _playerUtils;
         [Inject] PanelView _panelView;
         [Inject] RequestUtils _requestUtils;
         [Inject] LeaderboardData _leaderboardData;
+        [Inject] private ResultsViewController _resultsViewController;
 
         public IDifficultyBeatmap currentDifficultyBeatmap;
         public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
@@ -387,6 +388,7 @@ namespace QSLeaderboard.UI.Leaderboard
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+            Plugin.Log.Info(balls);
             currentSongLinkLBWebView = $"https://questsupporters.me/?board={balls}";
             _requestUtils.GetBeatMapData(balls, page, result =>
             {
@@ -506,6 +508,16 @@ namespace QSLeaderboard.UI.Leaderboard
             result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedPP + formattedMods + "</size>";
 
             return new ScoreData(score, result, rank, false);
+        }
+
+        public void Initialize()
+        {
+            _resultsViewController.continueButtonPressedEvent += FUCKOFFIHATETHISIWANTTODIE;
+        }
+
+        public void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController)
+        {
+            OnLeaderboardSet(currentDifficultyBeatmap);
         }
     }
 
