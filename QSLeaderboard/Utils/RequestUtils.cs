@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
-using static LocalLeaderboardsModel;
 
 namespace QSLeaderboard.Utils
 {
@@ -25,10 +24,9 @@ namespace QSLeaderboard.Utils
                 try
                 {
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                    string requestBody = getLBDownloadJSON(balls, page, 10);
+                    string requestString = getLBDownloadJSON(balls, page, 10, "top");
 
-                    HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_DOWNLOAD_END_POINT, content);
+                    HttpResponseMessage response = await httpClient.GetAsync(requestString);
 
                     int rank = 0;
                     float pp = 0f;
@@ -83,17 +81,10 @@ namespace QSLeaderboard.Utils
             }
         }
 
-        private string getLBDownloadJSON(string balls, int page, int limit)
+        private string getLBDownloadJSON(string balls, int page, int limit, string sort)
         {
-            var Data = new JObject
-            {
-                { "limit", limit },
-                { "page", page },
-                { "hash", balls },
-                { "id", Plugin.userID },
-            };
-            return Data.ToString();
-            return string.Empty;
+            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT}/{balls}?sort={sort}&limit=10&page={page}&user={Plugin.userID}";
+            return Data;
         }
 
         public void GetBeatMapData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
@@ -133,9 +124,7 @@ namespace QSLeaderboard.Utils
                     try
                     {
                         _leaderboardView.userIDHere.text = userID;
-                        var idBytes = Encoding.UTF8.GetBytes(userID);
-                        var authKey = Convert.ToBase64String(idBytes);
-                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Plugin.apiKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
 
@@ -143,7 +132,17 @@ namespace QSLeaderboard.Utils
 
                         HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT, content);
 
-                        if (response.StatusCode == HttpStatusCode.OK)
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            callback(response.IsSuccessStatusCode);
+                            _panelView.prompt_loader.SetActive(false);
+                            _panelView.promptText.text = "<color=red>Better score already exists.</color>";
+                            await Task.Delay(3000);
+                            _panelView.promptText.gameObject.SetActive(false);
+                            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                            break;
+                        }
+                        else if (response.StatusCode == HttpStatusCode.OK)
                         {
                             var jsonResponse = await response.Content.ReadAsStringAsync();
                             callback(response.IsSuccessStatusCode);

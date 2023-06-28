@@ -72,7 +72,14 @@
 				  italics="true"
 				  color="red"
 				  active="false"/>
-			<loading anchor-pos-x="-5" align="Center" active="false" id="loadingLB" pref-width='20' pref-height='20' preserve-aspect='true'/>
+			
+				<loading anchor-pos-x="-5" align="Center" active="false" id="loadingLB" pref-width='20' pref-height='20' preserve-aspect='true'/>
+
+			<vertical  child-align='MiddleCenter' child-control-height='false' child-expand-height='false'>
+				<string-setting preferred-width='50' text='Login Code' id='loginKeyboard' value='loginKeyboardVALUE' active='false' anchor-pos-x='-5' apply-on-change='true'/>
+				<button id='loginButton' text='Login' active='false' anchor-pos-x='-5' on-click='loginButtonCLICK'/>
+			</vertical>
+			
 			<modal child-expand-height="false" id='infoModal' show-event='showInfoModal' hide-event='hideInfoModal' size-delta-x='80' size-delta-y='55' clickerino-offerino-closerino='true'
 					move-to-center='true'>
 				<vertical spacing='1'

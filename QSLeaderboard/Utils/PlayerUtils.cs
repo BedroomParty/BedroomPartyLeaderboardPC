@@ -1,20 +1,13 @@
-﻿using IPA.Utilities.Async;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QSLeaderboard.UI.Leaderboard;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Playables;
 using Zenject;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QSLeaderboard.Utils
 {
@@ -49,12 +42,152 @@ namespace QSLeaderboard.Utils
                     taskCompletionSource.SetResult((user.Data.ID.ToString(), user.Data.OculusID));
                 });
             }
-        
+
             return taskCompletionSource.Task;
         }
 
+        // CODE
 
-        private async Task GetAuth(Action<(bool, string)> callback)
+
+        private async Task GetAuthCode(int code, Action<(bool, string)> callback)
+        {
+            _panelView.prompt_loader.SetActive(true);
+            _panelView.promptText.gameObject.SetActive(true);
+            _panelView.promptText.text = "Creating User...";
+            Plugin.Log.Info($"Code: {code}");
+            (string id, string username) = await GetPlayerInfo();
+            _panelView.playerUsername.text = username;
+
+            _leaderboardView.userIDHere.text = id;
+
+            using (var httpClient = new HttpClient())
+            {
+                int x = 0;
+                while (x < 2)
+                {
+                    try
+                    {
+                        await Task.Delay(500);
+                        Plugin.Log.Notice($"Create User attempt {x + 1}");
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                        string requestBody = getLoginStringCode(id, code);
+
+                        HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+                        HttpResponseMessage response = await httpClient.PostAsync(Constants.USER_URL + "/link", content);
+                        bool isAuthed = response.StatusCode == HttpStatusCode.OK;
+                        if (isAuthed)
+                        {
+                            Plugin.Authed = true;
+                            await Task.Delay(2000);
+                            callback((isAuthed, username));
+                            await Task.Delay(3000);
+                            _panelView.prompt_loader.SetActive(false);
+                            _panelView.promptText.gameObject.SetActive(false);
+
+                            // Parse the response and extract the API key
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            Plugin.Log.Info(responseContent);
+                            JObject jsonResponse = JObject.Parse(responseContent);
+                            string apiKey;
+                            if (jsonResponse.TryGetValue("key", out JToken apiKeyToken))
+                            {
+                                Plugin.Log.Info("IN jsonResponse.TryGetValue");
+                                apiKey = apiKeyToken.Value<string>();
+
+                                Plugin.Log.Info(apiKey);
+                                if (!string.IsNullOrEmpty(apiKey))
+                                {
+                                    if (!Directory.Exists(Constants.BALL_PATH))
+                                    {
+                                        Directory.CreateDirectory(Constants.BALL_PATH);
+                                    }
+                                    if(!File.Exists(Constants.BALL_PATH + "apiKey.txt"))
+                                    {
+                                        File.Create(Constants.BALL_PATH + "apiKey.txt");
+                                    }
+                                    string apiKeyFilePath = Constants.BALL_PATH + "apiKey.txt";
+                                    
+                                    using(StreamWriter sw = new(apiKeyFilePath))
+                                    {
+                                        await sw.WriteAsync(apiKey);
+                                    }
+                                    Plugin.Log.Info("API key saved successfully.");
+                                }
+                                else
+                                {
+                                    Plugin.Log.Error("Failed to parse API key from the response.");
+                                }
+                            }
+                            else
+                            {
+                                Plugin.Log.Error("API key not found in the response.");
+                            }
+
+                            break;
+                        }
+                        await Task.Delay(2000);
+                        _panelView.promptText.text = $"<color=red>Error Creating User... attempt {x + 1} of 3</color>";
+                        x++;
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        _panelView.promptText.text = $"<color=red>Error Creating User... attempt {x + 1} of 3</color>";
+                        Plugin.Log.Error($"HttpRequestException: {ex.Message}");
+                        x++;
+                        await Task.Delay(5000);
+                    }
+                    catch (JsonException ex)
+                    {
+                        _panelView.promptText.text = $"<color=red>Error Creating User... attempt {x + 1} of 3</color>";
+                        Plugin.Log.Error($"JsonException: {ex.Message}");
+                        x++;
+                        await Task.Delay(5000);
+                    }
+                    x++;
+                }
+                if (x == 2)
+                {
+                    callback((false, username));
+                }
+            }
+        }
+
+
+        private string getLoginStringCode(string id, int code)
+        {
+            var Data = new JObject
+            {
+                { "id", id },
+                { "code", code.ToString()}
+            };
+
+            return Data.ToString();
+            return string.Empty;
+        }
+
+        private string getLoginStringKey(string id)
+        {
+            var Data = new JObject
+            {
+                { "id", id },
+            };
+
+            return Data.ToString();
+            return string.Empty;
+        }
+
+        public void GetAuthStatusCode(int code, Action<(bool, string)> callback)
+        {
+            Task.Run(() => GetAuthCode(code, callback));
+        }
+
+
+
+        // KEY
+
+
+        private async Task GetAuthKey(string apiKey, Action<(bool, string)> callback)
         {
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
@@ -63,29 +196,29 @@ namespace QSLeaderboard.Utils
             _panelView.playerUsername.text = username;
 
             _leaderboardView.userIDHere.text = id;
-            var idBytes = Encoding.UTF8.GetBytes(id);
-            var authKey = Convert.ToBase64String(idBytes);
+
 
 
             using (var httpClient = new HttpClient())
             {
                 int x = 0;
-                while(x < 2)
+                while (x < 2)
                 {
                     try
                     {
                         Plugin.Log.Notice($"LOGIN ATTEMPT {x + 1}");
-                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", authKey);
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", apiKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                        string requestBody = getLoginString(id);
+                        string requestBody = getLoginStringKey(id);
 
 
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
                         HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
                         bool isAuthed = response.StatusCode == HttpStatusCode.OK;
-                        if(isAuthed)
+                        if (isAuthed)
                         {
+                            Plugin.Authed = true;
                             await Task.Delay(2000);
                             callback((isAuthed, username));
                             await Task.Delay(3000);
@@ -112,20 +245,9 @@ namespace QSLeaderboard.Utils
             }
         }
 
-        private string getLoginString(string id)
+        public void GetAuthStatusKey(string key, Action<(bool, string)> callback)
         {
-            var Data = new JObject
-            {
-                { "ID", id }
-            };
-
-            return Data.ToString();
-            return string.Empty;
-        }
-
-        public void GetAuthStatus(Action<(bool, string)> callback)
-        {
-            Task.Run(() => GetAuth(callback));
+            Task.Run(() => GetAuthKey(key, callback));
         }
     }
 }

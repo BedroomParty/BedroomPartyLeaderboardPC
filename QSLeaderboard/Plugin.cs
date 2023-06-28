@@ -1,7 +1,7 @@
 ﻿using IPA;
-using IPALogger = IPA.Logging.Logger;
-using SiraUtil.Zenject;
 using QSLeaderboard.Installers;
+using SiraUtil.Zenject;
+using IPALogger = IPA.Logging.Logger;
 
 namespace QSLeaderboard
 {
@@ -13,6 +13,7 @@ namespace QSLeaderboard
         public static bool Authed;
         public static string userID;
         public static string userName;
+        public static string apiKey;
 
         [Init]
         public Plugin(IPALogger logger, Zenjector zenjector)

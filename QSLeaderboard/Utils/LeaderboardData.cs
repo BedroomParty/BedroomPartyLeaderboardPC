@@ -66,12 +66,7 @@ namespace QSLeaderboard.Utils
                     modifiers ?? ""
                 ));
             }
-
             return leaderboard;
         }
-
-
-
-
     }
 }

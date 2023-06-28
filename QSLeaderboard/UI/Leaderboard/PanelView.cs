@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BeatSaberMarkupLanguage;
-using BeatSaberMarkupLanguage.Attributes;
-using BeatSaberMarkupLanguage.Components;
+﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
 using QSLeaderboard.Utils;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -64,7 +58,13 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIAction("#post-parse")]
         private void PostParse()
         {
-            
+
+        }
+
+        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+        {
+            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
+
         }
     }
 }

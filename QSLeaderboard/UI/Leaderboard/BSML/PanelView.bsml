@@ -14,7 +14,7 @@
 			<horizontal pref-height="13">
 				<vertical spacing="6" child-expand-width="false" child-control-width="false" child-align="MiddleCenter">
 					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
-						<text id="playerUsername" font-size="6" text="PLAYERNAME" rich-text="false" align="Center"/>
+							<text id="playerUsername" font-size="6" text="PLAYERNAME" rich-text="false" align="Center"/>
 					</horizontal>
 
 					<horizontal horizontal-fit="PreferredSize" spacing="3">

@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using BeatSaberMarkupLanguage;
+﻿using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
-using IPA.Logging;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
 using QSLeaderboard.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static LeaderboardTableView;
 using Button = UnityEngine.UI.Button;
 
@@ -66,6 +61,15 @@ namespace QSLeaderboard.UI.Leaderboard
 
         [UIComponent("linkText")]
         public TextMeshProUGUI linkText;
+
+
+
+        [UIObject("loginKeyboard")]
+        public GameObject loginKeyboard;
+
+        [UIObject("loginButton")]
+        public GameObject loginButton;
+
 
         [UIValue("imageHolders")]
         [Inject] private List<ImageHolder> holders;
@@ -260,6 +264,29 @@ namespace QSLeaderboard.UI.Leaderboard
             parserParams.EmitEvent("showInfoModal");
         }
 
+        private protected string loginCODEFUCKOFF;
+
+        [UIValue("loginKeyboardVALUE")]
+        private string loginKeyboardVALUE
+        {
+            get => loginCODEFUCKOFF;
+            set => loginCODEFUCKOFF = value;
+        }
+
+        [UIAction("loginButtonCLICK")]
+        public void loginButtonCLICK()
+        {
+            if (int.TryParse(loginCODEFUCKOFF, out int silly))
+            {
+                LoginCode(silly);
+            }
+            else
+            {
+
+            }
+        }
+
+
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
@@ -268,47 +295,94 @@ namespace QSLeaderboard.UI.Leaderboard
             var header = _plvc.transform.Find("HeaderPanel");
             if (firstActivation)
             {
-                _playerUtils.GetAuthStatus(result =>
+                int code = 0;
+                string apiKey = string.Empty;
+                if(File.Exists(Constants.BALL_PATH + "apiKey.txt"))
                 {
-                    bool isAuthenticated = result.Item1;
-                    string username = result.Item2;
+                    apiKey = File.ReadAllText(Constants.BALL_PATH + "apiKey.txt");
+                    LoginKey(apiKey);
+                    Plugin.apiKey = apiKey;
+                }
+                else
+                {
+                    loginKeyboard.gameObject.SetActive(true);
+                    loginButton.gameObject.SetActive(true);
+                }
 
-                    if (isAuthenticated)
-                    {
-                        Plugin.Authed = true;
-                        Plugin.userName = username;
-                        Plugin.Log.Info("Authenticated! Username: " + username);
-                        _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
-                        if (currentDifficultyBeatmap != null)
-                        {
-                            OnLeaderboardSet(currentDifficultyBeatmap);
-                            UpdatePageButtons();
-
-                        }
-                        var url = $"{Constants.PROFILE_PICTURE}/{Plugin.userID}/avatar/low";
-                        Plugin.Log.Info(url);
-                        UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
-                    }
-                    else
-                    {
-                        _panelView.promptText.text = "<color=red>Error Authenticating</color>";
-                        _panelView.prompt_loader.SetActive(false);
-                        Plugin.Log.Error("Not authenticated! Username: " + username);
-                    }
-                });
-                //_panelView.currentRank.text = $"Current Rank: #1";
-                //_panelView.isMapRanked.text = $"Ranked Status: Ranked";
-                // Create a transparent texture with a size of 1x1
                 Texture2D texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                texture.SetPixel(0, 0, new Color(1f, 1f, 1f, 0f)); // Set pixel color with alpha = 0 (transparent)
+                texture.SetPixel(0, 0, new Color(1f, 1f, 1f, 0f));
                 texture.Apply();
 
-                // Create a sprite using the transparent texture
                 transparentSprite = Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), Vector2.one * 0.5f);
             }
         }
 
+        private protected void LoginCode(int code)
+        {
+            _playerUtils.GetAuthStatusCode(code, result =>
+            {
+                bool isAuthenticated = result.Item1;
+                string username = result.Item2;
+
+                if (isAuthenticated)
+                {
+                    Plugin.Authed = true;
+                    Plugin.userName = username;
+                    Plugin.Log.Info("Authenticated! Username: " + username);
+                    loginButton.gameObject.SetActive(false);
+                    loginKeyboard.gameObject.SetActive(false);
+                    _panelView.prompt_loader.SetActive(false);
+                    _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
+                    if (currentDifficultyBeatmap != null)
+                    {
+                        OnLeaderboardSet(currentDifficultyBeatmap);
+                        UpdatePageButtons();
+                    }
+                    var url = $"{Constants.USER_URL}/{Plugin.userID}/avatar/low";
+                    Plugin.Log.Info(url);
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
+                }
+                else
+                {
+                    _panelView.promptText.text = "<color=red>Error Authenticating</color>";
+                    _panelView.prompt_loader.SetActive(false);
+                    Plugin.Log.Error("Not authenticated! Username: " + username);
+                }
+            });
+        }
+
+        private protected void LoginKey(string apiKey)
+        {
+            _playerUtils.GetAuthStatusKey(apiKey, result =>
+            {
+                bool isAuthenticated = result.Item1;
+                string username = result.Item2;
+
+                if (isAuthenticated)
+                {
+                    Plugin.Authed = true;
+                    Plugin.userName = username;
+                    Plugin.Log.Info("Authenticated! Username: " + username);
+                    _panelView.prompt_loader.SetActive(false);
+                    _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
+                    if (currentDifficultyBeatmap != null)
+                    {
+                        OnLeaderboardSet(currentDifficultyBeatmap);
+                        UpdatePageButtons();
+
+                    }
+                    var url = $"{Constants.USER_URL}/{Plugin.userID}/avatar/low";
+                    Plugin.Log.Info(url);
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
+                }
+                else
+                {
+                    _panelView.promptText.text = "<color=red>Error Authenticating</color>";
+                    _panelView.prompt_loader.SetActive(false);
+                    Plugin.Log.Error("Not authenticated! Username: " + username);
+                }
+            });
+        }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
@@ -360,7 +434,7 @@ namespace QSLeaderboard.UI.Leaderboard
             request.Dispose();
         }
 
-        
+
 
         private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
@@ -372,7 +446,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
             if (!Plugin.Authed)
             {
-                errorText.gameObject.SetActive(true);
+                errorText.gameObject.SetActive(false);
                 errorReason = "Auth Fail";
                 return;
             }
@@ -449,7 +523,7 @@ namespace QSLeaderboard.UI.Leaderboard
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                var url = $"{Constants.PROFILE_PICTURE}/{leaderboard[i].userID.ToString()}/avatar/low";
+                var url = $"{Constants.USER_URL}/{leaderboard[i].userID.ToString()}/avatar/low";
                 SetProfileImage(url, i, leaderboard[i].userID);
             }
 
@@ -459,7 +533,7 @@ namespace QSLeaderboard.UI.Leaderboard
             }
         }
 
-        void RichMyText(LeaderboardTableView tableView) 
+        void RichMyText(LeaderboardTableView tableView)
         {
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
             {
@@ -484,7 +558,7 @@ namespace QSLeaderboard.UI.Leaderboard
             for (int i = 0; i < leaderboard.Count; i++)
             {
                 int score = leaderboard[i].score;
-                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], i + (page * 10) + 1, score));
+                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score));
                 holders[i].profileImage.gameObject.SetActive(true);
                 buttonEntryArray[i] = leaderboard[i];
                 Buttonholders[i].infoButton.gameObject.SetActive(true);
@@ -492,7 +566,7 @@ namespace QSLeaderboard.UI.Leaderboard
             return tableData;
         }
 
-        public ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int rank, int score)
+        public ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int score)
         {
             string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
             string formattedCombo = "";
@@ -507,7 +581,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
             result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedPP + formattedMods + "</size>";
 
-            return new ScoreData(score, result, rank, false);
+            return new ScoreData(score, result, entry.rank, false);
         }
 
         public void Initialize()

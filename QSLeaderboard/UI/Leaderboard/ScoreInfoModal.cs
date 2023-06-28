@@ -80,7 +80,7 @@ namespace QSLeaderboard.UI
 
             if (entry.fullCombo) fcScoreText.text = "<size=4><color=green>Full Combo!</color></size>";
             else fcScoreText.text = string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
-            SetProfileImageModal($"{Constants.PROFILE_PICTURE}/{entry.userID.ToString()}/avatar/low", entry.userID, profileImageModal);
+            SetProfileImageModal($"{Constants.USER_URL}/{entry.userID.ToString()}/avatar/low", entry.userID, profileImageModal);
             parserParams.EmitEvent("showScoreInfo");
             currentEntry = entry;
         }

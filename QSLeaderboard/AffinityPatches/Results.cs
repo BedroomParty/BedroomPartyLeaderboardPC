@@ -1,14 +1,6 @@
-﻿using IPA.Utilities.Async;
-using QSLeaderboard.UI.Leaderboard;
-using QSLeaderboard.Utils;
+﻿using QSLeaderboard.Utils;
 using SiraUtil.Affinity;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using Zenject;
 
 namespace QSLeaderboard.AffinityPatches
@@ -89,6 +81,7 @@ namespace QSLeaderboard.AffinityPatches
         [AffinityPatch(typeof(LevelCompletionResultsHelper), nameof(LevelCompletionResultsHelper.ProcessScore))]
         private void Postfix(ref PlayerData playerData, ref PlayerLevelStatsData playerLevelStats, ref LevelCompletionResults levelCompletionResults, ref IReadonlyBeatmapData transformedBeatmapData, ref IDifficultyBeatmap difficultyBeatmap, ref PlatformLeaderboardsModel platformLeaderboardsModel)
         {
+            if (!Plugin.Authed) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             float modifiedScore = levelCompletionResults.modifiedScore;
             if (modifiedScore == 0 || maxScore == 0) return;
