@@ -10,7 +10,7 @@ namespace QSLeaderboard.Utils
         public const string LEADERBOARD_UPLOAD_END_POINT = "https://api.questsupporters.me/leaderboard/upload";
         public const string USER_URL = "https://api.questsupporters.me/user";
         public const string BALL_PATH = "./UserData/QSLeaderboard/Scary/";
-        public const string PLAYLIST_PATH = "./Playlists";
+        public const string PLAYLIST_PATH = "./Playlists/";
 
         public const string PLAYLIST_URL = "https://api.questsupporters.me/playlist/ranked";
 

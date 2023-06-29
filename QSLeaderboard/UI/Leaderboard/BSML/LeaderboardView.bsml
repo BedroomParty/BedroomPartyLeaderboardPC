@@ -20,7 +20,6 @@
 
 	<!-- Leaderboard scrollers -->
 	<bg anchor-pos-x="-40" anchor-pos-y="-15">
-
 		<page-button id="up_button"
 					 icon="QSLeaderboard.Images.arrow.png"
 					 dir="Up"
@@ -42,7 +41,6 @@
 				   pref-width="10"
 				   pref-height="10"
 				   on-click="OnPageDown"/>
-
 
 		<clickable-image size-delta-x="6" size-delta-y="6" anchor-pos-y="-5.5" anchor-pos-x="0" id='linkIcon' src="QSLeaderboard.Images.link.png" on-click='openLBWebView'/>
 	</bg>
@@ -107,7 +105,7 @@
 							<macro.define name="font-size" value="3.1"/>
 
 							<horizontal spacing="-2">
-								<text rich-text="true" id="usernameScoreText" font-size="~font-size" text="USERNAME" align="Center"/>
+								<clickable-text rich-text="true" id="usernameScoreText" font-size="~font-size" text="USERNAME" align="Center" on-click=""/>
 								<vertical anchor-pos-y="25" pref-width="12" pref-height="12">
 									<stack>
 										<image id="profileImageModal" src="QSLeaderboard.Images.blank.png"  preserve-aspect="true"/>

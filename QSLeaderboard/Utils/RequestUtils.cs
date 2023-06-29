@@ -123,7 +123,6 @@ namespace QSLeaderboard.Utils
                     _panelView.promptText.text = "Uploading Score...";
                     try
                     {
-                        _leaderboardView.userIDHere.text = userID;
                         Plugin.Log.Info($"Sending upload post with api key in auth: {Plugin.apiKey}");
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Plugin.apiKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
@@ -228,13 +227,9 @@ namespace QSLeaderboard.Utils
 
                             if (!string.IsNullOrEmpty(playlistStringLMFAOOOOO))
                             {
-                                if (!Directory.Exists(Constants.PLAYLIST_PATH))
+                                if (!File.Exists(Constants.PLAYLIST_PATH + "QS-Ranked.bplist"))
                                 {
-                                    Directory.CreateDirectory(Constants.PLAYLIST_PATH);
-                                }
-                                if (!File.Exists(Constants.PLAYLIST_PATH + "QS-RANKED.bplist"))
-                                {
-                                    using (File.Create(Constants.PLAYLIST_PATH + "QS-RANKED.bplist")) { }
+                                    using (File.Create(Constants.PLAYLIST_PATH + "QS-Ranked.bplist")) { }
                                 }
                                 string apiKeyFilePath = Constants.PLAYLIST_PATH + "QS-Ranked.bplist";
 

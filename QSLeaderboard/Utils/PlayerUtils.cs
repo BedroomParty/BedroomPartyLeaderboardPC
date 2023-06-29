@@ -216,7 +216,6 @@ namespace QSLeaderboard.Utils
 
             (string id, string username) = await GetPlayerInfo();
             _panelView.playerUsername.text = username;
-            _leaderboardView.userIDHere.text = id;
             string discordID;
             string usernameTemp = "Error";
             using (var httpClient = new HttpClient())

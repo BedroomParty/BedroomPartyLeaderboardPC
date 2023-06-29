@@ -58,14 +58,6 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIComponent("errorText")]
         private TextMeshProUGUI errorText;
 
-        [UIComponent("userIDHere")]
-        public TextMeshProUGUI userIDHere;
-
-        [UIComponent("linkText")]
-        public TextMeshProUGUI linkText;
-
-
-
         [UIObject("loginKeyboard")]
         public GameObject loginKeyboard;
 
@@ -141,7 +133,6 @@ namespace QSLeaderboard.UI.Leaderboard
             ImageSkew(ref _imgView) = 0.18f;
             ImageGradient(ref _imgView) = true;
 
-            linkText.text = "Link your account with <size=110%><color=green>/link</color></size> in the QS server!";
         }
 
         public async void SetProfileImage(string url, int index, string userID)
@@ -594,7 +585,7 @@ namespace QSLeaderboard.UI.Leaderboard
             else formattedCombo = string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
 
             string formattedPP = string.Empty;
-            if (entry.PP > 0) formattedPP = $" - <color=#AEC6CF>{entry.PP}</color>pp";
+            if (entry.PP > 0) formattedPP = $" - <color=#AEC6CF>{entry.PP.ToString("F2")}</color>pp";
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;
