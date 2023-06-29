@@ -1,4 +1,5 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using HMUI;
 using IPA.Utilities.Async;
@@ -19,7 +20,7 @@ namespace QSLeaderboard.UI
         public ModalView infoModal;
 
         [UIComponent("usernameScoreText")]
-        private TextMeshProUGUI usernameScoreText;
+        private ClickableText usernameScoreText;
 
         [UIComponent("dateScoreText")]
         private TextMeshProUGUI dateScoreText;
@@ -51,6 +52,12 @@ namespace QSLeaderboard.UI
         [UIParams]
         public BSMLParserParams parserParams;
 
+        [UIAction("usernameScoreTextCLICK")]
+        public void usernameScoreTextCLICK()
+        {
+            Application.OpenURL(Constants.USER_PROFILE_LINK + currentEntry.userID);
+        }
+
         [Inject] LeaderboardView _leaderboardView;
 
         LeaderboardData.LeaderboardEntry currentEntry;
@@ -61,6 +68,8 @@ namespace QSLeaderboard.UI
 
         public void setScoreModalText(LeaderboardData.LeaderboardEntry entry)
         {
+            currentEntry = entry;
+
             string formattedDate = "Error";
             profileImageModalLOADING.SetActive(true);
 
@@ -69,6 +78,7 @@ namespace QSLeaderboard.UI
 
             usernameScoreText.text = $"<size=180%>{entry.userName}</color>";
             usernameScoreText.richText = true;
+
 
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc.ToString("F2")}%</color></size>";
             scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.score}</size>";
@@ -82,7 +92,6 @@ namespace QSLeaderboard.UI
             else fcScoreText.text = string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
             SetProfileImageModal($"{Constants.USER_URL}/{entry.userID.ToString()}/avatar/low", entry.userID, profileImageModal);
             parserParams.EmitEvent("showScoreInfo");
-            currentEntry = entry;
         }
 
         private async void SetProfileImageModal(string url, string userID, ImageView image)

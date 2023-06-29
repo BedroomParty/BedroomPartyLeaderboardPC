@@ -55,6 +55,9 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIComponent("myHeader")]
         private Backgroundable myHeader;
 
+        [UIComponent("headerText")]
+        private TextMeshProUGUI headerText;
+
         [UIComponent("errorText")]
         private TextMeshProUGUI errorText;
 
@@ -489,6 +492,16 @@ namespace QSLeaderboard.UI.Leaderboard
                     }
 
                     _panelView.playerPP.text = $"{result.Item6}pp";
+
+                    if(result.Item5 != 0)
+                    {
+                        headerText.SetText($"RANKED - {result.Item5.ToString("F2")}<b>✰</b>");
+                    }
+                    else
+                    {
+                        headerText.SetText("UNRANKED");
+                    }
+
 
                     if (result.Item2 != null)
                     {
