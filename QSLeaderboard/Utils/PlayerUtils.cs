@@ -94,7 +94,7 @@ namespace QSLeaderboard.Utils
                             {
                                 Plugin.Log.Info("IN jsonResponse.TryGetValue");
                                 apiKey = apiKeyToken.Value<string>();
-
+                                Plugin.apiKey = apiKey;
                                 Plugin.Log.Info(apiKey);
                                 if (!string.IsNullOrEmpty(apiKey))
                                 {
@@ -102,9 +102,9 @@ namespace QSLeaderboard.Utils
                                     {
                                         Directory.CreateDirectory(Constants.BALL_PATH);
                                     }
-                                    if(!File.Exists(Constants.BALL_PATH + "apiKey.txt"))
+                                    if (!File.Exists(Constants.BALL_PATH + "apiKey.txt"))
                                     {
-                                        File.Create(Constants.BALL_PATH + "apiKey.txt");
+                                        using (File.Create(Constants.BALL_PATH + "apiKey.txt")) { }
                                     }
                                     string apiKeyFilePath = Constants.BALL_PATH + "apiKey.txt";
                                     

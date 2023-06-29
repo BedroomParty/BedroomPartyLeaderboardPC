@@ -23,7 +23,6 @@ namespace QSLeaderboard.Utils
             {
                 try
                 {
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                     string requestString = getLBDownloadJSON(balls, page, 10, "top");
 
                     HttpResponseMessage response = await httpClient.GetAsync(requestString);
