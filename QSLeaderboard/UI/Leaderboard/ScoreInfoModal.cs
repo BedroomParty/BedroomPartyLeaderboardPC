@@ -81,9 +81,18 @@ namespace QSLeaderboard.UI
 
 
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc.ToString("F2")}%</color></size>";
-            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.score}</size>";
+            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.score.ToString("N0")}</size>";
+            scoreScoreText.text.Replace(",", " ");
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
-            ppScoreText.text = string.Format("<size=4.8><color=#BCE59C>{0}<size=3>pp</size></color></size>", entry.PP);
+
+            if(entry.PP != 0)
+            {
+                ppScoreText.text = string.Format("<size=4.8><color=#BCE59C>{0}<size=3>pp</size></color></size>", entry.PP.ToString("F2"));
+            }
+            else
+            {
+                ppScoreText.gameObject.SetActive(false);
+            }
 
             if (entry.mods.IsEmpty()) modifiersScoreText.gameObject.SetActive(false);
             else modifiersScoreText.gameObject.SetActive(true);
