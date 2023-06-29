@@ -20,6 +20,7 @@
 
 	<!-- Leaderboard scrollers -->
 	<bg anchor-pos-x="-40" anchor-pos-y="-15">
+
 		<page-button id="up_button"
 					 icon="QSLeaderboard.Images.arrow.png"
 					 dir="Up"
@@ -41,6 +42,7 @@
 				   pref-width="10"
 				   pref-height="10"
 				   on-click="OnPageDown"/>
+
 
 		<clickable-image size-delta-x="6" size-delta-y="6" anchor-pos-y="-5.5" anchor-pos-x="0" id='linkIcon' src="QSLeaderboard.Images.link.png" on-click='openLBWebView'/>
 	</bg>
@@ -88,19 +90,16 @@
 						<image align='Left' id="QSLeaderboard_logo" src="QSLeaderboard.Images.QSLeaderboard_logo.png" preserve-aspect="true" pref-width="15" pref-height="15"/>
 						<text font-size="10" text='QS Leaderboard' align='Right'/>
 					</horizontal>
-					<text font-size='5' align='Center' text='QS Leaderboard by Speecil and Nuggo!'/>
+					<text font-size='5' align='Center' text='QS Leaderboard by the QS Team'/>
 					<text text-wrap='true' align='Center' text='A leaderboard for the best server'/>
-					<horizontal spacing='2'>
-						<text align='Right' text='Your ID: '/>
-						<text align='Left' id='userIDHere' text='TEST DATA' font-size='5'/>
+					<horizontal>
+						<action-button text="Ranked Playlist" pref-width="25" pref-height="10" id='playlistButton' on-click='downloadRankedPlaylist'/>
+						<action-button text="Website" pref-width="25" pref-height="10"  id='websiteButton' on-click='openWebsite'/>
 					</horizontal>
-					<text id='linkText' align='Center' rich-text='true' text='Link your account with /link in the QS server!' word-wrapping='true'/>
 				</vertical>
 			</modal>
 			<macro.as-host host="scoreInfoModal">
 				<modal id="scoreInfo" show-event="showScoreInfo" hide-event="hideScoreInfo" size-delta-x="60" size-delta-y="42" clickerino-offerino-closerino="true" move-to-center="true">
-
-
 					<stack>
 						<vertical spacing="1" child-expand-height="true" child-expand-width="true" pad="3">
 

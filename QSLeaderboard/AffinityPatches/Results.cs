@@ -93,7 +93,6 @@ namespace QSLeaderboard.AffinityPatches
             int misses = levelCompletionResults.missedCount;
             bool fc = levelCompletionResults.fullCombo;
 
-
             string mapId = difficultyBeatmap.level.levelID.Substring(13);
 
             int difficulty = difficultyBeatmap.difficultyRank;
@@ -103,7 +102,7 @@ namespace QSLeaderboard.AffinityPatches
 
             string mods = GetModifiersString(levelCompletionResults);
 
-            _requestUtils.SetBeatMapData(balls, Plugin.userID, Plugin.userName, badCut, misses, fc, acc, score, mods, result =>
+            _requestUtils.SetBeatMapData(balls, Plugin.discordID, Plugin.userName, badCut, misses, fc, acc, score, mods, result =>
             {
                 Plugin.Log.Info("_requestUtils.SetBeatMapData");
             });

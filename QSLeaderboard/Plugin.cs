@@ -11,7 +11,11 @@ namespace QSLeaderboard
         internal static IPALogger Log { get; private set; }
 
         public static bool Authed;
-        public static string userID;
+        
+        public static string platformID;
+
+        public static string discordID;
+
         public static string userName;
         public static string apiKey;
 

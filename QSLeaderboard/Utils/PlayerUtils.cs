@@ -22,7 +22,7 @@ namespace QSLeaderboard.Utils
             var steamName = "loser";
             steamID = Steamworks.SteamUser.GetSteamID().ToString();
             steamName = Steamworks.SteamFriends.GetPersonaName();
-            Plugin.userID = steamID;
+            Plugin.platformID = steamID;
             return (steamID, steamName);
         }
 
@@ -38,7 +38,7 @@ namespace QSLeaderboard.Utils
             {
                 Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
                 {
-                    Plugin.userID = user.Data.ID.ToString();
+                    Plugin.platformID = user.Data.ID.ToString();
                     taskCompletionSource.SetResult((user.Data.ID.ToString(), user.Data.OculusID));
                 });
             }
@@ -56,9 +56,7 @@ namespace QSLeaderboard.Utils
             _panelView.promptText.text = "Creating User...";
             Plugin.Log.Info($"Code: {code}");
             (string id, string username) = await GetPlayerInfo();
-            _panelView.playerUsername.text = username;
 
-            _leaderboardView.userIDHere.text = id;
 
             using (var httpClient = new HttpClient())
             {
@@ -90,6 +88,8 @@ namespace QSLeaderboard.Utils
                             Plugin.Log.Info(responseContent);
                             JObject jsonResponse = JObject.Parse(responseContent);
                             string apiKey;
+                            string discordID;
+                            string usernameTemp = "Error";
                             if (jsonResponse.TryGetValue("key", out JToken apiKeyToken))
                             {
                                 Plugin.Log.Info("IN jsonResponse.TryGetValue");
@@ -124,6 +124,27 @@ namespace QSLeaderboard.Utils
                                 Plugin.Log.Error("API key not found in the response.");
                             }
 
+                            if(jsonResponse.TryGetValue("ID", out JToken discordIDToken))
+                            {
+                                discordID = discordIDToken.Value<string>();
+                                Plugin.discordID = discordID;
+                            }
+                            else
+                            {
+                                Plugin.Log.Error("Discord ID key not found in the response.");
+                            }
+
+                            if (jsonResponse.TryGetValue("Username", out JToken usernameToken))
+                            {
+                                usernameTemp = usernameToken.Value<string>();
+                                Plugin.userName = usernameTemp;
+                                _panelView.playerUsername.text = usernameTemp;
+                            }
+                            else
+                            {
+                                Plugin.Log.Error("Username key not found in the response.");
+                            }
+                            callback((isAuthed, usernameTemp));
                             break;
                         }
                         await Task.Delay(2000);
@@ -192,13 +213,12 @@ namespace QSLeaderboard.Utils
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
             _panelView.promptText.text = "Authenticating...";
+
             (string id, string username) = await GetPlayerInfo();
             _panelView.playerUsername.text = username;
-
             _leaderboardView.userIDHere.text = id;
-
-
-
+            string discordID;
+            string usernameTemp = "Error";
             using (var httpClient = new HttpClient())
             {
                 int x = 0;
@@ -216,19 +236,41 @@ namespace QSLeaderboard.Utils
 
                         HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
                         bool isAuthed = response.StatusCode == HttpStatusCode.OK;
+
+                        string responseContent = await response.Content.ReadAsStringAsync();
+                        Plugin.Log.Info(responseContent);
+                        JObject jsonResponse = JObject.Parse(responseContent);
                         if (isAuthed)
                         {
                             Plugin.Authed = true;
-                            await Task.Delay(2000);
-                            callback((isAuthed, username));
-                            await Task.Delay(3000);
                             _panelView.prompt_loader.SetActive(false);
                             _panelView.promptText.gameObject.SetActive(false);
-                            break;
+                            if (jsonResponse.TryGetValue("ID", out JToken discordIDToken))
+                            {
+                                discordID = discordIDToken.Value<string>();
+                                Plugin.discordID = discordID;
+                            }
+                            else
+                            {
+                                Plugin.Log.Error("Discord ID key not found in the response.");
+                            }
+
+                            if (jsonResponse.TryGetValue("Username", out JToken usernameToken))
+                            {
+                                usernameTemp = usernameToken.Value<string>();
+                                Plugin.userName = usernameTemp;
+                                _panelView.playerUsername.text = usernameTemp;
+                            }
+                            else
+                            {
+                                Plugin.Log.Error("Username key not found in the response.");
+                            }
+                            callback((isAuthed, usernameTemp));
+
+                            await Task.Delay(2000);
+                            _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
+                            x++;
                         }
-                        await Task.Delay(2000);
-                        _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
-                        x++;
                     }
                     catch (HttpRequestException)
                     {

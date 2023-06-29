@@ -11,6 +11,8 @@ using QSLeaderboard.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -287,6 +289,23 @@ namespace QSLeaderboard.UI.Leaderboard
         }
 
 
+        [UIComponent("playlistButton")]
+        public Button playlistButton;
+
+
+        [UIAction("downloadRankedPlaylist")]
+        public void downloadRankedPlaylist()
+        {
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.FUCKOFFPLAYLIST());
+        }
+
+
+        [UIAction("openWebsite")]
+        public void openWebsite()
+        {
+            Application.OpenURL("https://questsupporters.me");
+        }
+
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
@@ -338,7 +357,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         OnLeaderboardSet(currentDifficultyBeatmap);
                         UpdatePageButtons();
                     }
-                    var url = $"{Constants.USER_URL}/{Plugin.userID}/avatar/low";
+                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/low";
                     Plugin.Log.Info(url);
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
                 }
@@ -371,7 +390,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         UpdatePageButtons();
 
                     }
-                    var url = $"{Constants.USER_URL}/{Plugin.userID}/avatar/low";
+                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/low";
                     Plugin.Log.Info(url);
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
                 }
@@ -443,6 +462,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
             await Task.Delay(1);
             FuckOffButtons();
+            leaderboardTableView.SetScores(null, -1);
 
             if (!Plugin.Authed)
             {

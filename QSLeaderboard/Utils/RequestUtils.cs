@@ -3,12 +3,17 @@ using Newtonsoft.Json.Linq;
 using QSLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using Zenject;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QSLeaderboard.Utils
 {
@@ -34,8 +39,6 @@ namespace QSLeaderboard.Utils
                     int totalPages = 0;
                     List<LeaderboardData.LeaderboardEntry> data = new List<LeaderboardData.LeaderboardEntry>();
 
-                    if (response.IsSuccessStatusCode)
-                    {
                         var jsonResponse = await response.Content.ReadAsStringAsync();
                         Plugin.Log.Info(jsonResponse.ToString());
                         JObject jsonObject = JObject.Parse(jsonResponse);
@@ -67,7 +70,6 @@ namespace QSLeaderboard.Utils
                         else
                             data = new List<LeaderboardData.LeaderboardEntry>();
 
-                    }
 
                     callback((response.IsSuccessStatusCode, data, rank, totalPages, stars, pp));
                     return;
@@ -82,7 +84,7 @@ namespace QSLeaderboard.Utils
 
         private string getLBDownloadJSON(string balls, int page, int limit, string sort)
         {
-            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT}/{balls}?sort={sort}&limit=10&page={page}&user={Plugin.userID}";
+            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT}/{balls}?sort={sort}&limit=10&page={page}&id={Plugin.discordID}";
             return Data;
         }
 
@@ -105,7 +107,6 @@ namespace QSLeaderboard.Utils
                 { "ID", userID },
             };
             return Data.ToString();
-            return string.Empty;
         }
 
 
@@ -123,6 +124,7 @@ namespace QSLeaderboard.Utils
                     try
                     {
                         _leaderboardView.userIDHere.text = userID;
+                        Plugin.Log.Info($"Sending upload post with api key in auth: {Plugin.apiKey}");
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Plugin.apiKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
@@ -140,7 +142,7 @@ namespace QSLeaderboard.Utils
                             _panelView.promptText.gameObject.SetActive(false);
                             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                             break;
-                        }
+                        }   
                         else if (response.StatusCode == HttpStatusCode.OK)
                         {
                             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -196,7 +198,119 @@ namespace QSLeaderboard.Utils
                 { "Modifiers", mods },
             };
             return Data.ToString();
-            return string.Empty;
+        }
+
+
+        public void FUCKOFFPLAYLIST()
+        {
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => FUCK());
+        }
+
+        private async Task FUCK()
+        {
+            using (var httpClient = new HttpClient())
+            {
+                int x = 0;
+                while (x < 2)
+                {
+                    _panelView.prompt_loader.SetActive(true);
+                    _panelView.promptText.gameObject.SetActive(true);
+                    _leaderboardView.playlistButton.interactable = false;
+                    _panelView.promptText.text = "Downloading Playlist...";
+                    try
+                    {
+                        HttpResponseMessage response = await httpClient.GetAsync(Constants.PLAYLIST_URL);
+
+                        if (response.StatusCode == HttpStatusCode.OK)
+                        {
+                            var playlistStringLMFAOOOOO = await response.Content.ReadAsStringAsync();
+
+
+                            if (!string.IsNullOrEmpty(playlistStringLMFAOOOOO))
+                            {
+                                if (!Directory.Exists(Constants.PLAYLIST_PATH))
+                                {
+                                    Directory.CreateDirectory(Constants.PLAYLIST_PATH);
+                                }
+                                if (!File.Exists(Constants.PLAYLIST_PATH + "QS-RANKED.bplist"))
+                                {
+                                    using (File.Create(Constants.PLAYLIST_PATH + "QS-RANKED.bplist")) { }
+                                }
+                                string apiKeyFilePath = Constants.PLAYLIST_PATH + "QS-Ranked.bplist";
+
+                                using (StreamWriter sw = new(apiKeyFilePath))
+                                {
+                                    await sw.WriteAsync(playlistStringLMFAOOOOO);
+                                }
+                                TryRefreshPlaylists(true);
+                                Plugin.Log.Info("API key saved successfully.");
+                            }
+                            else
+                            {
+                                Plugin.Log.Error("Failed to parse API key from the response.");
+                            }
+                        }
+                        else
+                        {
+                            Plugin.Log.Error("Failed to download the ranked playlist");
+                        }
+
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = "<color=green>Successfully downloaded the ranked playlist!</color>";
+                        await Task.Delay(3000);
+                        _panelView.promptText.gameObject.SetActive(false);
+                        _leaderboardView.playlistButton.interactable = true;
+                        break;
+                    }
+                    catch(HttpListenerException e)
+                    {
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = "<color=red>Failed to download the playlist... Retrying!</color>";
+                        await Task.Delay(500);
+                        _panelView.promptText.gameObject.SetActive(false);
+                        _leaderboardView.playlistButton.interactable = true;
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        Plugin.Log.Error("EXCEPTION: " + e.ToString());
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.text = "<color=red>EXCEPTION ERROR</color>";
+                        await Task.Delay(3000);
+                        _panelView.promptText.gameObject.SetActive(false);
+                        _leaderboardView.playlistButton.interactable = true;
+                        return;
+                    }
+                    x++;
+                }
+                if (x == 2)
+                {
+                    _panelView.promptText.text = "<color=red>Failed to download the playlist... Retrying!</color>";
+                    await Task.Delay(3000);
+                    _panelView.promptText.gameObject.SetActive(false);
+                    _panelView.prompt_loader.SetActive(false);
+                    _leaderboardView.playlistButton.interactable = true;
+                }
+            }
+        }
+
+        public static bool TryRefreshPlaylists(bool fullRefresh)
+        {
+            try
+            {
+                var assembly = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(assembly => assembly.GetName().Name == "BeatSaberPlaylistsLib");
+                var playlistManagerType = assembly!.GetType("BeatSaberPlaylistsLib.PlaylistManager");
+                var defaultManagerField = playlistManagerType.GetProperty("DefaultManager", BindingFlags.Static | BindingFlags.Public);
+                var refreshMethodInfo = playlistManagerType.GetMethod("RefreshPlaylists", BindingFlags.Instance | BindingFlags.Public);
+
+                var manager = defaultManagerField!.GetValue(null);
+                refreshMethodInfo!.Invoke(manager, new object[] { fullRefresh });
+                return true;
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.Debug($"RefreshPlaylists failed: {e}");
+                return false;
+            }
         }
 
     }
