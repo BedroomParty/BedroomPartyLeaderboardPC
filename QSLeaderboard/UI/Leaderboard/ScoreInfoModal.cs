@@ -85,7 +85,7 @@ namespace QSLeaderboard.UI
             scoreScoreText.text.Replace(",", " ");
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
 
-            if(entry.PP != 0)
+            if (entry.PP != 0)
             {
                 ppScoreText.text = string.Format("<size=4.8><color=#BCE59C>{0}<size=3>pp</size></color></size>", entry.PP.ToString("F2"));
             }

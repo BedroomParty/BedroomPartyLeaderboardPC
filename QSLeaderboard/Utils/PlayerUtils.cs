@@ -107,8 +107,8 @@ namespace QSLeaderboard.Utils
                                         using (File.Create(Constants.BALL_PATH + "apiKey.txt")) { }
                                     }
                                     string apiKeyFilePath = Constants.BALL_PATH + "apiKey.txt";
-                                    
-                                    using(StreamWriter sw = new(apiKeyFilePath))
+
+                                    using (StreamWriter sw = new(apiKeyFilePath))
                                     {
                                         await sw.WriteAsync(apiKey);
                                     }
@@ -124,7 +124,7 @@ namespace QSLeaderboard.Utils
                                 Plugin.Log.Error("API key not found in the response.");
                             }
 
-                            if(jsonResponse.TryGetValue("ID", out JToken discordIDToken))
+                            if (jsonResponse.TryGetValue("ID", out JToken discordIDToken))
                             {
                                 discordID = discordIDToken.Value<string>();
                                 Plugin.discordID = discordID;

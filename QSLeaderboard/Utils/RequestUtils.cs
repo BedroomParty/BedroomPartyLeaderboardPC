@@ -10,10 +10,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using Zenject;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QSLeaderboard.Utils
 {
@@ -39,36 +37,36 @@ namespace QSLeaderboard.Utils
                     int totalPages = 0;
                     List<LeaderboardData.LeaderboardEntry> data = new List<LeaderboardData.LeaderboardEntry>();
 
-                        var jsonResponse = await response.Content.ReadAsStringAsync();
-                        Plugin.Log.Info(jsonResponse.ToString());
-                        JObject jsonObject = JObject.Parse(jsonResponse);
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    Plugin.Log.Info(jsonResponse.ToString());
+                    JObject jsonObject = JObject.Parse(jsonResponse);
 
-                        if (jsonObject.TryGetValue("GlobalRank", out JToken globalRankToken))
-                            rank = globalRankToken.Value<int>();
-                        else
-                            rank = 0;
+                    if (jsonObject.TryGetValue("GlobalRank", out JToken globalRankToken))
+                        rank = globalRankToken.Value<int>();
+                    else
+                        rank = 0;
 
-                        if (jsonObject.TryGetValue("PP", out JToken PP))
-                            pp = PP.Value<float>();
-                        else
-                            pp = 0;
+                    if (jsonObject.TryGetValue("PP", out JToken PP))
+                        pp = PP.Value<float>();
+                    else
+                        pp = 0;
 
-                        if (jsonObject.TryGetValue("ScoreCount", out JToken scoreCountToken))
-                            scorecount = scoreCountToken.Value<int>();
-                        else
-                            scorecount = 0;
+                    if (jsonObject.TryGetValue("ScoreCount", out JToken scoreCountToken))
+                        scorecount = scoreCountToken.Value<int>();
+                    else
+                        scorecount = 0;
 
-                        if (jsonObject.TryGetValue("Stars", out JToken starsToken))
-                            stars = starsToken.Value<float>();
-                        else
-                            stars = 0f;
+                    if (jsonObject.TryGetValue("Stars", out JToken starsToken))
+                        stars = starsToken.Value<float>();
+                    else
+                        stars = 0f;
 
-                        totalPages = Mathf.CeilToInt((float)scorecount / 10);
+                    totalPages = Mathf.CeilToInt((float)scorecount / 10);
 
-                        if (jsonObject.TryGetValue("Scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0)
-                            data = _leaderboardData.LoadBeatMapInfo(scoresArray);
-                        else
-                            data = new List<LeaderboardData.LeaderboardEntry>();
+                    if (jsonObject.TryGetValue("Scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0)
+                        data = _leaderboardData.LoadBeatMapInfo(scoresArray);
+                    else
+                        data = new List<LeaderboardData.LeaderboardEntry>();
 
 
                     callback((response.IsSuccessStatusCode, data, rank, totalPages, stars, pp));
@@ -141,7 +139,7 @@ namespace QSLeaderboard.Utils
                             _panelView.promptText.gameObject.SetActive(false);
                             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                             break;
-                        }   
+                        }
                         else if (response.StatusCode == HttpStatusCode.OK)
                         {
                             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -257,7 +255,7 @@ namespace QSLeaderboard.Utils
                         _leaderboardView.playlistButton.interactable = true;
                         break;
                     }
-                    catch(HttpListenerException e)
+                    catch (HttpListenerException e)
                     {
                         _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.text = "<color=red>Failed to download the playlist... Retrying!</color>";

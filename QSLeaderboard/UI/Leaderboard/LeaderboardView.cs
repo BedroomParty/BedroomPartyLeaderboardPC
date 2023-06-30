@@ -11,8 +11,6 @@ using QSLeaderboard.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -310,7 +308,7 @@ namespace QSLeaderboard.UI.Leaderboard
             {
                 int code = 0;
                 string apiKey = string.Empty;
-                if(File.Exists(Constants.BALL_PATH + "apiKey.txt"))
+                if (File.Exists(Constants.BALL_PATH + "apiKey.txt"))
                 {
                     apiKey = File.ReadAllText(Constants.BALL_PATH + "apiKey.txt");
                     LoginKey(apiKey);
@@ -493,7 +491,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
                     _panelView.playerPP.text = $"{result.Item6}pp";
 
-                    if(result.Item5 != 0)
+                    if (result.Item5 != 0)
                     {
                         headerText.SetText($"RANKED - {result.Item5.ToString("F2")}<b>✰</b>");
                     }
