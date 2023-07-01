@@ -62,7 +62,6 @@ namespace QSLeaderboard.UI.Leaderboard
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-
         }
     }
 }

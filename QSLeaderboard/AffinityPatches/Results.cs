@@ -82,6 +82,7 @@ namespace QSLeaderboard.AffinityPatches
         private void Postfix(ref PlayerData playerData, ref PlayerLevelStatsData playerLevelStats, ref LevelCompletionResults levelCompletionResults, ref IReadonlyBeatmapData transformedBeatmapData, ref IDifficultyBeatmap difficultyBeatmap, ref PlatformLeaderboardsModel platformLeaderboardsModel)
         {
             if (!Plugin.Authed) return;
+            if (BS_Utils.Gameplay.ScoreSubmission.Disabled) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             float modifiedScore = levelCompletionResults.modifiedScore;
             if (modifiedScore == 0 || maxScore == 0) return;
@@ -101,6 +102,12 @@ namespace QSLeaderboard.AffinityPatches
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
 
             string mods = GetModifiersString(levelCompletionResults);
+
+
+
+
+            // new data tests
+
 
             _requestUtils.SetBeatMapData(balls, Plugin.discordID, Plugin.userName, badCut, misses, fc, acc, score, mods, result =>
             {

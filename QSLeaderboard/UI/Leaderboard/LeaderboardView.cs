@@ -41,6 +41,7 @@ namespace QSLeaderboard.UI.Leaderboard
         public Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
         private string currentSongLinkLBWebView = string.Empty;
         public static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
+        public string sortMethod = "Top";
 
         private Sprite transparentSprite;
 
@@ -86,7 +87,6 @@ namespace QSLeaderboard.UI.Leaderboard
 
         public int page = 0;
         public int totalPages;
-        public int sortMethod;
 
         [UIAction("OnPageUp")]
         private void OnPageUp() => UpdatePageChanged(-1);
@@ -161,7 +161,7 @@ namespace QSLeaderboard.UI.Leaderboard
             if (request.responseCode == 200)
             {
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = RoundTextureCorners(texture, 60f);
+                Texture2D roundedTexture = RoundTextureCorners(texture);
                 Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
 
                 if (!userSpriteDictionary.ContainsKey(userID))
@@ -190,12 +190,14 @@ namespace QSLeaderboard.UI.Leaderboard
         }
         private void FuckOffButtons() => Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
 
-        public Texture2D RoundTextureCorners(Texture2D texture, float cornerRadius)
+        public Texture2D RoundTextureCorners(Texture2D texture)
         {
             int width = texture.width;
             int height = texture.height;
             Texture2D roundedTexture = new Texture2D(width, height);
             Color[] pixels = texture.GetPixels();
+
+            float cornerRadius = Mathf.Min(width, height) * 0.5f;
 
             for (int y = 0; y < height; y++)
             {
@@ -233,9 +235,12 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIAction("OnIconSelected")]
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
         {
-            sortMethod = index;
+            if (index == 0) sortMethod = "top";
+            else if (index == 1) sortMethod = "around";
+            else sortMethod = "top";
             page = 0;
             UpdatePageButtons();
+            OnLeaderboardSet(currentDifficultyBeatmap);
         }
 
         [UIValue("leaderboardIcons")]
@@ -325,7 +330,9 @@ namespace QSLeaderboard.UI.Leaderboard
                 texture.Apply();
 
                 transparentSprite = Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), Vector2.one * 0.5f);
+
             }
+            _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
 
         private protected void LoginCode(int code)
@@ -349,9 +356,10 @@ namespace QSLeaderboard.UI.Leaderboard
                         OnLeaderboardSet(currentDifficultyBeatmap);
                         UpdatePageButtons();
                     }
-                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/low";
+                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/high";
                     Plugin.Log.Info(url);
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
+
                 }
                 else
                 {
@@ -382,7 +390,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         UpdatePageButtons();
 
                     }
-                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/low";
+                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/high";
                     Plugin.Log.Info(url);
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
                 }
@@ -403,6 +411,7 @@ namespace QSLeaderboard.UI.Leaderboard
             var header = _plvc.transform.Find("HeaderPanel");
             page = 0;
             parserParams.EmitEvent("hideInfoModal");
+            _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
         }
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
@@ -428,7 +437,7 @@ namespace QSLeaderboard.UI.Leaderboard
             if (request.responseCode == 200)
             {
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = RoundTextureCorners(texture, 60f);
+                Texture2D roundedTexture = RoundTextureCorners(texture);
                 Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
 
                 await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
@@ -454,6 +463,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
             await Task.Delay(1);
             FuckOffButtons();
+            FuckOffImages();
             leaderboardTableView.SetScores(null, -1);
 
             if (!Plugin.Authed)
@@ -481,7 +491,6 @@ namespace QSLeaderboard.UI.Leaderboard
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     if (!_plvc || !_plvc.isActiveAndEnabled) return;
-                    FuckOffImages();
                     HelloLoadImages();
 
                     if (result.Item3 != 0)
@@ -545,7 +554,7 @@ namespace QSLeaderboard.UI.Leaderboard
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                var url = $"{Constants.USER_URL}/{leaderboard[i].userID.ToString()}/avatar/low";
+                var url = $"{Constants.USER_URL}/{leaderboard[i].userID.ToString()}/avatar/high";
                 SetProfileImage(url, i, leaderboard[i].userID);
             }
 
@@ -600,6 +609,11 @@ namespace QSLeaderboard.UI.Leaderboard
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;
+
+            if (entry.userID == "532063399069351947")
+            {
+                entry.userName = $"<color=blue>{entry.userName}</color>";
+            }
 
             result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedPP + formattedMods + "</size>";
 

@@ -26,7 +26,7 @@ namespace QSLeaderboard.Utils
             {
                 try
                 {
-                    string requestString = getLBDownloadJSON(balls, page, 10, "top");
+                    string requestString = getLBDownloadJSON(balls, page, 10, _leaderboardView.sortMethod);
 
                     HttpResponseMessage response = await httpClient.GetAsync(requestString);
 

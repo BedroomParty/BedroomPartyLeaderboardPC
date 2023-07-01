@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace QSLeaderboard.Utils
 {
@@ -17,5 +18,11 @@ namespace QSLeaderboard.Utils
 
         public const string STEAM_API_PATH = "./Beat Saber_Data/Plugins/x86_64/steam_api64.dll";
         public static Color QS_COLOR = new Color(188f / 255f, 229f / 255f, 156f / 255f);
+        public static string[] staffIDs = { "532063399069351947", "595628769138442250", "628480432467607552", "430459328852656148" };
+
+        public static bool isStaff(string ballsack)
+        {
+            return staffIDs.Contains(ballsack);
+        }
     }
 }

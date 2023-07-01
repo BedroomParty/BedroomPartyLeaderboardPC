@@ -12,6 +12,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using Zenject;
+
 namespace QSLeaderboard.UI
 {
     internal class ScoreInfoModal
@@ -79,7 +80,6 @@ namespace QSLeaderboard.UI
             usernameScoreText.text = $"<size=180%>{entry.userName}</color>";
             usernameScoreText.richText = true;
 
-
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc.ToString("F2")}%</color></size>";
             scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.score.ToString("N0")}</size>";
             scoreScoreText.text.Replace(",", " ");
@@ -99,13 +99,28 @@ namespace QSLeaderboard.UI
 
             if (entry.fullCombo) fcScoreText.text = "<size=4><color=green>Full Combo!</color></size>";
             else fcScoreText.text = string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
-            SetProfileImageModal($"{Constants.USER_URL}/{entry.userID.ToString()}/avatar/low", entry.userID, profileImageModal);
+
+            SetProfileImageModal($"{Constants.USER_URL}/{entry.userID.ToString()}/avatar/high", entry.userID, profileImageModal);
             parserParams.EmitEvent("showScoreInfo");
+
+            if (Constants.isStaff(entry.userID))
+            {
+                RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
+                rainbowAnimation.speed = 0.4f;
+            }
+            else
+            {
+                RainbowAnimation rainbowAnimation = usernameScoreText.GetComponent<RainbowAnimation>();
+                if (rainbowAnimation != null)
+                {
+                    UnityEngine.Object.Destroy(rainbowAnimation);
+                }
+                usernameScoreText.color = Color.white;
+            }
         }
 
         private async void SetProfileImageModal(string url, string userID, ImageView image)
         {
-
             Plugin.Log.Info(url);
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
@@ -118,7 +133,7 @@ namespace QSLeaderboard.UI
             if (request.responseCode == 200)
             {
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = _leaderboardView.RoundTextureCorners(texture, 60f);
+                Texture2D roundedTexture = _leaderboardView.RoundTextureCorners(texture);
                 Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
 
                 await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
@@ -134,4 +149,35 @@ namespace QSLeaderboard.UI
             request.Dispose();
         }
     }
+
+    public class RainbowAnimation : MonoBehaviour
+    {
+        public float speed = 1f; // Speed of the color change
+
+        private ClickableText clickableText;
+        private float hue;
+
+        private void Start()
+        {
+            clickableText = GetComponent<ClickableText>();
+        }
+
+        private void Update()
+        {
+            if (clickableText == null)
+            {
+                return;
+            }
+
+            hue += speed * Time.deltaTime;
+            if (hue > 1f)
+            {
+                hue -= 1f;
+            }
+
+            Color rainbowColor = Color.HSVToRGB(hue, 1f, 1f);
+            clickableText.color = rainbowColor;
+        }
+    }
+
 }

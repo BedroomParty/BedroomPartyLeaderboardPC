@@ -143,7 +143,7 @@
 	<vertical anchor-pos-x="47" anchor-pos-y="5.4" spacing="-19.4">
 		<macro.for-each hosts="buttonHolders">
 			<horizontal min-height="8" child-expand-height="true" child-align="MiddleCenter">
-				<button-with-icon id="infoButton" on-click="infoClick" icon ="QSLeaderboard.Images.info.png" hover-hint="Info" pref-width="10" pref-height="7"/>
+				<button-with-icon active="false" id="infoButton" on-click="infoClick" icon ="QSLeaderboard.Images.info.png" hover-hint="Info" pref-width="10" pref-height="7"/>
 			</horizontal>
 		</macro.for-each>
 	</vertical>
