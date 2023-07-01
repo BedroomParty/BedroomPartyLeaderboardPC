@@ -100,7 +100,7 @@ namespace QSLeaderboard.UI
             if (entry.fullCombo) fcScoreText.text = "<size=4><color=green>Full Combo!</color></size>";
             else fcScoreText.text = string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
 
-            SetProfileImageModal($"{Constants.USER_URL}/{entry.userID.ToString()}/avatar/high", entry.userID, profileImageModal);
+            SetProfileImageModal(Constants.profilePictureLink(entry.userID), profileImageModal);
             parserParams.EmitEvent("showScoreInfo");
 
             if (Constants.isStaff(entry.userID))
@@ -119,7 +119,7 @@ namespace QSLeaderboard.UI
             }
         }
 
-        private async void SetProfileImageModal(string url, string userID, ImageView image)
+        private async void SetProfileImageModal(string url, ImageView image)
         {
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();

@@ -18,6 +18,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
 using static LeaderboardTableView;
+using static UnityEngine.EventSystems.EventTrigger;
 using Button = UnityEngine.UI.Button;
 
 namespace QSLeaderboard.UI.Leaderboard
@@ -359,9 +360,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         OnLeaderboardSet(currentDifficultyBeatmap);
                         UpdatePageButtons();
                     }
-                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/high";
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
-
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(Plugin.discordID)));
                 }
                 else
                 {
@@ -391,8 +390,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         UpdatePageButtons();
 
                     }
-                    var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/high";
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(Plugin.discordID)));
                 }
                 else
                 {
@@ -552,8 +550,7 @@ namespace QSLeaderboard.UI.Leaderboard
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                var url = $"{Constants.USER_URL}/{leaderboard[i].userID.ToString()}/avatar/high";
-                SetProfileImage(url, i, leaderboard[i].userID);
+                SetProfileImage(Constants.profilePictureLink(leaderboard[i].userID), i, leaderboard[i].userID);
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)

@@ -24,5 +24,10 @@ namespace QSLeaderboard.Utils
         {
             return staffIDs.Contains(ballsack);
         }
+
+        public static string profilePictureLink(string kms)
+        {
+            return $"https://cdn.phazed.xyz/QSBoard/High/{kms}.png";
+        }
     }
 }
