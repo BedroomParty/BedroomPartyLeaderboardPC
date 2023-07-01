@@ -141,7 +141,6 @@ namespace QSLeaderboard.UI.Leaderboard
             // Check if the sprite already exists in the dictionary
             if (userSpriteDictionary.ContainsKey(userID))
             {
-                Plugin.Log.Info($"Sprite already exists for {userID}, using that!");
                 holders[index].profileImage.sprite = userSpriteDictionary[userID];
                 holders[index].profileloading.SetActive(false);
                 return;
@@ -167,11 +166,9 @@ namespace QSLeaderboard.UI.Leaderboard
                 if (!userSpriteDictionary.ContainsKey(userID))
                 {
                     userSpriteDictionary.Add(userID, sprite);
-                    Plugin.Log.Info($"Added {userID} to the cache!");
                 }
                 else
                 {
-                    Plugin.Log.Info($"Sprite already exists for {userID}, using that!");
                     sprite = userSpriteDictionary[userID];
                 }
 
@@ -346,7 +343,6 @@ namespace QSLeaderboard.UI.Leaderboard
                 {
                     Plugin.Authed = true;
                     Plugin.userName = username;
-                    Plugin.Log.Info("Authenticated! Username: " + username);
                     loginButton.gameObject.SetActive(false);
                     loginKeyboard.gameObject.SetActive(false);
                     _panelView.prompt_loader.SetActive(false);
@@ -357,7 +353,6 @@ namespace QSLeaderboard.UI.Leaderboard
                         UpdatePageButtons();
                     }
                     var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/high";
-                    Plugin.Log.Info(url);
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
 
                 }
@@ -381,7 +376,6 @@ namespace QSLeaderboard.UI.Leaderboard
                 {
                     Plugin.Authed = true;
                     Plugin.userName = username;
-                    Plugin.Log.Info("Authenticated! Username: " + username);
                     _panelView.prompt_loader.SetActive(false);
                     _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
                     if (currentDifficultyBeatmap != null)
@@ -391,7 +385,6 @@ namespace QSLeaderboard.UI.Leaderboard
 
                     }
                     var url = $"{Constants.USER_URL}/{Plugin.discordID}/avatar/high";
-                    Plugin.Log.Info(url);
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, url));
                 }
                 else
@@ -422,7 +415,6 @@ namespace QSLeaderboard.UI.Leaderboard
 
         private async Task SetProfilePic(ImageView image, string url)
         {
-            Plugin.Log.Info(url);
             _panelView.playerAvatarLoading.SetActive(true);
             await Task.Delay(1);
 
@@ -484,7 +476,6 @@ namespace QSLeaderboard.UI.Leaderboard
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
-            Plugin.Log.Info(balls);
             currentSongLinkLBWebView = $"https://questsupporters.me/?board={balls}";
             _requestUtils.GetBeatMapData(balls, page, result =>
             {

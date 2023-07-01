@@ -111,7 +111,7 @@ namespace QSLeaderboard.AffinityPatches
 
             _requestUtils.SetBeatMapData(balls, Plugin.discordID, Plugin.userName, badCut, misses, fc, acc, score, mods, result =>
             {
-                Plugin.Log.Info("_requestUtils.SetBeatMapData");
+
             });
         }
     }

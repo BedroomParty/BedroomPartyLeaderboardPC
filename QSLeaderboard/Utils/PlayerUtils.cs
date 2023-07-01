@@ -54,7 +54,6 @@ namespace QSLeaderboard.Utils
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
             _panelView.promptText.text = "Creating User...";
-            Plugin.Log.Info($"Code: {code}");
             (string id, string username) = await GetPlayerInfo();
 
 
@@ -66,7 +65,6 @@ namespace QSLeaderboard.Utils
                     try
                     {
                         await Task.Delay(500);
-                        Plugin.Log.Notice($"Create User attempt {x + 1}");
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLoginStringCode(id, code);
 
@@ -85,17 +83,14 @@ namespace QSLeaderboard.Utils
 
                             // Parse the response and extract the API key
                             string responseContent = await response.Content.ReadAsStringAsync();
-                            Plugin.Log.Info(responseContent);
                             JObject jsonResponse = JObject.Parse(responseContent);
                             string apiKey;
                             string discordID;
                             string usernameTemp = "Error";
                             if (jsonResponse.TryGetValue("key", out JToken apiKeyToken))
                             {
-                                Plugin.Log.Info("IN jsonResponse.TryGetValue");
                                 apiKey = apiKeyToken.Value<string>();
                                 Plugin.apiKey = apiKey;
-                                Plugin.Log.Info(apiKey);
                                 if (!string.IsNullOrEmpty(apiKey))
                                 {
                                     if (!Directory.Exists(Constants.BALL_PATH))
@@ -112,7 +107,6 @@ namespace QSLeaderboard.Utils
                                     {
                                         await sw.WriteAsync(apiKey);
                                     }
-                                    Plugin.Log.Info("API key saved successfully.");
                                 }
                                 else
                                 {
@@ -225,7 +219,6 @@ namespace QSLeaderboard.Utils
                 {
                     try
                     {
-                        Plugin.Log.Notice($"LOGIN ATTEMPT {x + 1}");
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", apiKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLoginStringKey(id);
@@ -237,7 +230,6 @@ namespace QSLeaderboard.Utils
                         bool isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                         string responseContent = await response.Content.ReadAsStringAsync();
-                        Plugin.Log.Info(responseContent);
                         JObject jsonResponse = JObject.Parse(responseContent);
                         if (isAuthed)
                         {

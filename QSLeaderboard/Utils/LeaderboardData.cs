@@ -38,7 +38,6 @@ namespace QSLeaderboard.Utils
         public List<LeaderboardEntry> LoadBeatMapInfo(JArray jsonArray)
         {
             var leaderboard = new List<LeaderboardEntry>();
-            Plugin.Log.Info("LOADBEATMAPINFO");
             foreach (var scoreData in jsonArray)
             {
                 string rank = scoreData["Rank"]?.ToString();

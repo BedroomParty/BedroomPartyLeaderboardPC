@@ -121,7 +121,6 @@ namespace QSLeaderboard.UI
 
         private async void SetProfileImageModal(string url, string userID, ImageView image)
         {
-            Plugin.Log.Info(url);
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
 

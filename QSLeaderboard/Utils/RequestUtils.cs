@@ -38,7 +38,6 @@ namespace QSLeaderboard.Utils
                     List<LeaderboardData.LeaderboardEntry> data = new List<LeaderboardData.LeaderboardEntry>();
 
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-                    Plugin.Log.Info(jsonResponse.ToString());
                     JObject jsonObject = JObject.Parse(jsonResponse);
 
                     if (jsonObject.TryGetValue("GlobalRank", out JToken globalRankToken))
@@ -121,7 +120,6 @@ namespace QSLeaderboard.Utils
                     _panelView.promptText.text = "Uploading Score...";
                     try
                     {
-                        Plugin.Log.Info($"Sending upload post with api key in auth: {Plugin.apiKey}");
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Plugin.apiKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
@@ -236,7 +234,6 @@ namespace QSLeaderboard.Utils
                                     await sw.WriteAsync(playlistStringLMFAOOOOO);
                                 }
                                 TryRefreshPlaylists(true);
-                                Plugin.Log.Info("API key saved successfully.");
                             }
                             else
                             {
