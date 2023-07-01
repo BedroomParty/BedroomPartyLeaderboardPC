@@ -41,7 +41,7 @@ namespace QSLeaderboard.UI.Leaderboard
         public Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
         private string currentSongLinkLBWebView = string.Empty;
         public static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
-        public string sortMethod = "Top";
+        public string sortMethod = "top";
 
         private Sprite transparentSprite;
 
@@ -103,6 +103,13 @@ namespace QSLeaderboard.UI.Leaderboard
 
         private void UpdatePageButtons()
         {
+            if(sortMethod == "around")
+            {
+                up_button.interactable = false;
+                down_button.interactable = false;
+                return;
+            }
+
             up_button.interactable = (page > 0);
             down_button.interactable = (page < totalPages - 1);
         }
