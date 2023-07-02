@@ -14,7 +14,7 @@
 			<horizontal pref-height="10">
 				<vertical spacing="6" child-expand-width="false" child-control-width="false" child-align="MiddleCenter">
 					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
-							<text id="playerUsername" font-size="6" text="loading..." rich-text="false" align="Center"/>
+							<clickable-text id="playerUsername" font-size="6" text="loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK"/>
 					</horizontal>
 
 					<horizontal horizontal-fit="PreferredSize" spacing="3">
@@ -32,7 +32,7 @@
 
 		<vertical pref-width="20">
 			<horizontal pref-height="14">
-				<stack>
+				<stack >
 					<image id="playerAvatar" src="QSLeaderboard.Images.blank.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
 					<loading-indicator id="playerAvatarLoading" preserve-aspect="true" preferred-height="5" preferred-width="5"/>
 				</stack>

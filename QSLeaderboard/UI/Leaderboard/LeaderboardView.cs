@@ -236,6 +236,12 @@ namespace QSLeaderboard.UI.Leaderboard
             Application.OpenURL(currentSongLinkLBWebView);
         }
 
+        [UIAction("openBUGWebView")]
+        public void openBUGWebView()
+        {
+            Application.OpenURL(Constants.BUG_REPORT_LINK);
+        }
+
 
         [UIAction("OnIconSelected")]
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
@@ -388,9 +394,23 @@ namespace QSLeaderboard.UI.Leaderboard
                     {
                         OnLeaderboardSet(currentDifficultyBeatmap);
                         UpdatePageButtons();
-
                     }
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(Plugin.discordID)));
+
+                    if (Constants.isStaff(Plugin.discordID))
+                    {
+                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
+                        rainbowAnimation.speed = 0.35f;
+                    }
+                    else
+                    {
+                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.GetComponent<RainbowAnimation>();
+                        if (rainbowAnimation != null)
+                        {
+                            UnityEngine.Object.Destroy(rainbowAnimation);
+                        }
+                        _panelView.playerUsername.color = Color.white;
+                    }
                 }
                 else
                 {
@@ -400,6 +420,7 @@ namespace QSLeaderboard.UI.Leaderboard
                 }
             });
         }
+
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {

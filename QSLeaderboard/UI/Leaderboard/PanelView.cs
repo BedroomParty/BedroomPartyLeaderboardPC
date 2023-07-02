@@ -2,6 +2,7 @@
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
+using QSLeaderboard.Utils;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -57,6 +58,13 @@ namespace QSLeaderboard.UI.Leaderboard
         private void PostParse()
         {
 
+        }
+
+        [UIAction("playerUsernameCLICK")]
+        public void playerUsernameCLICK()
+        {
+            if (string.IsNullOrEmpty(Plugin.discordID)) return;
+            Application.OpenURL($"https://questsupporters.me/?user={Plugin.discordID}");
         }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)

@@ -212,30 +212,31 @@ namespace QSLeaderboard.Utils
             _panelView.playerUsername.text = username;
             string discordID;
             string usernameTemp = "Error";
+
             using (var httpClient = new HttpClient())
             {
                 int x = 0;
-                while (x < 2)
+                while (x < 3)
                 {
                     try
                     {
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", apiKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLoginStringKey(id);
-
-
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                        HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
+                        HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content).ConfigureAwait(false);
                         bool isAuthed = response.StatusCode == HttpStatusCode.OK;
 
-                        string responseContent = await response.Content.ReadAsStringAsync();
+                        string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                         JObject jsonResponse = JObject.Parse(responseContent);
+
                         if (isAuthed)
                         {
                             Plugin.Authed = true;
                             _panelView.prompt_loader.SetActive(false);
                             _panelView.promptText.gameObject.SetActive(false);
+
                             if (jsonResponse.TryGetValue("ID", out JToken discordIDToken))
                             {
                                 discordID = discordIDToken.Value<string>();
@@ -256,12 +257,12 @@ namespace QSLeaderboard.Utils
                             {
                                 Plugin.Log.Error("Username key not found in the response.");
                             }
-                            callback((isAuthed, usernameTemp));
 
-                            await Task.Delay(2000);
-                            _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
-                            x++;
+                            callback((true, usernameTemp));
+                            return;
                         }
+                        _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
+                        x++;
                     }
                     catch (HttpRequestException)
                     {
@@ -271,12 +272,13 @@ namespace QSLeaderboard.Utils
                     }
                     x++;
                 }
-                if (x == 2)
+                if (x == 3)
                 {
                     callback((false, username));
                 }
             }
         }
+
 
         public void GetAuthStatusKey(string key, Action<(bool, string)> callback)
         {
