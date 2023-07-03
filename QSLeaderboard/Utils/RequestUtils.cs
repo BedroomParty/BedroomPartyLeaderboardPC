@@ -144,9 +144,9 @@ namespace QSLeaderboard.Utils
                             callback(response.IsSuccessStatusCode);
                             _panelView.prompt_loader.SetActive(false);
                             _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
+                            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                             await Task.Delay(3000);
                             _panelView.promptText.gameObject.SetActive(false);
-                            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                             break;
                         }
 

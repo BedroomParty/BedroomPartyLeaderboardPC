@@ -201,7 +201,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AffinityPatches\Results.cs" />
-    <Compile Include="Installers\AppInstaller.cs" />
     <Compile Include="Installers\MenuInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
