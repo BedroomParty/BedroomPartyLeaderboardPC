@@ -2,7 +2,6 @@
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
 using IPA.Utilities;
-using QSLeaderboard.Utils;
 using TMPro;
 using UnityEngine;
 using Zenject;

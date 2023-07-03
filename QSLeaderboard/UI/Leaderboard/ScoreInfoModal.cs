@@ -7,10 +7,9 @@ using ModestTree;
 using QSLeaderboard.UI.Leaderboard;
 using QSLeaderboard.Utils;
 using System;
-using System.Threading.Tasks;
+using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using Zenject;
 
 namespace QSLeaderboard.UI
@@ -69,10 +68,12 @@ namespace QSLeaderboard.UI
 
         public void setScoreModalText(LeaderboardData.LeaderboardEntry entry)
         {
+            profileImageModalLOADING.SetActive(true);
             currentEntry = entry;
 
             string formattedDate = "Error";
-            profileImageModalLOADING.SetActive(true);
+            profileImageModal.sprite = _leaderboardView.transparentSprite;
+            profileImageModalLOADING.SetActive(false);
 
             TimeSpan relativeTime = TimeUtils.GetRelativeTime(entry.timestamp.ToString());
             dateScoreText.text = string.Format("<size=4.8><color=white>{0}</color></size>", TimeUtils.GetRelativeTimeString(relativeTime));
@@ -99,54 +100,41 @@ namespace QSLeaderboard.UI
 
             if (entry.fullCombo) fcScoreText.text = "<size=4><color=green>Full Combo!</color></size>";
             else fcScoreText.text = string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
-
-            SetProfileImageModal(Constants.profilePictureLink(entry.userID), profileImageModal);
             parserParams.EmitEvent("showScoreInfo");
 
-            if (Constants.isStaff(entry.userID))
+            UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-                RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
-                rainbowAnimation.speed = 0.4f;
-            }
-            else
-            {
-                RainbowAnimation rainbowAnimation = usernameScoreText.GetComponent<RainbowAnimation>();
-                if (rainbowAnimation != null)
+
+                int lastDigit = entry.rank % 10;
+                int position = lastDigit - 1;
+                _leaderboardView.StartCoroutine(SetProfileImageModal(position, profileImageModal));
+                if (Constants.isStaff(entry.userID))
                 {
-                    UnityEngine.Object.Destroy(rainbowAnimation);
+                    RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
+                    rainbowAnimation.speed = 0.4f;
                 }
-                usernameScoreText.color = Color.white;
-            }
-        }
-
-        private async void SetProfileImageModal(string url, ImageView image)
-        {
-            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
-
-            while (!asyncOperation.isDone)
-            {
-                await Task.Delay(10);
-            }
-
-            if (request.responseCode == 200)
-            {
-                Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = _leaderboardView.RoundTextureCorners(texture);
-                Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
-
-                await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                else
                 {
-                    image.sprite = sprite;
-                    profileImageModalLOADING.SetActive(false);
-                });
-            }
-            else
-            {
-                Plugin.Log.Error("Failed to retrieve profile image: " + request.error);
-            }
-            request.Dispose();
+                    RainbowAnimation rainbowAnimation = usernameScoreText.GetComponent<RainbowAnimation>();
+                    if (rainbowAnimation != null)
+                    {
+                        UnityEngine.Object.Destroy(rainbowAnimation);
+                    }
+                    usernameScoreText.color = Color.white;
+                }
+            });
         }
+
+        private IEnumerator SetProfileImageModal(int pos, ImageView image)
+        {
+            while (_leaderboardView.holders[pos].profileImage.sprite == _leaderboardView.transparentSprite)
+            {
+                yield return null;
+            }
+            image.sprite = _leaderboardView.holders[pos].profileImage.sprite;
+            profileImageModalLOADING.SetActive(false);
+        }
+
     }
 
     public class RainbowAnimation : MonoBehaviour

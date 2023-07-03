@@ -18,7 +18,6 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
 using static LeaderboardTableView;
-using static UnityEngine.EventSystems.EventTrigger;
 using Button = UnityEngine.UI.Button;
 
 namespace QSLeaderboard.UI.Leaderboard
@@ -44,7 +43,7 @@ namespace QSLeaderboard.UI.Leaderboard
         public static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
         public string sortMethod = "top";
 
-        private Sprite transparentSprite;
+        public Sprite transparentSprite;
 
         [UIComponent("leaderboardTableView")]
         private LeaderboardTableView leaderboardTableView = null;
@@ -69,7 +68,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
 
         [UIValue("imageHolders")]
-        [Inject] private List<ImageHolder> holders;
+        [Inject] public List<ImageHolder> holders;
 
         [UIValue("buttonHolders")]
         [Inject] private List<ButtonHolder> Buttonholders;
@@ -104,7 +103,7 @@ namespace QSLeaderboard.UI.Leaderboard
 
         private void UpdatePageButtons()
         {
-            if(sortMethod == "around")
+            if (sortMethod == "around")
             {
                 up_button.interactable = false;
                 down_button.interactable = false;
@@ -324,6 +323,32 @@ namespace QSLeaderboard.UI.Leaderboard
             {
                 int code = 0;
                 string apiKey = string.Empty;
+
+                #region newShit
+                /*
+                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software", true);
+                if(key.OpenSubKey("QSLeaderboard") != null)
+                {
+                    key = key.OpenSubKey("QSLeaderboard");
+                    if(key.GetValue("apiKey") != null)
+                    {
+                        LoginKey(key.GetValue("apiKey").ToString());
+                        Plugin.Log.Info(key.GetValue("apiKey").ToString());
+                        Plugin.apiKey = key.GetValue("apiKey").ToString();
+                    }
+                    else
+                    {
+                        Plugin.Log.Error("APIKEY NOT FOUND");
+                    }
+                }
+                else
+                {
+                    loginKeyboard.gameObject.SetActive(true);
+                    loginButton.gameObject.SetActive(true);
+                }
+                */
+                #endregion
+
                 if (File.Exists(Constants.BALL_PATH + "apiKey.txt"))
                 {
                     apiKey = File.ReadAllText(Constants.BALL_PATH + "apiKey.txt");
@@ -341,7 +366,6 @@ namespace QSLeaderboard.UI.Leaderboard
                 texture.Apply();
 
                 transparentSprite = Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), Vector2.one * 0.5f);
-
             }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
@@ -648,7 +672,7 @@ namespace QSLeaderboard.UI.Leaderboard
     }
 
 
-    internal class ImageHolder
+    public class ImageHolder
     {
         private int index;
 
