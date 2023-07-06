@@ -291,7 +291,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         _panelView.playerGlobalRank.text = $"#{result.Item3}";
                     }
 
-                    _panelView.playerPP.text = $"{result.Item6}pp";
+                    _panelView.playerPP.text = $"{result.Item6.ToString("F2")}pp";
 
                     if (result.Item5 != 0)
                     {
