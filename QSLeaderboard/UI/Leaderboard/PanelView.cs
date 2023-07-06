@@ -1,7 +1,6 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
-using IPA.Utilities;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -14,17 +13,8 @@ namespace QSLeaderboard.UI.Leaderboard
     {
         [Inject] LeaderboardView _leaderboardView;
 
-        private const float _skew = 0.18f;
-        private ImageView _background;
-        public ImageView _imgView;
-
         [UIComponent("QSLeaderboard_logo")]
         private ImageView QSLeaderboard_logo;
-
-
-        internal static readonly FieldAccessor<ImageView, float>.Accessor ImageSkew = FieldAccessor<ImageView, float>.GetAccessor("_skew");
-        internal static readonly FieldAccessor<ImageView, bool>.Accessor ImageGradient = FieldAccessor<ImageView, bool>.GetAccessor("_gradient");
-
 
         [UIObject("prompt_loader")]
         public GameObject prompt_loader;
@@ -53,22 +43,11 @@ namespace QSLeaderboard.UI.Leaderboard
             _leaderboardView.showInfoModal();
         }
 
-        [UIAction("#post-parse")]
-        private void PostParse()
-        {
-
-        }
-
         [UIAction("playerUsernameCLICK")]
         public void playerUsernameCLICK()
         {
             if (string.IsNullOrEmpty(Plugin.discordID)) return;
             Application.OpenURL($"https://questsupporters.me/?user={Plugin.discordID}");
-        }
-
-        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
-        {
-            base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
         }
     }
 }

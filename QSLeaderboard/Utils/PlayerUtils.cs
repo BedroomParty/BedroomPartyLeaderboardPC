@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using IPA.Utilities.Async;
+using ModestTree;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using QSLeaderboard.UI.Leaderboard;
 using System;
@@ -7,7 +9,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
+using static QSLeaderboard.Utils.UIUtils;
 
 namespace QSLeaderboard.Utils
 {
@@ -16,6 +20,7 @@ namespace QSLeaderboard.Utils
     {
         [Inject] PanelView _panelView;
         [Inject] LeaderboardView _leaderboardView;
+        [Inject] UIUtils _uiUtils;
         public (string, string) OculusSkillIssue()
         {
             var steamID = "0";
@@ -49,7 +54,7 @@ namespace QSLeaderboard.Utils
         // CODE
 
 
-        private async Task GetAuthCode(int code, Action<(bool, string)> callback)
+        private async Task GetAuthCode(int code, Action<bool> callback)
         {
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
@@ -64,7 +69,7 @@ namespace QSLeaderboard.Utils
                 {
                     try
                     {
-                        await Task.Delay(500);
+                        await Task.Delay(1);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLoginStringCode(id, code);
 
@@ -74,19 +79,10 @@ namespace QSLeaderboard.Utils
                         bool isAuthed = response.StatusCode == HttpStatusCode.OK;
                         if (isAuthed)
                         {
-                            Plugin.Authed = true;
-                            await Task.Delay(2000);
-                            callback((isAuthed, username));
-                            await Task.Delay(3000);
-                            _panelView.prompt_loader.SetActive(false);
-                            _panelView.promptText.gameObject.SetActive(false);
-
                             // Parse the response and extract the API key
                             string responseContent = await response.Content.ReadAsStringAsync();
                             JObject jsonResponse = JObject.Parse(responseContent);
                             string apiKey;
-                            string discordID;
-                            string usernameTemp = "Error";
                             if (jsonResponse.TryGetValue("key", out JToken apiKeyToken))
                             {
                                 apiKey = apiKeyToken.Value<string>();
@@ -105,7 +101,14 @@ namespace QSLeaderboard.Utils
 
                                     using (StreamWriter sw = new(apiKeyFilePath))
                                     {
-                                        await sw.WriteAsync(apiKey);
+                                        if (!apiKey.IsEmpty())
+                                        {
+                                            await sw.WriteAsync(apiKey);
+                                        }
+                                        else
+                                        {
+                                            Plugin.Log.Error("Failed to parse API key from the response.");
+                                        }
                                     }
                                 }
                                 else
@@ -116,29 +119,9 @@ namespace QSLeaderboard.Utils
                             else
                             {
                                 Plugin.Log.Error("API key not found in the response.");
-                            }
 
-                            if (jsonResponse.TryGetValue("ID", out JToken discordIDToken))
-                            {
-                                discordID = discordIDToken.Value<string>();
-                                Plugin.discordID = discordID;
                             }
-                            else
-                            {
-                                Plugin.Log.Error("Discord ID key not found in the response.");
-                            }
-
-                            if (jsonResponse.TryGetValue("Username", out JToken usernameToken))
-                            {
-                                usernameTemp = usernameToken.Value<string>();
-                                Plugin.userName = usernameTemp;
-                                _panelView.playerUsername.text = usernameTemp;
-                            }
-                            else
-                            {
-                                Plugin.Log.Error("Username key not found in the response.");
-                            }
-                            callback((isAuthed, usernameTemp));
+                            callback(isAuthed);
                             break;
                         }
                         await Task.Delay(2000);
@@ -159,11 +142,10 @@ namespace QSLeaderboard.Utils
                         x++;
                         await Task.Delay(5000);
                     }
-                    x++;
                 }
                 if (x == 2)
                 {
-                    callback((false, username));
+                    callback(false);
                 }
             }
         }
@@ -178,7 +160,6 @@ namespace QSLeaderboard.Utils
             };
 
             return Data.ToString();
-            return string.Empty;
         }
 
         private string getLoginStringKey(string id)
@@ -189,10 +170,9 @@ namespace QSLeaderboard.Utils
             };
 
             return Data.ToString();
-            return string.Empty;
         }
 
-        public void GetAuthStatusCode(int code, Action<(bool, string)> callback)
+        public void GetAuthStatusCode(int code, Action<bool> callback)
         {
             Task.Run(() => GetAuthCode(code, callback));
         }
@@ -284,5 +264,73 @@ namespace QSLeaderboard.Utils
         {
             Task.Run(() => GetAuthKey(key, callback));
         }
+
+
+
+
+        public void LoginCode(int code)
+        {
+            GetAuthStatusCode(code, result =>
+            {
+                if (result)
+                {
+                    _leaderboardView.loginButton.gameObject.SetActive(false);
+                    _leaderboardView.loginKeyboard.gameObject.SetActive(false);
+                    LoginKey(Plugin.apiKey);
+                }
+                else
+                {
+                    _panelView.promptText.text = "<color=red>Error Creating User</color>";
+                    _panelView.prompt_loader.SetActive(false);
+                    Plugin.Log.Error("Not created user!");
+                }
+            });
+        }
+
+        public void LoginKey(string apiKey)
+        {
+            GetAuthStatusKey(apiKey, result =>
+            {
+                bool isAuthenticated = result.Item1;
+                string username = result.Item2;
+
+                if (isAuthenticated)
+                {
+                    Plugin.Authed = true;
+                    Plugin.userName = username;
+                    _panelView.prompt_loader.SetActive(false);
+                    _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
+                    if (_leaderboardView.currentDifficultyBeatmap != null)
+                    {
+                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                        _leaderboardView.UpdatePageButtons();
+                    }
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(Plugin.discordID)));
+
+                    if (Constants.isStaff(Plugin.discordID))
+                    {
+                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
+                        rainbowAnimation.speed = 0.35f;
+                    }
+                    else
+                    {
+                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.GetComponent<RainbowAnimation>();
+                        if (rainbowAnimation != null)
+                        {
+                            UnityEngine.Object.Destroy(rainbowAnimation);
+                        }
+                        _panelView.playerUsername.color = Color.white;
+                    }
+                }
+                else
+                {
+                    _panelView.promptText.text = "<color=red>Error Authenticating</color>";
+                    _panelView.prompt_loader.SetActive(false);
+                    Plugin.Log.Error("Not authenticated! Username: " + username);
+                }
+            });
+        }
+
+
     }
 }

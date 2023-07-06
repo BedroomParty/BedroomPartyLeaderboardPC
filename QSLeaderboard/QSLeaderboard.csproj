@@ -213,6 +213,7 @@
     <Compile Include="Utils\PlayerUtils.cs" />
     <Compile Include="Utils\RequestUtils.cs" />
     <Compile Include="Utils\TimeUtils.cs" />
+    <Compile Include="Utils\UIUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />

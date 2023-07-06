@@ -5,6 +5,7 @@ using QSLeaderboard.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using Zenject;
+using static QSLeaderboard.Utils.UIUtils;
 
 namespace QSLeaderboard.Installers
 {
@@ -17,6 +18,7 @@ namespace QSLeaderboard.Installers
             Container.BindInterfacesTo<LeaderboardUtils>().AsSingle();
             Container.Bind<PlayerUtils>().AsSingle();
             Container.Bind<RequestUtils>().AsSingle();
+            Container.Bind<UIUtils>().AsSingle();
             Container.BindInterfacesTo<Results>().AsSingle();
             Container.Bind<LeaderboardData>().AsSingle();
             List<ImageHolder> Imageholder = Enumerable.Range(0, 10).Select(x => new ImageHolder(x)).ToList();

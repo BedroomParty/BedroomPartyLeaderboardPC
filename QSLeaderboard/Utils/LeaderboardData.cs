@@ -53,8 +53,8 @@ namespace QSLeaderboard.Utils
                 long timestamp = scoreData["TimeSet"]?.Value<long>() ?? 0;
                 leaderboard.Add(new LeaderboardEntry(
                     int.Parse(rank ?? "0"),
-                    userID ?? "balls",
-                    userName ?? "balls",
+                    userID ?? "0",
+                    userName ?? "Error",
                     timestamp,
                     PP,
                     missCount,

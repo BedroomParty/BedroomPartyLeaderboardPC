@@ -40,33 +40,22 @@ namespace QSLeaderboard.Utils
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     JObject jsonObject = JObject.Parse(jsonResponse);
 
-                    if (jsonObject.TryGetValue("GlobalRank", out JToken globalRankToken))
-                        rank = globalRankToken.Value<int>();
-                    else
-                        rank = 0;
+                    if (jsonObject.TryGetValue("GlobalRank", out JToken globalRankToken)) rank = globalRankToken.Value<int>();
+                    else rank = 0;
 
-                    if (jsonObject.TryGetValue("PP", out JToken PP))
-                        pp = PP.Value<float>();
-                    else
-                        pp = 0;
+                    if (jsonObject.TryGetValue("PP", out JToken PP)) pp = PP.Value<float>();
+                    else pp = 0;
 
-                    if (jsonObject.TryGetValue("ScoreCount", out JToken scoreCountToken))
-                        scorecount = scoreCountToken.Value<int>();
-                    else
-                        scorecount = 0;
+                    if (jsonObject.TryGetValue("ScoreCount", out JToken scoreCountToken)) scorecount = scoreCountToken.Value<int>();
+                    else scorecount = 0;
 
-                    if (jsonObject.TryGetValue("Stars", out JToken starsToken))
-                        stars = starsToken.Value<float>();
-                    else
-                        stars = 0f;
+                    if (jsonObject.TryGetValue("Stars", out JToken starsToken)) stars = starsToken.Value<float>();
+                    else stars = 0f;
 
                     totalPages = Mathf.CeilToInt((float)scorecount / 10);
 
-                    if (jsonObject.TryGetValue("Scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0)
-                        data = _leaderboardData.LoadBeatMapInfo(scoresArray);
-                    else
-                        data = new List<LeaderboardData.LeaderboardEntry>();
-
+                    if (jsonObject.TryGetValue("Scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0) data = _leaderboardData.LoadBeatMapInfo(scoresArray);
+                    else data = new List<LeaderboardData.LeaderboardEntry>();
 
                     callback((response.IsSuccessStatusCode, data, rank, totalPages, stars, pp));
                     return;
@@ -90,7 +79,6 @@ namespace QSLeaderboard.Utils
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
 
-
         public void SetBeatMapData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
         {
             UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback));
@@ -106,10 +94,8 @@ namespace QSLeaderboard.Utils
             return Data.ToString();
         }
 
-
         private async Task UploadLeaderboardData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
         {
-
             using (var httpClient = new HttpClient())
             {
                 int x = 0;
@@ -194,13 +180,10 @@ namespace QSLeaderboard.Utils
             };
             return Data.ToString();
         }
-
-
         public void FUCKOFFPLAYLIST()
         {
             UnityMainThreadTaskScheduler.Factory.StartNew(() => FUCK());
         }
-
         private async Task FUCK()
         {
             using (var httpClient = new HttpClient())
@@ -302,6 +285,5 @@ namespace QSLeaderboard.Utils
                 return false;
             }
         }
-
     }
 }

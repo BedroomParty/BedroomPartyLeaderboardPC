@@ -11,6 +11,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using Zenject;
+using static QSLeaderboard.Utils.UIUtils;
 
 namespace QSLeaderboard.UI
 {
@@ -86,14 +87,8 @@ namespace QSLeaderboard.UI
             scoreScoreText.text.Replace(",", " ");
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
 
-            if (entry.PP != 0)
-            {
-                ppScoreText.text = string.Format("<size=4.8><color=#BCE59C>{0}<size=3>pp</size></color></size>", entry.PP.ToString("F2"));
-            }
-            else
-            {
-                ppScoreText.gameObject.SetActive(false);
-            }
+            if (entry.PP != 0) ppScoreText.text = string.Format("<size=4.8><color=#BCE59C>{0}<size=3>pp</size></color></size>", entry.PP.ToString("F2"));
+            else ppScoreText.gameObject.SetActive(false);
 
             if (entry.mods.IsEmpty()) modifiersScoreText.gameObject.SetActive(false);
             else modifiersScoreText.gameObject.SetActive(true);
@@ -104,9 +99,7 @@ namespace QSLeaderboard.UI
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-
-                int lastDigit = entry.rank % 10;
-                int position = lastDigit - 1;
+                int position = (entry.rank % 10) - 1;
                 _leaderboardView.StartCoroutine(SetProfileImageModal(position, profileImageModal));
                 if (Constants.isStaff(entry.userID))
                 {
@@ -134,37 +127,5 @@ namespace QSLeaderboard.UI
             image.sprite = _leaderboardView.holders[pos].profileImage.sprite;
             profileImageModalLOADING.SetActive(false);
         }
-
     }
-
-    public class RainbowAnimation : MonoBehaviour
-    {
-        public float speed = 1f; // Speed of the color change
-
-        private ClickableText clickableText;
-        private float hue;
-
-        private void Start()
-        {
-            clickableText = GetComponent<ClickableText>();
-        }
-
-        private void Update()
-        {
-            if (clickableText == null)
-            {
-                return;
-            }
-
-            hue += speed * Time.deltaTime;
-            if (hue > 1f)
-            {
-                hue -= 1f;
-            }
-
-            Color rainbowColor = Color.HSVToRGB(hue, 1f, 1f);
-            clickableText.color = rainbowColor;
-        }
-    }
-
 }

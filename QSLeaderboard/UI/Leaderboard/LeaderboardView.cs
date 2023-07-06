@@ -14,10 +14,9 @@ using System.IO;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
 using Zenject;
 using static LeaderboardTableView;
+using static QSLeaderboard.Utils.UIUtils;
 using Button = UnityEngine.UI.Button;
 
 namespace QSLeaderboard.UI.Leaderboard
@@ -32,10 +31,10 @@ namespace QSLeaderboard.UI.Leaderboard
         [Inject] RequestUtils _requestUtils;
         [Inject] LeaderboardData _leaderboardData;
         [Inject] private ResultsViewController _resultsViewController;
+        [Inject] UIUtils _uiUtils;
 
         public IDifficultyBeatmap currentDifficultyBeatmap;
         public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
-
 
         public static ImageView[] profileImageArray = new ImageView[10];
         public Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
@@ -65,7 +64,6 @@ namespace QSLeaderboard.UI.Leaderboard
 
         [UIObject("loginButton")]
         public GameObject loginButton;
-
 
         [UIValue("imageHolders")]
         [Inject] public List<ImageHolder> holders;
@@ -101,7 +99,7 @@ namespace QSLeaderboard.UI.Leaderboard
             OnLeaderboardSet(currentDifficultyBeatmap);
         }
 
-        private void UpdatePageButtons()
+        public void UpdatePageButtons()
         {
             if (sortMethod == "around")
             {
@@ -109,7 +107,6 @@ namespace QSLeaderboard.UI.Leaderboard
                 down_button.interactable = false;
                 return;
             }
-
             up_button.interactable = (page > 0);
             down_button.interactable = (page < totalPages - 1);
         }
@@ -117,8 +114,8 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIParams]
         BSMLParserParams parserParams;
 
-        private ImageView _imgView;
         private GameObject _loadingControl;
+        private ImageView _imgView;
 
         internal static readonly FieldAccessor<ImageView, float>.Accessor ImageSkew = FieldAccessor<ImageView, float>.GetAccessor("_skew");
         internal static readonly FieldAccessor<ImageView, bool>.Accessor ImageGradient = FieldAccessor<ImageView, bool>.GetAccessor("_gradient");
@@ -133,114 +130,23 @@ namespace QSLeaderboard.UI.Leaderboard
             Destroy(loadingContainer.Find("Text").gameObject);
             Destroy(_loadingControl.transform.Find("RefreshContainer").gameObject);
             Destroy(_loadingControl.transform.Find("DownloadingContainer").gameObject);
-
             _imgView = myHeader.background as ImageView;
             _imgView.color = Constants.QS_COLOR;
             _imgView.color0 = Constants.QS_COLOR;
             _imgView.color1 = Constants.QS_COLOR;
             ImageSkew(ref _imgView) = 0.18f;
             ImageGradient(ref _imgView) = true;
-
-        }
-
-        public async void SetProfileImage(string url, int index, string userID)
-        {
-            // Check if the sprite already exists in the dictionary
-            if (userSpriteDictionary.ContainsKey(userID))
-            {
-                holders[index].profileImage.sprite = userSpriteDictionary[userID];
-                holders[index].profileloading.SetActive(false);
-                return;
-            }
-
-            ImageView image = holders[index].profileImage;
-            GameObject loader = holders[index].profileloading;
-
-            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
-
-            while (!asyncOperation.isDone)
-            {
-                await Task.Delay(10);
-            }
-
-            if (request.responseCode == 200)
-            {
-                Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = RoundTextureCorners(texture);
-                Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
-
-                if (!userSpriteDictionary.ContainsKey(userID))
-                {
-                    userSpriteDictionary.Add(userID, sprite);
-                }
-                else
-                {
-                    sprite = userSpriteDictionary[userID];
-                }
-
-                await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
-                {
-                    image.sprite = sprite;
-                    loader.SetActive(false);
-                });
-            }
-            else
-            {
-                Plugin.Log.Error("Failed to retrieve profile image: " + request.error);
-            }
-
-            request.Dispose();
         }
         private void FuckOffButtons() => Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
-
-        public Texture2D RoundTextureCorners(Texture2D texture)
-        {
-            int width = texture.width;
-            int height = texture.height;
-            Texture2D roundedTexture = new Texture2D(width, height);
-            Color[] pixels = texture.GetPixels();
-
-            float cornerRadius = Mathf.Min(width, height) * 0.5f;
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    int index = y * width + x;
-                    Color pixel = pixels[index];
-                    Vector2 center = new Vector2(width * 0.5f, height * 0.5f);
-                    float distance = Vector2.Distance(new Vector2(x, y), center);
-
-                    if (distance > cornerRadius)
-                    {
-                        pixel.a = 0f;
-                    }
-
-                    roundedTexture.SetPixel(x, y, pixel);
-                }
-            }
-
-            roundedTexture.Apply();
-            return roundedTexture;
-        }
 
         [UIAction("openLBWebView")]
         public void openLBWebView()
         {
-            if (String.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" "))
-            {
-                return;
-            }
-            Application.OpenURL(currentSongLinkLBWebView);
+            if (!(String.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" "))) Application.OpenURL(currentSongLinkLBWebView);
         }
 
         [UIAction("openBUGWebView")]
-        public void openBUGWebView()
-        {
-            Application.OpenURL(Constants.BUG_REPORT_LINK);
-        }
-
+        public void openBUGWebView() => Application.OpenURL(Constants.BUG_REPORT_LINK);
 
         [UIAction("OnIconSelected")]
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
@@ -260,10 +166,8 @@ namespace QSLeaderboard.UI.Leaderboard
             {
                 return new List<IconSegmentedControl.DataItem>()
                 {
-                new IconSegmentedControl.DataItem(
-                    Utilities.FindSpriteInAssembly("QSLeaderboard.Images.Globe.png"), "Quest Supporters"),
-                new IconSegmentedControl.DataItem(
-                    Utilities.FindSpriteInAssembly("QSLeaderboard.Images.Player.png"), "Around you")
+                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("QSLeaderboard.Images.Globe.png"), "Quest Supporters"),
+                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("QSLeaderboard.Images.Player.png"), "Around you")
                 };
             }
         }
@@ -285,33 +189,17 @@ namespace QSLeaderboard.UI.Leaderboard
         [UIAction("loginButtonCLICK")]
         public void loginButtonCLICK()
         {
-            if (int.TryParse(loginCODEFUCKOFF, out int silly))
-            {
-                LoginCode(silly);
-            }
-            else
-            {
-
-            }
+            if (int.TryParse(loginCODEFUCKOFF, out int silly)) _playerUtils.LoginCode(silly);
         }
-
 
         [UIComponent("playlistButton")]
         public Button playlistButton;
 
-
         [UIAction("downloadRankedPlaylist")]
-        public void downloadRankedPlaylist()
-        {
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.FUCKOFFPLAYLIST());
-        }
-
+        public void downloadRankedPlaylist() => UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.FUCKOFFPLAYLIST());
 
         [UIAction("openWebsite")]
-        public void openWebsite()
-        {
-            Application.OpenURL("https://questsupporters.me");
-        }
+        public void openWebsite() => Application.OpenURL("https://questsupporters.me");
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -324,35 +212,10 @@ namespace QSLeaderboard.UI.Leaderboard
                 int code = 0;
                 string apiKey = string.Empty;
 
-                #region newShit
-                /*
-                RegistryKey key = Registry.CurrentUser.OpenSubKey("Software", true);
-                if(key.OpenSubKey("QSLeaderboard") != null)
-                {
-                    key = key.OpenSubKey("QSLeaderboard");
-                    if(key.GetValue("apiKey") != null)
-                    {
-                        LoginKey(key.GetValue("apiKey").ToString());
-                        Plugin.Log.Info(key.GetValue("apiKey").ToString());
-                        Plugin.apiKey = key.GetValue("apiKey").ToString();
-                    }
-                    else
-                    {
-                        Plugin.Log.Error("APIKEY NOT FOUND");
-                    }
-                }
-                else
-                {
-                    loginKeyboard.gameObject.SetActive(true);
-                    loginButton.gameObject.SetActive(true);
-                }
-                */
-                #endregion
-
                 if (File.Exists(Constants.BALL_PATH + "apiKey.txt"))
                 {
                     apiKey = File.ReadAllText(Constants.BALL_PATH + "apiKey.txt");
-                    LoginKey(apiKey);
+                    _playerUtils.LoginKey(apiKey);
                     Plugin.apiKey = apiKey;
                 }
                 else
@@ -370,82 +233,6 @@ namespace QSLeaderboard.UI.Leaderboard
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
 
-        private protected void LoginCode(int code)
-        {
-            _playerUtils.GetAuthStatusCode(code, result =>
-            {
-                bool isAuthenticated = result.Item1;
-                string username = result.Item2;
-
-                if (isAuthenticated)
-                {
-                    Plugin.Authed = true;
-                    Plugin.userName = username;
-                    loginButton.gameObject.SetActive(false);
-                    loginKeyboard.gameObject.SetActive(false);
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
-                    if (currentDifficultyBeatmap != null)
-                    {
-                        OnLeaderboardSet(currentDifficultyBeatmap);
-                        UpdatePageButtons();
-                    }
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(Plugin.discordID)));
-                }
-                else
-                {
-                    _panelView.promptText.text = "<color=red>Error Authenticating</color>";
-                    _panelView.prompt_loader.SetActive(false);
-                    Plugin.Log.Error("Not authenticated! Username: " + username);
-                }
-            });
-        }
-
-        private protected void LoginKey(string apiKey)
-        {
-            _playerUtils.GetAuthStatusKey(apiKey, result =>
-            {
-                bool isAuthenticated = result.Item1;
-                string username = result.Item2;
-
-                if (isAuthenticated)
-                {
-                    Plugin.Authed = true;
-                    Plugin.userName = username;
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
-                    if (currentDifficultyBeatmap != null)
-                    {
-                        OnLeaderboardSet(currentDifficultyBeatmap);
-                        UpdatePageButtons();
-                    }
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(Plugin.discordID)));
-
-                    if (Constants.isStaff(Plugin.discordID))
-                    {
-                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
-                        rainbowAnimation.speed = 0.35f;
-                    }
-                    else
-                    {
-                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.GetComponent<RainbowAnimation>();
-                        if (rainbowAnimation != null)
-                        {
-                            UnityEngine.Object.Destroy(rainbowAnimation);
-                        }
-                        _panelView.playerUsername.color = Color.white;
-                    }
-                }
-                else
-                {
-                    _panelView.promptText.text = "<color=red>Error Authenticating</color>";
-                    _panelView.prompt_loader.SetActive(false);
-                    Plugin.Log.Error("Not authenticated! Username: " + username);
-                }
-            });
-        }
-
-
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
@@ -462,41 +249,6 @@ namespace QSLeaderboard.UI.Leaderboard
             currentDifficultyBeatmap = difficultyBeatmap;
             UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
         }
-
-        private async Task SetProfilePic(ImageView image, string url)
-        {
-            _panelView.playerAvatarLoading.SetActive(true);
-            await Task.Delay(1);
-
-            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
-
-            while (!asyncOperation.isDone)
-            {
-                await Task.Delay(10);
-            }
-
-            if (request.responseCode == 200)
-            {
-                Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = RoundTextureCorners(texture);
-                Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
-
-                await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
-                {
-                    image.sprite = sprite;
-                    _panelView.playerAvatarLoading.SetActive(false);
-                });
-            }
-            else
-            {
-                Plugin.Log.Error("Failed to retrieve profile image: " + request.error);
-            }
-
-            request.Dispose();
-        }
-
-
 
         private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
@@ -550,7 +302,6 @@ namespace QSLeaderboard.UI.Leaderboard
                         headerText.SetText("UNRANKED");
                     }
 
-
                     if (result.Item2 != null)
                     {
                         if (result.Item2.Count == 0)
@@ -565,7 +316,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         else
                         {
                             leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
-                            RichMyText(leaderboardTableView);
+                            _uiUtils.RichMyText(leaderboardTableView);
                             loadingLB.gameObject.SetActive(false);
                         }
                     }
@@ -579,7 +330,7 @@ namespace QSLeaderboard.UI.Leaderboard
                         errorText.gameObject.SetActive(true);
                     }
                     errorText.text = errorReason;
-                    SetProfiles(result.Item2);
+                    _uiUtils.SetProfiles(result.Item2);
                     totalPages = result.Item4;
                     UpdatePageButtons();
                 });
@@ -589,39 +340,6 @@ namespace QSLeaderboard.UI.Leaderboard
         private void FuckOffImages() => holders.ForEach(holder => holder.profileImage.sprite = transparentSprite);
         private void HelloLoadImages() => holders.ForEach(holder => holder.profileloading.SetActive(true));
         private void FuckLoadImages() => holders.ForEach(holder => holder.profileloading.SetActive(false));
-
-
-        void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard)
-        {
-            for (int i = 0; i < leaderboard.Count; i++)
-            {
-                SetProfileImage(Constants.profilePictureLink(leaderboard[i].userID), i, leaderboard[i].userID);
-            }
-
-            for (int i = leaderboard.Count; i <= 10; i++)
-            {
-                holders[i].profileloading.gameObject.SetActive(false);
-            }
-        }
-
-        void RichMyText(LeaderboardTableView tableView)
-        {
-            foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
-            {
-                cell.showSeparator = true;
-                var nameText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText");
-                var rankText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText");
-                var scoreText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText");
-                nameText.richText = true;
-                rankText.richText = true;
-                scoreText.richText = true;
-                rankText.text = $"<size=120%><u>{rankText.text}</u></size>";
-                var seperator = cell.GetField<Image, LeaderboardTableCell>("_separatorImage") as ImageView;
-                seperator.color = Constants.QS_COLOR;
-                seperator.color0 = Color.white;
-                seperator.color1 = new Color(1, 1, 1, 0);
-            }
-        }
 
         public List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page)
         {
@@ -649,60 +367,11 @@ namespace QSLeaderboard.UI.Leaderboard
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;
-
-            if (entry.userID == "532063399069351947")
-            {
-                entry.userName = $"<color=blue>{entry.userName}</color>";
-            }
-
+            if (entry.userID == "532063399069351947") entry.userName = $"<color=blue>{entry.userName}</color>";
             result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedPP + formattedMods + "</size>";
-
             return new ScoreData(score, result, entry.rank, false);
         }
-
-        public void Initialize()
-        {
-            _resultsViewController.continueButtonPressedEvent += FUCKOFFIHATETHISIWANTTODIE;
-        }
-
-        public void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController)
-        {
-            OnLeaderboardSet(currentDifficultyBeatmap);
-        }
-    }
-
-
-    public class ImageHolder
-    {
-        private int index;
-
-        public ImageHolder(int index)
-        {
-            this.index = index;
-        }
-
-        [UIComponent("profileImage")]
-        public ImageView profileImage;
-
-        [UIObject("profileloading")]
-        public GameObject profileloading;
-    }
-
-    internal class ButtonHolder
-    {
-        private int index;
-        private Action<LeaderboardData.LeaderboardEntry> onClick;
-
-        public ButtonHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
-        {
-            this.index = index;
-            onClick = endmylife;
-        }
-
-        [UIComponent("infoButton")]
-        public Button infoButton;
-
-        [UIAction("infoClick")]
-        private void infoClick() => onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
+        public void Initialize() => _resultsViewController.continueButtonPressedEvent += FUCKOFFIHATETHISIWANTTODIE;
+        public void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController) => OnLeaderboardSet(currentDifficultyBeatmap);
     }
 }
