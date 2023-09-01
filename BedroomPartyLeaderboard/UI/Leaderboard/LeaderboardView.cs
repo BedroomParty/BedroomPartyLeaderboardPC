@@ -237,6 +237,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 Constants.EXAMPLEENTRIES.Add(Constants.GenerateRandomEntry(i));
             }
             leaderboardTableView.SetScores(CreateLeaderboardData(Constants.EXAMPLEENTRIES, page), -1);
+
             //_requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
             //{
             //    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
