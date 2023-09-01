@@ -54,12 +54,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIComponent("errorText")]
         private TextMeshProUGUI errorText;
 
-        [UIObject("loginKeyboard")]
-        public GameObject loginKeyboard;
-
-        [UIObject("loginButton")]
-        public GameObject loginButton;
-
         [UIValue("imageHolders")]
         [Inject] public List<ImageHolder> _ImageHolders;
 
@@ -172,13 +166,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             parserParams.EmitEvent("showInfoModal");
         }
 
-
-        [UIComponent("playlistButton")]
-        public Button playlistButton;
-
-        [UIAction("downloadRankedPlaylist")]
-        public void downloadRankedPlaylist() => UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.FUCKOFFPLAYLIST());
-
         [UIAction("openWebsite")]
         public void openWebsite() => Application.OpenURL("https://thebedroom.party");
 
@@ -193,8 +180,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 _panelView.prompt_loader.SetActive(true);
                 _panelView.promptText.gameObject.SetActive(true);
                 _panelView.promptText.text = "Authenticating...";
-
-                _playerUtils.LoginUser();
+                UnityMainThreadTaskScheduler.Factory.StartNew(() => {_playerUtils.LoginUser(); 
+            });
             }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
@@ -244,62 +231,68 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
             currentSongLinkLBWebView = $"https://thebedroom.party/?board={balls}";
-            _requestUtils.GetBeatMapData(balls, page, result =>
+            Constants.EXAMPLEENTRIES.Clear();
+            for (int i = 0; i <= 10; i++)
             {
-                UnityMainThreadTaskScheduler.Factory.StartNew(() =>
-                {
-                    if (!_plvc || !_plvc.isActiveAndEnabled) return;
-                    HelloIMGLoader();
+                Constants.EXAMPLEENTRIES.Add(Constants.GenerateRandomEntry(i));
+            }
+            leaderboardTableView.SetScores(CreateLeaderboardData(Constants.EXAMPLEENTRIES, page), -1);
+            //_requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
+            //{
+            //    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+            //    {
+            //        if (!_plvc || !_plvc.isActiveAndEnabled) return;
+            //        HelloIMGLoader();
 
-                    if (result.Item3 != 0)
-                    {
-                        _panelView.playerGlobalRank.text = $"#{result.Item3}";
-                    }
+            //        if (result.Item3 != 0)
+            //        {
+            //            _panelView.playerGlobalRank.text = $"#{result.Item3}";
+            //        }
 
-                    _panelView.playerPP.text = $"{result.Item6.ToString("F2")}pp";
+            //        _panelView.playerPP.text = $"{result.Item6.ToString("F2")}pp";
 
-                    if (result.Item5 != 0)
-                    {
-                        headerText.SetText($"RANKED - {result.Item5.ToString("F2")}<b>✰</b>");
-                    }
-                    else
-                    {
-                        headerText.SetText("UNRANKED");
-                    }
+            //        if (result.Item5 != 0)
+            //        {
+            //            headerText.SetText($"RANKED - {result.Item5.ToString("F2")}<b>✰</b>");
+            //        }
+            //        else
+            //        {
+            //            headerText.SetText("UNRANKED");
+            //        }
 
-                    if (result.Item2 != null)
-                    {
-                        if (result.Item2.Count == 0)
-                        {
-                            errorReason = "No Scores Yet!";
-                            leaderboardTableView.SetScores(null, -1);
-                            errorText.gameObject.SetActive(true);
-                            loadingLB.gameObject.SetActive(false);
-                            ByeIMGLoader();
-                            UpdatePageButtons();
-                        }
-                        else
-                        {
-                            leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
-                            _uiUtils.RichMyText(leaderboardTableView);
-                            loadingLB.gameObject.SetActive(false);
-                        }
-                    }
-                    else
-                    {
-                        errorReason = "No Scores Yet!";
-                        leaderboardTableView.SetScores(null, -1);
-                        errorText.gameObject.SetActive(true);
-                        loadingLB.gameObject.SetActive(false);
-                        ByeIMGLoader();
-                        errorText.gameObject.SetActive(true);
-                    }
-                    errorText.text = errorReason;
-                    _uiUtils.SetProfiles(result.Item2);
-                    totalPages = result.Item4;
-                    UpdatePageButtons();
-                });
-            });
+            //        if (result.Item2 != null)
+            //        {
+            //            if (result.Item2.Count == 0)
+            //            {
+            //                errorReason = "No Scores Yet!";
+            //                leaderboardTableView.SetScores(null, -1);
+            //                errorText.gameObject.SetActive(true);
+            //                loadingLB.gameObject.SetActive(false);
+            //                ByeIMGLoader();
+            //                UpdatePageButtons();
+            //            }
+            //            else
+            //            {
+            //                //leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
+            //                _uiUtils.RichMyText(leaderboardTableView);
+            //                loadingLB.gameObject.SetActive(false);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            errorReason = "No Scores Yet!";
+            //            leaderboardTableView.SetScores(null, -1);
+            //            errorText.gameObject.SetActive(true);
+            //            loadingLB.gameObject.SetActive(false);
+            //            ByeIMGLoader();
+            //            errorText.gameObject.SetActive(true);
+            //        }
+            //        errorText.text = errorReason;
+            //        _uiUtils.SetProfiles(result.Item2);
+            //        totalPages = result.Item4;
+            //        UpdatePageButtons();
+            //    });
+            //});
         }
 
         private void ByeImages() => _ImageHolders.ForEach(holder => holder.profileImage.gameObject.SetActive(false));
@@ -327,8 +320,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             if (entry.fullCombo) formattedCombo = " -<color=green> FC </color>";
             else formattedCombo = string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
 
-            string formattedPP = string.Empty;
-            if (entry.PP > 0) formattedPP = $" - <color=#AEC6CF>{entry.PP.ToString("F2")}</color>pp";
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;

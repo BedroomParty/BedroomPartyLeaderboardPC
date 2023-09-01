@@ -21,39 +21,6 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private PanelView _panelView;
         [Inject] private LeaderboardView _leaderboardView;
 
-        public async Task SetProfilePic(ImageView image, string url)
-        {
-            _panelView.playerAvatarLoading.SetActive(true);
-            await Task.Delay(1);
-
-            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
-
-            while (!asyncOperation.isDone)
-            {
-                await Task.Delay(10);
-            }
-
-            if (request.responseCode == 200)
-            {
-                Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = RoundTextureCorners(texture);
-                Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
-
-                await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
-                {
-                    image.sprite = sprite;
-                    _panelView.playerAvatarLoading.SetActive(false);
-                });
-            }
-            else
-            {
-                Plugin.Log.Error("Failed to retrieve profile image: " + request.error);
-            }
-
-            request.Dispose();
-        }
-
         public class RainbowAnimation : MonoBehaviour
         {
             public float speed = 1f; // Speed of the color change
@@ -84,75 +51,11 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-        public async void SetProfileImage(string url, int index, string userID)
-        {
-            ImageView image = _leaderboardView._ImageHolders[index].profileImage;
-            GameObject loader = _leaderboardView._ImageHolders[index].profileloading;
-
-            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
-
-            while (!asyncOperation.isDone)
-            {
-                await Task.Delay(10);
-            }
-
-            if (request.responseCode == 200)
-            {
-                Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                Texture2D roundedTexture = RoundTextureCorners(texture);
-                Sprite sprite = Sprite.Create(roundedTexture, new Rect(0, 0, roundedTexture.width, roundedTexture.height), Vector2.one * 0.5f);
-
-                await UnityMainThreadTaskScheduler.Factory.StartNew(() =>
-                {
-                    image.sprite = sprite;
-                    loader.SetActive(false);
-                });
-            }
-            else
-            {
-                Plugin.Log.Error("Failed to retrieve profile image: " + request.error);
-            }
-
-            request.Dispose();
-        }
-
-        public Texture2D RoundTextureCorners(Texture2D texture)
-        {
-            int width = texture.width;
-            int height = texture.height;
-            Texture2D roundedTexture = new Texture2D(width, height);
-            Color[] pixels = texture.GetPixels();
-
-            float cornerRadius = Mathf.Min(width, height) * 0.5f;
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    int index = y * width + x;
-                    Color pixel = pixels[index];
-                    Vector2 center = new Vector2(width * 0.5f, height * 0.5f);
-                    float distance = Vector2.Distance(new Vector2(x, y), center);
-
-                    if (distance > cornerRadius)
-                    {
-                        pixel.a = 0f;
-                    }
-
-                    roundedTexture.SetPixel(x, y, pixel);
-                }
-            }
-
-            roundedTexture.Apply();
-            return roundedTexture;
-        }
-
         public void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard)
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                SetProfileImage(Constants.profilePictureLink(leaderboard[i].userID), i, leaderboard[i].userID);
+                _leaderboardView._ImageHolders[i].setProfileImage($"{leaderboard[i].userID}");
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)
@@ -160,6 +63,38 @@ namespace BedroomPartyLeaderboard.Utils
                 _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
             }
         }
+
+        public void GetCoolMaterialAndApply()
+        {
+            Material mat = FindCoolMaterial();
+            foreach(var x in _leaderboardView._ImageHolders)
+            {
+                x.profileImage.material = mat;
+            }
+            _panelView.playerAvatar.material = mat;
+        }
+
+        private Material FindCoolMaterial()
+        {
+            Material cool = null;
+            foreach (Material material in Resources.FindObjectsOfTypeAll<Material>())
+            {
+                if (material == null) continue;
+                if (material.name.Contains("UINoGlowRoundEdge"))
+                {
+                    cool = material;
+                    break;
+                }
+            }
+
+            if (cool == null)
+            {
+                Plugin.Log.Error("Material 'UINoGlowRoundEdge' not found.");
+            }
+
+            return cool;
+        }
+
 
         public void RichMyText(LeaderboardTableView tableView)
         {
@@ -183,6 +118,8 @@ namespace BedroomPartyLeaderboard.Utils
         {
             private int index;
 
+            public bool isLoading;
+
             public ImageHolder(int index)
             {
                 this.index = index;
@@ -196,9 +133,11 @@ namespace BedroomPartyLeaderboard.Utils
 
             public void setProfileImage(string url)
             {
+                isLoading = true;
                 profileloading.SetActive(true);
                 profileImage.SetImage(url);
                 profileloading.SetActive(false);
+                isLoading = false;
             }
         }
 

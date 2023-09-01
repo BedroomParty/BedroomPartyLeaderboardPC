@@ -1,4 +1,5 @@
-﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+﻿using BeatSaberMarkupLanguage;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
 using System;
@@ -38,7 +39,7 @@ namespace BedroomPartyLeaderboard.Utils
                 Steamworks.CSteamID steamID = Steamworks.SteamUser.GetSteamID();
                 string playerId = steamID.m_SteamID.ToString();
                 string playerName = Steamworks.SteamFriends.GetPersonaName();
-                return new PlayerInfo(playerName, playerId, authToken);
+                return new PlayerInfo(playerName, playerId, Constants.Base64Encode(authToken));
             });
             return steamInfo;
         }
@@ -69,7 +70,7 @@ namespace BedroomPartyLeaderboard.Utils
                                     playerId = user.Data.ID.ToString();
                                     playerName = user.Data.OculusID;
                                     authKey = userProofMessage.Data.Value + "," + authTokenMessage.Data;
-                                    taskCompletionSource.SetResult(new PlayerInfo(playerId, playerName, authKey));
+                                    taskCompletionSource.SetResult(new PlayerInfo(playerId, playerName, Constants.Base64Encode(authKey)));
                                 }
                                 else
                                 {
@@ -87,11 +88,28 @@ namespace BedroomPartyLeaderboard.Utils
             return taskCompletionSource.Task;
         }
 
+
+
+        private string GetLoginString(string userID)
+        {
+            JObject user = new JObject
+            {
+                { "userID", userID }
+            };
+
+            return user.ToString();
+        }
+
+
         private async Task GetAuth(Action<bool> callback)
         {
             PlayerInfo _localPlayerInfo = Task.Run(() => GetPlayerInfo()).Result;
             localPlayerInfo = _localPlayerInfo;
             _panelView.playerUsername.text = localPlayerInfo.username;
+            _isAuthed = true;
+            callback(true);
+            _uiUtils.GetCoolMaterialAndApply();
+            return;
 
             using (var httpClient = Plugin.httpClient)
             {
@@ -103,7 +121,7 @@ namespace BedroomPartyLeaderboard.Utils
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                        string requestBody = getLoginString(_localPlayerInfo.userID);
+                        string requestBody = GetLoginString(_localPlayerInfo.userID);
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
                         HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content).ConfigureAwait(false);
@@ -139,15 +157,15 @@ namespace BedroomPartyLeaderboard.Utils
         }
 
 
-        public void GetAuthStatus(Action<bool> callback)
+        public async void GetAuthStatus(Action<bool> callback)
         {
-            Task.Run(() => GetAuth(callback));
+            await Task.Run(() => GetAuth(callback));
         }
 
 
         public void LoginUser()
         {
-            GetAuthStatus(result =>
+            Task.Run(() => GetAuthStatus(result =>
             {
                 if (_isAuthed)
                 {
@@ -158,7 +176,8 @@ namespace BedroomPartyLeaderboard.Utils
                         _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                         _leaderboardView.UpdatePageButtons();
                     }
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(localPlayerInfo.userID)));
+                    _panelView.playerAvatar.SetImage("https://cdn.assets.beatleader.xyz/76561199077754911R34.png");
+                    _panelView.playerAvatarLoading.gameObject.SetActive(false);
 
                     if (Constants.isStaff(localPlayerInfo.userID))
                     {
@@ -181,7 +200,7 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.prompt_loader.SetActive(false);
                     Plugin.Log.Error("Not authenticated!");
                 }
-            });
+            }));
         }
 
         public struct PlayerInfo

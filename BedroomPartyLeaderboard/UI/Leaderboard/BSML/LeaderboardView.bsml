@@ -10,7 +10,7 @@
 		<stack>
 			<horizontal>
 				<text id="headerText"
-					  text="QS LEADERBOARD"
+					  text="BEDROOM PARTY"
 					  font-size="6"
 					  align="Midline"
 					  italics="true"
@@ -77,23 +77,21 @@
 			
 				<loading anchor-pos-x="-5" align="Center" active="false" id="loadingLB" pref-width='20' pref-height='20' preserve-aspect='true'/>
 
-			<vertical  child-align='MiddleCenter' child-control-height='false' child-expand-height='false'>
-				<string-setting preferred-width='50' text='Login Code' id='loginKeyboard' value='loginKeyboardVALUE' active='false' anchor-pos-x='-5' apply-on-change='true'/>
-				<button id='loginButton' text='Login' active='false' anchor-pos-x='-5' on-click='loginButtonCLICK'/>
-			</vertical>
-			
 			<modal child-expand-height="false" id='infoModal' show-event='showInfoModal' hide-event='hideInfoModal' size-delta-x='80' size-delta-y='55' clickerino-offerino-closerino='true'
 					move-to-center='true'>
 				<vertical spacing='1'
 					vertical-fit='PreferredSize' pad='6'>
 					<horizontal spacing='4'>
 						<image align='Left' id="BedroomPartyLeaderboard_logo" src="BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png" preserve-aspect="true" pref-width="15" pref-height="15"/>
-						<text font-size="10" text='QS Leaderboard' align='Right'/>
+						<text font-size="10" text='BP Leaderboard' align='Right'/>
 					</horizontal>
-					<text font-size='5' align='Center' text='QS Leaderboard by the QS Team'/>
-					<text text-wrap='true' align='Center' text='A leaderboard for the best server'/>
+					<text font-size='5' align='Center' text='Bedroom Party Leaderboard by the BP Team'/>
+					<vertical>
+						<text text='Speecil (Mods)' font-size='3' align='Center'/>
+						<text text='Syl (Website)' font-size='3' align='Center'/>
+						<text text='Nuggo (Backend)' font-size='3' align='Center'/>
+					</vertical>
 					<horizontal>
-						<action-button text="Ranked Playlist" pref-width="25" pref-height="10" id='playlistButton' on-click='downloadRankedPlaylist'/>
 						<action-button text="Website" pref-width="25" pref-height="10"  id='websiteButton' on-click='openWebsite'/>
 					</horizontal>
 				</vertical>

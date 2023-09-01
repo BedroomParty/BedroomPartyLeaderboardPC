@@ -1,4 +1,5 @@
 ﻿using BedroomPartyLeaderboard.Installers;
+using BedroomPartyLeaderboard.Utils;
 using IPA;
 using SiraUtil.Zenject;
 using System.Net.Http;
@@ -19,6 +20,9 @@ namespace BedroomPartyLeaderboard
             Log = logger;
             httpClient = new HttpClient();
             zenjector.Install<MenuInstaller>(Location.Menu);
+
+
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BedroomPartyLeaderboard.UI.Leaderboard;
@@ -69,13 +70,9 @@ namespace BedroomPartyLeaderboard.UI
 
         public void setScoreModalText(LeaderboardData.LeaderboardEntry entry)
         {
-            profileImageModalLOADING.SetActive(true);
             currentEntry = entry;
-
+            profileImageModalLOADING.SetActive(true);
             string formattedDate = "Error";
-            profileImageModal.sprite = _leaderboardView.transparentSprite;
-            profileImageModalLOADING.SetActive(false);
-
             TimeSpan relativeTime = TimeUtils.GetRelativeTime(entry.timestamp.ToString());
             dateScoreText.text = string.Format("<size=4.8><color=white>{0}</color></size>", TimeUtils.GetRelativeTimeString(relativeTime));
 
@@ -87,8 +84,7 @@ namespace BedroomPartyLeaderboard.UI
             scoreScoreText.text.Replace(",", " ");
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
 
-            if (entry.PP != 0) ppScoreText.text = string.Format("<size=4.8><color=#BCE59C>{0}<size=3>pp</size></color></size>", entry.PP.ToString("F2"));
-            else ppScoreText.gameObject.SetActive(false);
+            ppScoreText.gameObject.SetActive(false);
 
             if (entry.mods.IsEmpty()) modifiersScoreText.gameObject.SetActive(false);
             else modifiersScoreText.gameObject.SetActive(true);
@@ -120,11 +116,12 @@ namespace BedroomPartyLeaderboard.UI
 
         private IEnumerator SetProfileImageModal(int pos, ImageView image)
         {
-            while (_leaderboardView.holders[pos].profileImage.sprite == _leaderboardView.transparentSprite)
+            profileImageModalLOADING.gameObject.SetActive(true);
+            while (!_leaderboardView._ImageHolders[pos].isLoading)
             {
                 yield return null;
             }
-            image.sprite = _leaderboardView.holders[pos].profileImage.sprite;
+            image.sprite = _leaderboardView._ImageHolders[pos].profileImage.sprite;
             profileImageModalLOADING.SetActive(false);
         }
     }

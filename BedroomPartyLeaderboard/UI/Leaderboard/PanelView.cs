@@ -1,5 +1,6 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.ViewControllers;
+using BedroomPartyLeaderboard.Utils;
 using HMUI;
 using TMPro;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     internal class PanelView : BSMLAutomaticViewController
     {
         [Inject] LeaderboardView _leaderboardView;
+        [Inject] PlayerUtils _playerUtils;
 
         [UIComponent("BedroomPartyLeaderboard_logo")]
         private ImageView BedroomPartyLeaderboard_logo;
@@ -28,12 +30,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIObject("playerAvatarLoading")]
         public GameObject playerAvatarLoading;
 
-        [UIComponent("playerGlobalRank")]
-        public TextMeshProUGUI playerGlobalRank;
-
-        [UIComponent("playerPP")]
-        public TextMeshProUGUI playerPP;
-
         [UIComponent("playerUsername")]
         public TextMeshProUGUI playerUsername;
 
@@ -46,8 +42,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIAction("playerUsernameCLICK")]
         public void playerUsernameCLICK()
         {
-            if (string.IsNullOrEmpty(Plugin.discordID)) return;
-            Application.OpenURL($"https://thebedroom.party/?user={Plugin.discordID}");
+            if (string.IsNullOrEmpty(_playerUtils.localPlayerInfo.userID)) return;
+            Application.OpenURL($"https://thebedroom.party/?user={_playerUtils.localPlayerInfo.userID}");
         }
     }
 }

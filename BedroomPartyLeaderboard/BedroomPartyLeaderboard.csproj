@@ -251,9 +251,6 @@
     <EmbeddedResource Include="Images\pixel.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Images\QSLeaderboard_logo.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Images\blank.png" />
   </ItemGroup>
   <ItemGroup>
@@ -264,6 +261,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\bug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\lmao.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\BedroomPartyLeaderboard_logo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

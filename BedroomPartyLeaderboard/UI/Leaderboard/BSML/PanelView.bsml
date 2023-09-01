@@ -3,38 +3,28 @@
 		<loading-indicator id="prompt_loader" active="false" preserve-aspect="true" pref-width="4" pref-height="4" />
 		<text rich-text="true" id="promptText" text="" active="false" anchor-pos-x="0" anchor-pos-y="10" align="BottomLeft" italics="true" />
 	</horizontal>
-	<horizontal anchor-pos-x="-2" anchor-pos-y="0" ignore-layout="true" pref-height="20" horizontal-fit="PreferredSize" spacing="6.5">
-		<vertical pref-width="20">
+	<horizontal anchor-pos-x="-2" anchor-pos-y="0" ignore-layout="true" pref-height="20" horizontal-fit="Unconstrained">
+		<vertical pref-width="20" child-align="MiddleLeft">
 			<horizontal pref-height="14">
 				<clickable-image id="BedroomPartyLeaderboard_logo" on-click="FunnyModalMoment" src="BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
 			</horizontal>
 		</vertical>
 
-		<vertical>
+		<vertical child-align="MiddleCenter">
 			<horizontal pref-height="10">
 				<vertical spacing="6" child-expand-width="false" child-control-width="false" child-align="MiddleCenter">
 					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
-							<clickable-text id="playerUsername" font-size="6" text="loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK"/>
+							<clickable-text id="playerUsername" font-size="6" text="loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
 					</horizontal>
-
-					<horizontal horizontal-fit="PreferredSize" spacing="3">
-						<horizontal pref-height="6" pad="1" spacing="1.5">
-							<image  src="BedroomPartyLeaderboard.Images.Globe.png" preserve-aspect="true" pref-height="3" preferred-width="3"/>
-							<text id="playerGlobalRank" text="loading..." align="Left"/>
-						</horizontal>
-						<horizontal pref-height="6" pad="1">
-							<text id="playerPP" color="teal" text="loading..." align="Left"/>
-						</horizontal>
-					</horizontal> 
 				</vertical>
 			</horizontal>
 		</vertical>
 
-		<vertical pref-width="20">
+		<vertical pref-width="20" child-align="MiddleRight">
 			<horizontal pref-height="14">
 				<stack >
 					<image id="playerAvatar" src="BedroomPartyLeaderboard.Images.blank.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
-					<loading-indicator id="playerAvatarLoading" preserve-aspect="true" preferred-height="5" preferred-width="5"/>
+					<loading-indicator  id="playerAvatarLoading" preserve-aspect="true" preferred-height="5" preferred-width="5"/>
 				</stack>
 			</horizontal>
 		</vertical>

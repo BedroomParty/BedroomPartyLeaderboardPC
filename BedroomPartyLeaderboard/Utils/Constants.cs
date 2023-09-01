@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = System.Random;
 
 namespace BedroomPartyLeaderboard.Utils
 {
@@ -7,9 +10,8 @@ namespace BedroomPartyLeaderboard.Utils
     {
         public const string AUTH_END_POINT = "https://api.thebedroom.party/login";
 
-        public const string LEADERBOARD_DOWNLOAD_END_POINT = "https://api.thebedroom.party/leaderboard";
-        public const string LEADERBOARD_OVERALL_END_POINT = "https://api.thebedroom.party/leaderboard/overview";
-        public const string LEADERBOARD_UPLOAD_END_POINT = "https://api.thebedroom.party/leaderboard/upload";
+        public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}";
+        public static string LEADERBOARD_UPLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}/upload";
 
         public const string USER_URL = "https://api.thebedroom.party/user";
         public const string PLAYLIST_PATH = "./Playlists/";
@@ -29,7 +31,7 @@ namespace BedroomPartyLeaderboard.Utils
         {
             if (staffIDs == null)
             {
-                // begin fetch of staffIDs
+                staffIDs = Plugin.httpClient.GetAsync("https://api.thebedroom.party/staff").Result.ToString().Split(',');
             }
             return staffIDs.Contains(uwu); // we do not talk about it :clueless:
         }
@@ -37,6 +39,31 @@ namespace BedroomPartyLeaderboard.Utils
         public static string profilePictureLink(string kms)
         {
             return $"https://cdn.phazed.xyz/QSBoard/High/{kms}.png";
+        }
+
+        public static string Base64Encode(string plainText)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
+
+        public static List<LeaderboardData.LeaderboardEntry> EXAMPLEENTRIES = new List<LeaderboardData.LeaderboardEntry>();
+
+        public static LeaderboardData.LeaderboardEntry GenerateRandomEntry(int position)
+        {
+            Random random = new Random();
+            int rank = position; // Rank corresponds to position
+            string userID = (position + 1).ToString(); // User ID as a number from 1 to 10
+            string userName = "User" + random.Next(1, 100); // Generate a random user name
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(); // Current timestamp
+            int missCount = random.Next(0, 50);
+            int badCutCount = random.Next(0, 20);
+            float acc = (float)(random.NextDouble() * 100.0); // Random accuracy between 0 and 100
+            bool fullCombo = random.Next(0, 2) == 1; // Randomly true or false
+            int score = random.Next(1000, 100000); // Assuming scores between 1000 and 100000
+            string mods = "RandomMods"; // You can replace this with a random mods generator
+
+            return new LeaderboardData.LeaderboardEntry(rank, userID, userName, timestamp, missCount, badCutCount, acc, fullCombo, score, mods);
         }
     }
 }

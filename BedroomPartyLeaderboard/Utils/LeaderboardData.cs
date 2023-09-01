@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BedroomPartyLeaderboard.Utils
 {
-    internal class LeaderboardData
+    public class LeaderboardData
     {
         public struct LeaderboardEntry
         {
@@ -11,7 +11,6 @@ namespace BedroomPartyLeaderboard.Utils
             public string userID;
             public string userName;
             public long timestamp;
-            public float PP;
             public int missCount;
             public int badCutCount;
             public float acc;
@@ -19,13 +18,12 @@ namespace BedroomPartyLeaderboard.Utils
             public int score;
             public string mods;
 
-            public LeaderboardEntry(int rank, string userID, string userName, long timestamp, float PP, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
+            public LeaderboardEntry(int rank, string userID, string userName, long timestamp, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
             {
                 this.rank = rank;
                 this.userID = userID;
                 this.userName = userName;
                 this.timestamp = timestamp;
-                this.PP = PP;
                 this.missCount = missCount;
                 this.badCutCount = badCutCount;
                 this.acc = acc;
@@ -43,7 +41,6 @@ namespace BedroomPartyLeaderboard.Utils
                 string rank = scoreData["Rank"]?.ToString();
                 string userID = scoreData["UserID"]?.ToString();
                 string userName = scoreData["Username"]?.ToString();
-                float PP = scoreData["PP"]?.Value<float>() ?? 0.0f;
                 int missCount = scoreData["Misses"]?.Value<int>() ?? 0;
                 int badCutCount = scoreData["BadCuts"]?.Value<int>() ?? 0;
                 float acc = scoreData["Accuracy"]?.Value<float>() ?? 0.0f;
@@ -56,7 +53,6 @@ namespace BedroomPartyLeaderboard.Utils
                     userID ?? "0",
                     userName ?? "Player",
                     timestamp,
-                    PP,
                     missCount,
                     badCutCount,
                     acc,

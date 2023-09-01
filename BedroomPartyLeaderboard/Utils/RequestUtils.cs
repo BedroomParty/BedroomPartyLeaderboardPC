@@ -21,7 +21,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private LeaderboardView _leaderboardView;
         [Inject] private PanelView _panelView;
         [Inject] private readonly PlayerUtils _playerUtils;
-        private async Task GetLeaderboardData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
+        private async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
         {
             using (var httpClient = new HttpClient())
             {
@@ -41,17 +41,8 @@ namespace BedroomPartyLeaderboard.Utils
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     JObject jsonObject = JObject.Parse(jsonResponse);
 
-                    if (jsonObject.TryGetValue("GlobalRank", out JToken globalRankToken)) rank = globalRankToken.Value<int>();
-                    else rank = 0;
-
-                    if (jsonObject.TryGetValue("PP", out JToken PP)) pp = PP.Value<float>();
-                    else pp = 0;
-
                     if (jsonObject.TryGetValue("ScoreCount", out JToken scoreCountToken)) scorecount = scoreCountToken.Value<int>();
                     else scorecount = 0;
-
-                    if (jsonObject.TryGetValue("Stars", out JToken starsToken)) stars = starsToken.Value<float>();
-                    else stars = 0f;
 
                     totalPages = Mathf.CeilToInt((float)scorecount / 10);
 
@@ -69,13 +60,13 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-        private string getLBDownloadJSON(string balls, int page, int limit, string sort)
+        private string getLBDownloadJSON((string, int, string) balls, int page, int limit, string sort)
         {
-            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT}/{balls}?sort={sort}&limit=10&page={page}&id={_playerUtils.localPlayerInfo.userID}";
+            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}sort={sort}&limit=10&page={page}&id={_playerUtils.localPlayerInfo.userID}";
             return Data;
         }
 
-        public void GetBeatMapData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
+        public void GetBeatMapData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
         {
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
@@ -113,7 +104,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                        HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT, content);
+                        HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(balls), content);
 
                         if (response.StatusCode == HttpStatusCode.NotFound)
                         {
@@ -180,111 +171,6 @@ namespace BedroomPartyLeaderboard.Utils
                 { "Modifiers", mods },
             };
             return Data.ToString();
-        }
-        public void FUCKOFFPLAYLIST()
-        {
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => FUCK());
-        }
-        private async Task FUCK()
-        {
-            using (var httpClient = new HttpClient())
-            {
-                int x = 0;
-                while (x < 2)
-                {
-                    _panelView.prompt_loader.SetActive(true);
-                    _panelView.promptText.gameObject.SetActive(true);
-                    _leaderboardView.playlistButton.interactable = false;
-                    _panelView.promptText.text = "Downloading Playlist...";
-                    try
-                    {
-                        HttpResponseMessage response = await httpClient.GetAsync(Constants.PLAYLIST_URL_RANKED);
-
-                        if (response.StatusCode == HttpStatusCode.OK)
-                        {
-                            var playlistStringLMFAOOOOO = await response.Content.ReadAsStringAsync();
-
-
-                            if (!string.IsNullOrEmpty(playlistStringLMFAOOOOO))
-                            {
-                                if (!File.Exists(Constants.PLAYLIST_PATH + "QS-Ranked.bplist"))
-                                {
-                                    using (File.Create(Constants.PLAYLIST_PATH + "QS-Ranked.bplist")) { }
-                                }
-                                string apiKeyFilePath = Constants.PLAYLIST_PATH + "QS-Ranked.bplist";
-
-                                using (StreamWriter sw = new(apiKeyFilePath))
-                                {
-                                    await sw.WriteAsync(playlistStringLMFAOOOOO);
-                                }
-                                TryRefreshPlaylists(true);
-                            }
-                            else
-                            {
-                                Plugin.Log.Error("Failed to parse API key from the response.");
-                            }
-                        }
-                        else
-                        {
-                            Plugin.Log.Error("Failed to download the ranked playlist");
-                        }
-
-                        _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=green>Successfully downloaded the ranked playlist!</color>";
-                        await Task.Delay(3000);
-                        _panelView.promptText.gameObject.SetActive(false);
-                        _leaderboardView.playlistButton.interactable = true;
-                        break;
-                    }
-                    catch (HttpListenerException e)
-                    {
-                        _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=red>Failed to download the playlist... Retrying!</color>";
-                        await Task.Delay(500);
-                        _panelView.promptText.gameObject.SetActive(false);
-                        _leaderboardView.playlistButton.interactable = true;
-                    }
-                    catch (HttpRequestException e)
-                    {
-                        Plugin.Log.Error("EXCEPTION: " + e.ToString());
-                        _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=red>EXCEPTION ERROR</color>";
-                        await Task.Delay(3000);
-                        _panelView.promptText.gameObject.SetActive(false);
-                        _leaderboardView.playlistButton.interactable = true;
-                        return;
-                    }
-                    x++;
-                }
-                if (x == 2)
-                {
-                    _panelView.promptText.text = "<color=red>Failed to download the playlist... Retrying!</color>";
-                    await Task.Delay(3000);
-                    _panelView.promptText.gameObject.SetActive(false);
-                    _panelView.prompt_loader.SetActive(false);
-                    _leaderboardView.playlistButton.interactable = true;
-                }
-            }
-        }
-
-        public static bool TryRefreshPlaylists(bool fullRefresh)
-        {
-            try
-            {
-                var assembly = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(assembly => assembly.GetName().Name == "BeatSaberPlaylistsLib");
-                var playlistManagerType = assembly!.GetType("BeatSaberPlaylistsLib.PlaylistManager");
-                var defaultManagerField = playlistManagerType.GetProperty("DefaultManager", BindingFlags.Static | BindingFlags.Public);
-                var refreshMethodInfo = playlistManagerType.GetMethod("RefreshPlaylists", BindingFlags.Instance | BindingFlags.Public);
-
-                var manager = defaultManagerField!.GetValue(null);
-                refreshMethodInfo!.Invoke(manager, new object[] { fullRefresh });
-                return true;
-            }
-            catch (Exception e)
-            {
-                Plugin.Log.Debug($"RefreshPlaylists failed: {e}");
-                return false;
-            }
         }
     }
 }
