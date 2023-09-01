@@ -137,7 +137,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIAction("openLBWebView")]
         public void openLBWebView()
         {
-            if (!(String.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" "))) Application.OpenURL(currentSongLinkLBWebView);
+            if (!(string.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" "))) Application.OpenURL(currentSongLinkLBWebView);
         }
 
         [UIAction("openBUGWebView")]
