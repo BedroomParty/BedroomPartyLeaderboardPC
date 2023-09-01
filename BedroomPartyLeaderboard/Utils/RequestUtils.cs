@@ -20,6 +20,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private LeaderboardData _leaderboardData;
         [Inject] private LeaderboardView _leaderboardView;
         [Inject] private PanelView _panelView;
+        [Inject] private readonly PlayerUtils _playerUtils;
         private async Task GetLeaderboardData(string balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
         {
             using (var httpClient = new HttpClient())
@@ -70,7 +71,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         private string getLBDownloadJSON(string balls, int page, int limit, string sort)
         {
-            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT}/{balls}?sort={sort}&limit=10&page={page}&id={Plugin.discordID}";
+            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT}/{balls}?sort={sort}&limit=10&page={page}&id={_playerUtils.localPlayerInfo.userID}";
             return Data;
         }
 
@@ -106,7 +107,7 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.promptText.text = "Uploading Score...";
                     try
                     {
-                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", Plugin.apiKey);
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _playerUtils.localPlayerInfo.authKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                         string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
 
@@ -197,7 +198,7 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.promptText.text = "Downloading Playlist...";
                     try
                     {
-                        HttpResponseMessage response = await httpClient.GetAsync(Constants.PLAYLIST_URL);
+                        HttpResponseMessage response = await httpClient.GetAsync(Constants.PLAYLIST_URL_RANKED);
 
                         if (response.StatusCode == HttpStatusCode.OK)
                         {

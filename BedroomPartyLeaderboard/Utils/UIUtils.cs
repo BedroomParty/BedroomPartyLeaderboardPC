@@ -86,8 +86,8 @@ namespace BedroomPartyLeaderboard.Utils
 
         public async void SetProfileImage(string url, int index, string userID)
         {
-            ImageView image = _leaderboardView.holders[index].profileImage;
-            GameObject loader = _leaderboardView.holders[index].profileloading;
+            ImageView image = _leaderboardView._ImageHolders[index].profileImage;
+            GameObject loader = _leaderboardView._ImageHolders[index].profileloading;
 
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             UnityWebRequestAsyncOperation asyncOperation = request.SendWebRequest();
@@ -157,7 +157,7 @@ namespace BedroomPartyLeaderboard.Utils
 
             for (int i = leaderboard.Count; i <= 10; i++)
             {
-                _leaderboardView.holders[i].profileloading.gameObject.SetActive(false);
+                _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
             }
         }
 
