@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33403.182
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSLeaderboard", "QSLeaderboard\QSLeaderboard.csproj", "{ABD0E9FB-95BD-42A1-A33A-39E533D391BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BedroomPartyLeaderboard", "BedroomPartyLeaderboard\BedroomPartyLeaderboard.csproj", "{ABD0E9FB-95BD-42A1-A33A-39E533D391BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -17,6 +17,7 @@ namespace BedroomPartyLeaderboard
         public static string discordID;
 
         public static string userName;
+
         public static string apiKey;
 
         [Init]
