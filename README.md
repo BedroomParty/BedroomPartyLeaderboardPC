@@ -1,4 +1,4 @@
-# QSLeaderboard-PC
+# BedroomPartyLeaderboard-PC
 
 ![balls](https://media.tenor.com/26L2n_gNyLEAAAAS/dripping-cock-no-way-in-hell-can-anyone-replicate-this-drip.gif)
 ![balls](https://media.tenor.com/26L2n_gNyLEAAAAS/dripping-cock-no-way-in-hell-can-anyone-replicate-this-drip.gif)
