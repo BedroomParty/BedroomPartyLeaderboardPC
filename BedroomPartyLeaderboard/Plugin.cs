@@ -1,6 +1,7 @@
-﻿using IPA;
-using BedroomPartyLeaderboard.Installers;
+﻿using BedroomPartyLeaderboard.Installers;
+using IPA;
 using SiraUtil.Zenject;
+using System.Net.Http;
 using IPALogger = IPA.Logging.Logger;
 
 namespace BedroomPartyLeaderboard
@@ -10,20 +11,13 @@ namespace BedroomPartyLeaderboard
     {
         internal static IPALogger Log { get; private set; }
 
-        public static bool Authed;
-
-        public static string platformID;
-
-        public static string discordID;
-
-        public static string userName;
-
-        public static string apiKey;
+        public static HttpClient httpClient { get; private set; }
 
         [Init]
         public Plugin(IPALogger logger, Zenjector zenjector)
         {
             Log = logger;
+            httpClient = new HttpClient();
             zenjector.Install<MenuInstaller>(Location.Menu);
         }
     }

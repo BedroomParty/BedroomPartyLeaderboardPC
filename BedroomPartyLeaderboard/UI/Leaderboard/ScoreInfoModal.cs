@@ -1,11 +1,11 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
+using BedroomPartyLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.Utils;
 using HMUI;
 using IPA.Utilities.Async;
 using ModestTree;
-using BedroomPartyLeaderboard.UI.Leaderboard;
-using BedroomPartyLeaderboard.Utils;
 using System;
 using System.Collections;
 using TMPro;

@@ -1,8 +1,6 @@
-﻿using IPA.Utilities.Async;
-using ModestTree;
-using Newtonsoft.Json;
+﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
-using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 using System.IO;
 using System.Net;
@@ -15,233 +13,114 @@ using static BedroomPartyLeaderboard.Utils.UIUtils;
 
 namespace BedroomPartyLeaderboard.Utils
 {
-
     internal class PlayerUtils
     {
         [Inject] PanelView _panelView;
         [Inject] LeaderboardView _leaderboardView;
         [Inject] UIUtils _uiUtils;
-        public (string, string) OculusSkillIssue()
+
+        protected private bool _isAuthed = false;
+        public PlayerInfo localPlayerInfo;
+
+        public bool isAuthed
         {
-            var steamID = "0";
-            var steamName = "loser";
-            //steamID = Steamworks.SteamUser.GetSteamID().ToString();
-            //steamName = Steamworks.SteamFriends.GetPersonaName();
-            Plugin.platformID = steamID;
-            return (steamID, steamName);
+            get { return _isAuthed; }
         }
 
-        public Task<(string, string)> GetPlayerInfo()
+        private async Task<PlayerInfo> GetSteamInfo()
         {
-            TaskCompletionSource<(string, string)> taskCompletionSource = new TaskCompletionSource<(string, string)>();
+            await WaitUntil(() => SteamManager.Initialized);
+
+            string authToken = (await new SteamPlatformUserModel().GetUserAuthToken()).token;
+
+            PlayerInfo steamInfo = await Task.Run(() =>
+            {
+                Steamworks.CSteamID steamID = Steamworks.SteamUser.GetSteamID();
+                string playerId = steamID.m_SteamID.ToString();
+                string playerName = Steamworks.SteamFriends.GetPersonaName();
+                return new PlayerInfo(playerName, playerId, authToken);
+            });
+            return steamInfo;
+        }
+
+        public Task<PlayerInfo> GetPlayerInfo()
+        {
+            TaskCompletionSource<PlayerInfo> taskCompletionSource = new TaskCompletionSource<PlayerInfo>();
+            string playerId = "";
+            string playerName = "";
+            string authKey = "";
+
             if (File.Exists(Constants.STEAM_API_PATH))
             {
-                (string steamID, string steamName) = OculusSkillIssue();
-                taskCompletionSource.SetResult((steamID, steamName));
+                taskCompletionSource.SetResult(Task.Run(() => GetSteamInfo()).Result);
             }
             else
             {
                 Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
                 {
-                    Plugin.platformID = user.Data.ID.ToString();
-                    taskCompletionSource.SetResult((user.Data.ID.ToString(), user.Data.OculusID));
-                });
-            }
-
-            return taskCompletionSource.Task;
-        }
-
-        // CODE
-
-
-        private async Task GetAuthCode(int code, Action<bool> callback)
-        {
-            _panelView.prompt_loader.SetActive(true);
-            _panelView.promptText.gameObject.SetActive(true);
-            _panelView.promptText.text = "Creating User...";
-            (string id, string username) = await GetPlayerInfo();
-
-
-            using (var httpClient = new HttpClient())
-            {
-                int x = 0;
-                while (x < 2)
-                {
-                    try
+                    Oculus.Platform.Users.GetUserProof().OnComplete(userProofMessage =>
                     {
-                        await Task.Delay(1);
-                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                        string requestBody = getLoginStringCode(id, code);
-
-                        HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-
-                        HttpResponseMessage response = await httpClient.PostAsync(Constants.USER_URL + "/link", content);
-                        bool isAuthed = response.StatusCode == HttpStatusCode.OK;
-                        if (isAuthed)
+                        if (!userProofMessage.IsError)
                         {
-                            // Parse the response and extract the API key
-                            string responseContent = await response.Content.ReadAsStringAsync();
-                            JObject jsonResponse = JObject.Parse(responseContent);
-                            string apiKey;
-                            if (jsonResponse.TryGetValue("key", out JToken apiKeyToken))
+                            Oculus.Platform.Users.GetAccessToken().OnComplete(authTokenMessage =>
                             {
-                                apiKey = apiKeyToken.Value<string>();
-                                Plugin.apiKey = apiKey;
-                                if (!string.IsNullOrEmpty(apiKey))
+                                if (!authTokenMessage.IsError)
                                 {
-                                    if (!Directory.Exists(Constants.BALL_PATH))
-                                    {
-                                        Directory.CreateDirectory(Constants.BALL_PATH);
-                                    }
-                                    if (!File.Exists(Constants.BALL_PATH + "apiKey.txt"))
-                                    {
-                                        using (File.Create(Constants.BALL_PATH + "apiKey.txt")) { }
-                                    }
-                                    string apiKeyFilePath = Constants.BALL_PATH + "apiKey.txt";
-
-                                    using (StreamWriter sw = new(apiKeyFilePath))
-                                    {
-                                        if (!apiKey.IsEmpty())
-                                        {
-                                            await sw.WriteAsync(apiKey);
-                                        }
-                                        else
-                                        {
-                                            Plugin.Log.Error("Failed to parse API key from the response.");
-                                        }
-                                    }
+                                    playerId = user.Data.ID.ToString();
+                                    playerName = user.Data.OculusID;
+                                    authKey = userProofMessage.Data.Value + "," + authTokenMessage.Data;
+                                    taskCompletionSource.SetResult(new PlayerInfo(playerId, playerName, authKey));
                                 }
                                 else
                                 {
-                                    Plugin.Log.Error("Failed to parse API key from the response.");
+                                    taskCompletionSource.SetException(new Exception("Failed to get access token."));
                                 }
-                            }
-                            else
-                            {
-                                Plugin.Log.Error("API key not found in the response.");
-
-                            }
-                            callback(isAuthed);
-                            break;
+                            });
                         }
-                        await Task.Delay(2000);
-                        _panelView.promptText.text = $"<color=red>Error Creating User... attempt {x + 1} of 3</color>";
-                        x++;
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        _panelView.promptText.text = $"<color=red>Error Creating User... attempt {x + 1} of 3</color>";
-                        Plugin.Log.Error($"HttpRequestException: {ex.Message}");
-                        x++;
-                        await Task.Delay(5000);
-                    }
-                    catch (JsonException ex)
-                    {
-                        _panelView.promptText.text = $"<color=red>Error Creating User... attempt {x + 1} of 3</color>";
-                        Plugin.Log.Error($"JsonException: {ex.Message}");
-                        x++;
-                        await Task.Delay(5000);
-                    }
-                }
-                if (x == 2)
-                {
-                    callback(false);
-                }
+                        else
+                        {
+                            taskCompletionSource.SetException(new Exception("Failed to get user proof."));
+                        }
+                    });
+                });
             }
+            return taskCompletionSource.Task;
         }
 
-
-        private string getLoginStringCode(string id, int code)
+        private async Task GetAuth(Action<bool> callback)
         {
-            var Data = new JObject
-            {
-                { "id", id },
-                { "code", code.ToString()}
-            };
+            PlayerInfo _localPlayerInfo = Task.Run(() => GetPlayerInfo()).Result;
+            localPlayerInfo = _localPlayerInfo;
+            _panelView.playerUsername.text = localPlayerInfo.username;
 
-            return Data.ToString();
-        }
-
-        private string getLoginStringKey(string id)
-        {
-            var Data = new JObject
-            {
-                { "id", id },
-            };
-
-            return Data.ToString();
-        }
-
-        public void GetAuthStatusCode(int code, Action<bool> callback)
-        {
-            Task.Run(() => GetAuthCode(code, callback));
-        }
-
-
-
-        // KEY
-
-
-        private async Task GetAuthKey(string apiKey, Action<(bool, string)> callback)
-        {
-            _panelView.prompt_loader.SetActive(true);
-            _panelView.promptText.gameObject.SetActive(true);
-            _panelView.promptText.text = "Authenticating...";
-
-            (string id, string username) = await GetPlayerInfo();
-            _panelView.playerUsername.text = username;
-            string discordID;
-            string usernameTemp = "Error";
-
-            using (var httpClient = new HttpClient())
+            using (var httpClient = Plugin.httpClient)
             {
                 int x = 0;
                 while (x < 3)
                 {
                     try
                     {
-                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", apiKey);
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                        string requestBody = getLoginStringKey(id);
+
+                        string requestBody = getLoginString(_localPlayerInfo.userID);
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
                         HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content).ConfigureAwait(false);
-                        bool isAuthed = response.StatusCode == HttpStatusCode.OK;
+                        _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                         string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                         JObject jsonResponse = JObject.Parse(responseContent);
 
-                        if (isAuthed)
+                        if (_isAuthed)
                         {
-                            Plugin.Authed = true;
                             _panelView.prompt_loader.SetActive(false);
                             _panelView.promptText.gameObject.SetActive(false);
-
-                            if (jsonResponse.TryGetValue("ID", out JToken discordIDToken))
-                            {
-                                discordID = discordIDToken.Value<string>();
-                                Plugin.discordID = discordID;
-                            }
-                            else
-                            {
-                                Plugin.Log.Error("Discord ID key not found in the response.");
-                            }
-
-                            if (jsonResponse.TryGetValue("Username", out JToken usernameToken))
-                            {
-                                usernameTemp = usernameToken.Value<string>();
-                                Plugin.userName = usernameTemp;
-                                _panelView.playerUsername.text = usernameTemp;
-                            }
-                            else
-                            {
-                                Plugin.Log.Error("Username key not found in the response.");
-                            }
-
-                            callback((true, usernameTemp));
+                            callback(true);
                             return;
                         }
                         _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
+                        await Task.Delay(500);
                         x++;
                     }
                     catch (HttpRequestException)
@@ -252,62 +131,36 @@ namespace BedroomPartyLeaderboard.Utils
                     }
                     x++;
                 }
-                if (x == 3)
+                if (x < 2)
                 {
-                    callback((false, username));
+                    callback(false);
                 }
             }
         }
 
 
-        public void GetAuthStatusKey(string key, Action<(bool, string)> callback)
+        public void GetAuthStatus(Action<bool> callback)
         {
-            Task.Run(() => GetAuthKey(key, callback));
+            Task.Run(() => GetAuth(callback));
         }
 
 
-
-
-        public void LoginCode(int code)
+        public void LoginUser()
         {
-            GetAuthStatusCode(code, result =>
+            GetAuthStatus(result =>
             {
-                if (result)
+                if (_isAuthed)
                 {
-                    _leaderboardView.loginButton.gameObject.SetActive(false);
-                    _leaderboardView.loginKeyboard.gameObject.SetActive(false);
-                    LoginKey(Plugin.apiKey);
-                }
-                else
-                {
-                    _panelView.promptText.text = "<color=red>Error Creating User</color>";
                     _panelView.prompt_loader.SetActive(false);
-                    Plugin.Log.Error("Not created user!");
-                }
-            });
-        }
-
-        public void LoginKey(string apiKey)
-        {
-            GetAuthStatusKey(apiKey, result =>
-            {
-                bool isAuthenticated = result.Item1;
-                string username = result.Item2;
-
-                if (isAuthenticated)
-                {
-                    Plugin.Authed = true;
-                    Plugin.userName = username;
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = $"<color=green>Successfully signed {username} in!</color>";
+                    _panelView.promptText.text = $"<color=green>Successfully signed in!</color>";
                     if (_leaderboardView.currentDifficultyBeatmap != null)
                     {
                         _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                         _leaderboardView.UpdatePageButtons();
                     }
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(Plugin.discordID)));
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetProfilePic(_panelView.playerAvatar, Constants.profilePictureLink(localPlayerInfo.userID)));
 
-                    if (Constants.isStaff(Plugin.discordID))
+                    if (Constants.isStaff(localPlayerInfo.userID))
                     {
                         RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
                         rainbowAnimation.speed = 0.35f;
@@ -326,11 +179,37 @@ namespace BedroomPartyLeaderboard.Utils
                 {
                     _panelView.promptText.text = "<color=red>Error Authenticating</color>";
                     _panelView.prompt_loader.SetActive(false);
-                    Plugin.Log.Error("Not authenticated! Username: " + username);
+                    Plugin.Log.Error("Not authenticated!");
                 }
             });
         }
 
+        public struct PlayerInfo
+        {
+            public string username;
+            public string userID;
+            public readonly string authKey;
 
+            public PlayerInfo(string username, string userID, string authKey)
+            {
+                this.authKey = authKey;
+                this.username = username;
+                this.userID = userID;
+            }
+        }
+
+
+        // from scoresaber yoink teehee
+        internal static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
+        {
+            var waitTask = Task.Run(async () =>
+            {
+                while (!condition()) await Task.Delay(frequency);
+            });
+
+            if (waitTask != await Task.WhenAny(waitTask,
+                    Task.Delay(timeout)))
+                throw new TimeoutException();
+        }
     }
 }

@@ -1,9 +1,10 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
-using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -173,7 +174,7 @@ namespace BedroomPartyLeaderboard.Utils
                 scoreText.richText = true;
                 rankText.text = $"<size=120%><u>{rankText.text}</u></size>";
                 var seperator = cell.GetField<Image, LeaderboardTableCell>("_separatorImage") as ImageView;
-                seperator.color = Constants.QS_COLOR;
+                seperator.color = Constants.BP_COLOR2;
                 seperator.color0 = Color.white;
                 seperator.color1 = new Color(1, 1, 1, 0);
             }
@@ -192,6 +193,13 @@ namespace BedroomPartyLeaderboard.Utils
 
             [UIObject("profileloading")]
             public GameObject profileloading;
+
+            public void setProfileImage(string url)
+            {
+                profileloading.SetActive(true);
+                profileImage.SetImage(url);
+                profileloading.SetActive(false);
+            }
         }
 
         internal class ButtonHolder

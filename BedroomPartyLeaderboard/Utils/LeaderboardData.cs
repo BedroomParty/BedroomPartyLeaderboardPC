@@ -54,7 +54,7 @@ namespace BedroomPartyLeaderboard.Utils
                 leaderboard.Add(new LeaderboardEntry(
                     int.Parse(rank ?? "0"),
                     userID ?? "0",
-                    userName ?? "Error",
+                    userName ?? "Player",
                     timestamp,
                     PP,
                     missCount,

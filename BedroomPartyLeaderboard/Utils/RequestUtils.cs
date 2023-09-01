@@ -1,6 +1,6 @@
-﻿using IPA.Utilities.Async;
+﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
-using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
 using System.IO;

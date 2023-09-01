@@ -1,7 +1,7 @@
-﻿using HMUI;
+﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+using HMUI;
 using LeaderboardCore.Managers;
 using LeaderboardCore.Models;
-using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 
 namespace BedroomPartyLeaderboard.Utils

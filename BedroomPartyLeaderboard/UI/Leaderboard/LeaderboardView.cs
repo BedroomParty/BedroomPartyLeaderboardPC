@@ -3,20 +3,19 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
+using BedroomPartyLeaderboard.Utils;
 using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
-using BedroomPartyLeaderboard.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Zenject;
-using static LeaderboardTableView;
 using static BedroomPartyLeaderboard.Utils.UIUtils;
+using static LeaderboardTableView;
 using Button = UnityEngine.UI.Button;
 
 namespace BedroomPartyLeaderboard.UI.Leaderboard
@@ -36,13 +35,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         public IDifficultyBeatmap currentDifficultyBeatmap;
         public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
 
-        public static ImageView[] profileImageArray = new ImageView[10];
-        public Dictionary<string, Sprite> userSpriteDictionary = new Dictionary<string, Sprite>();
         private string currentSongLinkLBWebView = string.Empty;
         public static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
         public string sortMethod = "top";
-
-        public Sprite transparentSprite;
 
         [UIComponent("leaderboardTableView")]
         private LeaderboardTableView leaderboardTableView = null;
@@ -66,7 +61,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         public GameObject loginButton;
 
         [UIValue("imageHolders")]
-        [Inject] public List<ImageHolder> holders;
+        [Inject] public List<ImageHolder> _ImageHolders;
 
         [UIValue("buttonHolders")]
         [Inject] private List<ButtonHolder> Buttonholders;
@@ -131,9 +126,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             Destroy(_loadingControl.transform.Find("RefreshContainer").gameObject);
             Destroy(_loadingControl.transform.Find("DownloadingContainer").gameObject);
             _imgView = myHeader.background as ImageView;
-            _imgView.color = Constants.QS_COLOR;
-            _imgView.color0 = Constants.QS_COLOR;
-            _imgView.color1 = Constants.QS_COLOR;
+            _imgView.color = Constants.BP_COLOR;
+            _imgView.color0 = Constants.BP_COLOR;
+            _imgView.color1 = Constants.BP_COLOR;
             ImageSkew(ref _imgView) = 0.18f;
             ImageGradient(ref _imgView) = true;
         }
@@ -166,7 +161,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             {
                 return new List<IconSegmentedControl.DataItem>()
                 {
-                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Globe.png"), "Quest Supporters"),
+                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Globe.png"), "Bedroom Party"),
                     new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), "Around you")
                 };
             }
@@ -177,20 +172,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             parserParams.EmitEvent("showInfoModal");
         }
 
-        private protected string loginCODEFUCKOFF;
-
-        [UIValue("loginKeyboardVALUE")]
-        private string loginKeyboardVALUE
-        {
-            get => loginCODEFUCKOFF;
-            set => loginCODEFUCKOFF = value;
-        }
-
-        [UIAction("loginButtonCLICK")]
-        public void loginButtonCLICK()
-        {
-            if (int.TryParse(loginCODEFUCKOFF, out int silly)) _playerUtils.LoginCode(silly);
-        }
 
         [UIComponent("playlistButton")]
         public Button playlistButton;
@@ -209,26 +190,11 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             var header = _plvc.transform.Find("HeaderPanel");
             if (firstActivation)
             {
-                int code = 0;
-                string apiKey = string.Empty;
+                _panelView.prompt_loader.SetActive(true);
+                _panelView.promptText.gameObject.SetActive(true);
+                _panelView.promptText.text = "Authenticating...";
 
-                if (File.Exists(Constants.BALL_PATH + "apiKey.txt"))
-                {
-                    apiKey = File.ReadAllText(Constants.BALL_PATH + "apiKey.txt");
-                    _playerUtils.LoginKey(apiKey);
-                    Plugin.apiKey = apiKey;
-                }
-                else
-                {
-                    loginKeyboard.gameObject.SetActive(true);
-                    loginButton.gameObject.SetActive(true);
-                }
-
-                Texture2D texture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-                texture.SetPixel(0, 0, new Color(1f, 1f, 1f, 0f));
-                texture.Apply();
-
-                transparentSprite = Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), Vector2.one * 0.5f);
+                _playerUtils.LoginUser();
             }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
@@ -238,7 +204,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
             if (!_plvc) return;
             if (!_plvc.isActivated) return;
-            var header = _plvc.transform.Find("HeaderPanel");
             page = 0;
             parserParams.EmitEvent("hideInfoModal");
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
@@ -257,10 +222,10 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
             await Task.Delay(1);
             FuckOffButtons();
-            FuckOffImages();
+            ByeImages();
             leaderboardTableView.SetScores(null, -1);
 
-            if (!Plugin.Authed)
+            if (_playerUtils.isAuthed)
             {
                 errorText.gameObject.SetActive(false);
                 errorReason = "Auth Fail";
@@ -284,7 +249,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     if (!_plvc || !_plvc.isActiveAndEnabled) return;
-                    HelloLoadImages();
+                    HelloIMGLoader();
 
                     if (result.Item3 != 0)
                     {
@@ -310,7 +275,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                             leaderboardTableView.SetScores(null, -1);
                             errorText.gameObject.SetActive(true);
                             loadingLB.gameObject.SetActive(false);
-                            FuckLoadImages();
+                            ByeIMGLoader();
                             UpdatePageButtons();
                         }
                         else
@@ -326,7 +291,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                         leaderboardTableView.SetScores(null, -1);
                         errorText.gameObject.SetActive(true);
                         loadingLB.gameObject.SetActive(false);
-                        FuckLoadImages();
+                        ByeIMGLoader();
                         errorText.gameObject.SetActive(true);
                     }
                     errorText.text = errorReason;
@@ -337,9 +302,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             });
         }
 
-        private void FuckOffImages() => holders.ForEach(holder => holder.profileImage.sprite = transparentSprite);
-        private void HelloLoadImages() => holders.ForEach(holder => holder.profileloading.SetActive(true));
-        private void FuckLoadImages() => holders.ForEach(holder => holder.profileloading.SetActive(false));
+        private void ByeImages() => _ImageHolders.ForEach(holder => holder.profileImage.gameObject.SetActive(false));
+        private void HelloIMGLoader() => _ImageHolders.ForEach(holder => holder.profileloading.SetActive(true));
+        private void ByeIMGLoader() => _ImageHolders.ForEach(holder => holder.profileloading.SetActive(false));
 
         public List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page)
         {
@@ -348,7 +313,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             {
                 int score = leaderboard[i].score;
                 tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score));
-                holders[i].profileImage.gameObject.SetActive(true);
+                _ImageHolders[i].setProfileImage(leaderboard[i].userID);
                 buttonEntryArray[i] = leaderboard[i];
                 Buttonholders[i].infoButton.gameObject.SetActive(true);
             }
@@ -367,10 +332,11 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;
-            if (entry.userID == "532063399069351947") entry.userName = $"<color=blue>{entry.userName}</color>";
-            result = "<size=100%>" + entry.userName + formattedAcc + formattedCombo + formattedPP + formattedMods + "</size>";
+            if (entry.userID == "3033139560125578") entry.userName = $"<color=blue>{entry.userName}</color>";
+            result = "<size=100%>" + entry.userName.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";
             return new ScoreData(score, result, entry.rank, false);
         }
+
         public void Initialize() => _resultsViewController.continueButtonPressedEvent += FUCKOFFIHATETHISIWANTTODIE;
         public void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController) => OnLeaderboardSet(currentDifficultyBeatmap);
     }
