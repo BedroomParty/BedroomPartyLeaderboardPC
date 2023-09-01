@@ -1,8 +1,8 @@
-﻿using QSLeaderboard.Utils;
+﻿using BedroomPartyLeaderboard.Utils;
 using SiraUtil.Affinity;
 using Zenject;
 
-namespace QSLeaderboard.AffinityPatches
+namespace BedroomPartyLeaderboard.AffinityPatches
 {
     internal class Results : IAffinity
     {

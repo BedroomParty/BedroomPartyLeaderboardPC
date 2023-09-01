@@ -4,16 +4,16 @@ using BeatSaberMarkupLanguage.Parser;
 using HMUI;
 using IPA.Utilities.Async;
 using ModestTree;
-using QSLeaderboard.UI.Leaderboard;
-using QSLeaderboard.Utils;
+using BedroomPartyLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.Utils;
 using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using Zenject;
-using static QSLeaderboard.Utils.UIUtils;
+using static BedroomPartyLeaderboard.Utils.UIUtils;
 
-namespace QSLeaderboard.UI
+namespace BedroomPartyLeaderboard.UI
 {
     internal class ScoreInfoModal
     {

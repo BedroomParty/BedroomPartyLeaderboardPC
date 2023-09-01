@@ -1,6 +1,6 @@
 ﻿using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
-using QSLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
-namespace QSLeaderboard.Utils
+namespace BedroomPartyLeaderboard.Utils
 {
     internal class RequestUtils
     {

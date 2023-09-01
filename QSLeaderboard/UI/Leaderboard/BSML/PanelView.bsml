@@ -6,7 +6,7 @@
 	<horizontal anchor-pos-x="-2" anchor-pos-y="0" ignore-layout="true" pref-height="20" horizontal-fit="PreferredSize" spacing="6.5">
 		<vertical pref-width="20">
 			<horizontal pref-height="14">
-				<clickable-image id="QSLeaderboard_logo" on-click="FunnyModalMoment" src="QSLeaderboard.Images.QSLeaderboard_logo.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
+				<clickable-image id="BedroomPartyLeaderboard_logo" on-click="FunnyModalMoment" src="BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
 			</horizontal>
 		</vertical>
 
@@ -19,7 +19,7 @@
 
 					<horizontal horizontal-fit="PreferredSize" spacing="3">
 						<horizontal pref-height="6" pad="1" spacing="1.5">
-							<image  src="QSLeaderboard.Images.Globe.png" preserve-aspect="true" pref-height="3" preferred-width="3"/>
+							<image  src="BedroomPartyLeaderboard.Images.Globe.png" preserve-aspect="true" pref-height="3" preferred-width="3"/>
 							<text id="playerGlobalRank" text="loading..." align="Left"/>
 						</horizontal>
 						<horizontal pref-height="6" pad="1">
@@ -33,7 +33,7 @@
 		<vertical pref-width="20">
 			<horizontal pref-height="14">
 				<stack >
-					<image id="playerAvatar" src="QSLeaderboard.Images.blank.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
+					<image id="playerAvatar" src="BedroomPartyLeaderboard.Images.blank.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
 					<loading-indicator id="playerAvatarLoading" preserve-aspect="true" preferred-height="5" preferred-width="5"/>
 				</stack>
 			</horizontal>

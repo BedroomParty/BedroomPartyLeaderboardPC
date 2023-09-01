@@ -5,16 +5,16 @@ using TMPro;
 using UnityEngine;
 using Zenject;
 
-namespace QSLeaderboard.UI.Leaderboard
+namespace BedroomPartyLeaderboard.UI.Leaderboard
 {
     [HotReload(RelativePathToLayout = @"./BSML/PanelView.bsml")]
-    [ViewDefinition("QSLeaderboard.UI.Leaderboard.BSML.PanelView.bsml")]
+    [ViewDefinition("BedroomPartyLeaderboard.UI.Leaderboard.BSML.PanelView.bsml")]
     internal class PanelView : BSMLAutomaticViewController
     {
         [Inject] LeaderboardView _leaderboardView;
 
-        [UIComponent("QSLeaderboard_logo")]
-        private ImageView QSLeaderboard_logo;
+        [UIComponent("BedroomPartyLeaderboard_logo")]
+        private ImageView BedroomPartyLeaderboard_logo;
 
         [UIObject("prompt_loader")]
         public GameObject prompt_loader;
@@ -47,7 +47,7 @@ namespace QSLeaderboard.UI.Leaderboard
         public void playerUsernameCLICK()
         {
             if (string.IsNullOrEmpty(Plugin.discordID)) return;
-            Application.OpenURL($"https://questsupporters.me/?user={Plugin.discordID}");
+            Application.OpenURL($"https://thebedroom.party/?user={Plugin.discordID}");
         }
     }
 }

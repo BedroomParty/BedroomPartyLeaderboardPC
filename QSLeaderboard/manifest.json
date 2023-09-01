@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
-  "id": "QSLeaderboard",
-  "name": "QSLeaderboard",
+  "id": "BedroomPartyLeaderboard",
+  "name": "BedroomPartyLeaderboard",
   "author": "Nuggo",
   "version": "0.0.1",
   "description": "",

@@ -1,9 +1,9 @@
 ﻿using IPA;
-using QSLeaderboard.Installers;
+using BedroomPartyLeaderboard.Installers;
 using SiraUtil.Zenject;
 using IPALogger = IPA.Logging.Logger;
 
-namespace QSLeaderboard
+namespace BedroomPartyLeaderboard
 {
     [Plugin(RuntimeOptions.SingleStartInit), NoEnableDisable]
     public class Plugin

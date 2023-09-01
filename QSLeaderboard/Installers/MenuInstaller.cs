@@ -1,13 +1,13 @@
-﻿using QSLeaderboard.AffinityPatches;
-using QSLeaderboard.UI;
-using QSLeaderboard.UI.Leaderboard;
-using QSLeaderboard.Utils;
+﻿using BedroomPartyLeaderboard.AffinityPatches;
+using BedroomPartyLeaderboard.UI;
+using BedroomPartyLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using Zenject;
-using static QSLeaderboard.Utils.UIUtils;
+using static BedroomPartyLeaderboard.Utils.UIUtils;
 
-namespace QSLeaderboard.Installers
+namespace BedroomPartyLeaderboard.Installers
 {
     internal class MenuInstaller : Installer
     {

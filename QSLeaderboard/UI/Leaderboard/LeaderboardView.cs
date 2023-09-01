@@ -7,7 +7,7 @@ using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
-using QSLeaderboard.Utils;
+using BedroomPartyLeaderboard.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,13 +16,13 @@ using TMPro;
 using UnityEngine;
 using Zenject;
 using static LeaderboardTableView;
-using static QSLeaderboard.Utils.UIUtils;
+using static BedroomPartyLeaderboard.Utils.UIUtils;
 using Button = UnityEngine.UI.Button;
 
-namespace QSLeaderboard.UI.Leaderboard
+namespace BedroomPartyLeaderboard.UI.Leaderboard
 {
     [HotReload(RelativePathToLayout = @"./BSML/LeaderboardView.bsml")]
-    [ViewDefinition("QSLeaderboard.UI.Leaderboard.BSML.LeaderboardView.bsml")]
+    [ViewDefinition("BedroomPartyLeaderboard.UI.Leaderboard.BSML.LeaderboardView.bsml")]
     internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet, IInitializable
     {
         [Inject] private PlatformLeaderboardViewController _plvc;
@@ -166,8 +166,8 @@ namespace QSLeaderboard.UI.Leaderboard
             {
                 return new List<IconSegmentedControl.DataItem>()
                 {
-                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("QSLeaderboard.Images.Globe.png"), "Quest Supporters"),
-                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("QSLeaderboard.Images.Player.png"), "Around you")
+                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Globe.png"), "Quest Supporters"),
+                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), "Around you")
                 };
             }
         }
@@ -199,7 +199,7 @@ namespace QSLeaderboard.UI.Leaderboard
         public void downloadRankedPlaylist() => UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.FUCKOFFPLAYLIST());
 
         [UIAction("openWebsite")]
-        public void openWebsite() => Application.OpenURL("https://questsupporters.me");
+        public void openWebsite() => Application.OpenURL("https://thebedroom.party");
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -278,7 +278,7 @@ namespace QSLeaderboard.UI.Leaderboard
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
-            currentSongLinkLBWebView = $"https://questsupporters.me/?board={balls}";
+            currentSongLinkLBWebView = $"https://thebedroom.party/?board={balls}";
             _requestUtils.GetBeatMapData(balls, page, result =>
             {
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>

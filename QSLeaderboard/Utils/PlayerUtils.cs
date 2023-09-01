@@ -2,7 +2,7 @@
 using ModestTree;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using QSLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 using System.IO;
 using System.Net;
@@ -11,9 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
-using static QSLeaderboard.Utils.UIUtils;
+using static BedroomPartyLeaderboard.Utils.UIUtils;
 
-namespace QSLeaderboard.Utils
+namespace BedroomPartyLeaderboard.Utils
 {
 
     internal class PlayerUtils
@@ -25,8 +25,8 @@ namespace QSLeaderboard.Utils
         {
             var steamID = "0";
             var steamName = "loser";
-            steamID = Steamworks.SteamUser.GetSteamID().ToString();
-            steamName = Steamworks.SteamFriends.GetPersonaName();
+            //steamID = Steamworks.SteamUser.GetSteamID().ToString();
+            //steamName = Steamworks.SteamFriends.GetPersonaName();
             Plugin.platformID = steamID;
             return (steamID, steamName);
         }

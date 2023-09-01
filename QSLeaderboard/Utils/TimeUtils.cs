@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QSLeaderboard.Utils
+namespace BedroomPartyLeaderboard.Utils
 {
     internal class TimeUtils
     {

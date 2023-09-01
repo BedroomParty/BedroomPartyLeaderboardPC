@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-namespace QSLeaderboard.Utils
+namespace BedroomPartyLeaderboard.Utils
 {
     internal class LeaderboardData
     {

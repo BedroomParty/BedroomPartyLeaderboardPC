@@ -3,7 +3,7 @@ using BeatSaberMarkupLanguage.Components;
 using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
-using QSLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
 
-namespace QSLeaderboard.Utils
+namespace BedroomPartyLeaderboard.Utils
 {
     internal class UIUtils
     {

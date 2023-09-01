@@ -21,9 +21,9 @@
 
 	<!-- Leaderboard scrollers -->
 	<bg anchor-pos-x="-40" anchor-pos-y="-15">
-		<clickable-image size-delta-x="6" size-delta-y="6"  anchor-pos-y="48" anchor-pos-x="0" id='bugIcon' src="QSLeaderboard.Images.bug.png" on-click='openBUGWebView' hover-hint='Report a bug'/>
+		<clickable-image size-delta-x="6" size-delta-y="6"  anchor-pos-y="48" anchor-pos-x="0" id='bugIcon' src="BedroomPartyLeaderboard.Images.bug.png" on-click='openBUGWebView' hover-hint='Report a bug'/>
 		<page-button id="up_button"
-					 icon="QSLeaderboard.Images.arrow.png"
+					 icon="BedroomPartyLeaderboard.Images.arrow.png"
 					 dir="Up"
 					 anchor-pos-y="12"
 					 pref-width="10"
@@ -37,21 +37,21 @@
 								size-delta-y="16"/>
 
 		<page-button id="down_button"
-				   icon="QSLeaderboard.Images.arrow.png"
+				   icon="BedroomPartyLeaderboard.Images.arrow.png"
 				   dir="Down"
 				   anchor-pos-y="-12"
 				   pref-width="10"
 				   pref-height="10"
 				   on-click="OnPageDown"/>
 
-		<clickable-image size-delta-x="6" size-delta-y="6" anchor-pos-y="-5.5" anchor-pos-x="0" id='linkIcon' src="QSLeaderboard.Images.link.png" on-click='openLBWebView' hover-hint='Open the leaderboard in the web view'/>
+		<clickable-image size-delta-x="6" size-delta-y="6" anchor-pos-y="-5.5" anchor-pos-x="0" id='linkIcon' src="BedroomPartyLeaderboard.Images.link.png" on-click='openLBWebView' hover-hint='Open the leaderboard in the web view'/>
 	</bg>
 	<vertical anchor-pos-x="-23.5"
 			  anchor-pos-y="5.3" spacing="-19.4">
 		<macro.for-each hosts="imageHolders">
 			<horizontal child-expand-height="true" child-align="MiddleCenter">
 				<stack>
-					<image id="profileImage" src="QSLeaderboard.Images.blank.png" pref-width="5.5" pref-height="5.5" preserve-aspect="true"/>
+					<image id="profileImage" src="BedroomPartyLeaderboard.Images.blank.png" pref-width="5.5" pref-height="5.5" preserve-aspect="true"/>
 					<loading-indicator id="profileloading" pref-width="4" pref-height="4" active="false" preserve-aspect="true"/>
 				</stack>
 			</horizontal>
@@ -87,7 +87,7 @@
 				<vertical spacing='1'
 					vertical-fit='PreferredSize' pad='6'>
 					<horizontal spacing='4'>
-						<image align='Left' id="QSLeaderboard_logo" src="QSLeaderboard.Images.QSLeaderboard_logo.png" preserve-aspect="true" pref-width="15" pref-height="15"/>
+						<image align='Left' id="BedroomPartyLeaderboard_logo" src="BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png" preserve-aspect="true" pref-width="15" pref-height="15"/>
 						<text font-size="10" text='QS Leaderboard' align='Right'/>
 					</horizontal>
 					<text font-size='5' align='Center' text='QS Leaderboard by the QS Team'/>
@@ -110,7 +110,7 @@
 								<clickable-text rich-text="true" id="usernameScoreText" font-size="~font-size" text="USERNAME" align="Center" on-click="usernameScoreTextCLICK"/>
 								<vertical anchor-pos-y="25" pref-width="12" pref-height="12">
 									<stack>
-										<image id="profileImageModal" src="QSLeaderboard.Images.blank.png"  preserve-aspect="true"/>
+										<image id="profileImageModal" src="BedroomPartyLeaderboard.Images.blank.png"  preserve-aspect="true"/>
 										<loading-indicator id="profileImageModalLOADING" preserve-aspect="true" />
 									</stack>
 								</vertical>
@@ -144,7 +144,7 @@
 	<vertical anchor-pos-x="47" anchor-pos-y="5.4" spacing="-19.4">
 		<macro.for-each hosts="buttonHolders">
 			<horizontal min-height="8" child-expand-height="true" child-align="MiddleCenter">
-				<button-with-icon active="false" id="infoButton" on-click="infoClick" icon ="QSLeaderboard.Images.info.png" hover-hint="Info" pref-width="10" pref-height="7"/>
+				<button-with-icon active="false" id="infoButton" on-click="infoClick" icon ="BedroomPartyLeaderboard.Images.info.png" hover-hint="Info" pref-width="10" pref-height="7"/>
 			</horizontal>
 		</macro.for-each>
 	</vertical>

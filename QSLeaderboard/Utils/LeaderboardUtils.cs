@@ -1,10 +1,10 @@
 ﻿using HMUI;
 using LeaderboardCore.Managers;
 using LeaderboardCore.Models;
-using QSLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using System;
 
-namespace QSLeaderboard.Utils
+namespace BedroomPartyLeaderboard.Utils
 {
     internal class LeaderboardUtils : CustomLeaderboard, IDisposable
     {
