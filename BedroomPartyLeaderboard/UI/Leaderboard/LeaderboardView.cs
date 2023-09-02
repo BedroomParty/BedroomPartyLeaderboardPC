@@ -198,6 +198,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
+            Plugin.Log.Info("freuwojghfreuoihr");
             currentDifficultyBeatmap = difficultyBeatmap;
             UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
         }
@@ -206,11 +207,21 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         {
             string errorReason = "Error";
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
+            Plugin.Log.Info("hvuifehirgfhreufgre");
 
-            await Task.Delay(1);
+            string mapId = difficultyBeatmap.level.levelID.Substring(13);
+            int difficulty = difficultyBeatmap.difficultyRank;
+            string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
+            _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
+            {
+                Plugin.Log.Info(result.ToString());
+                leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
+            });
+
+            /*await Task.Delay(1);
             FuckOffButtons();
             ByeImages();
-            leaderboardTableView.SetScores(null, -1);
+            //leaderboardTableView.SetScores(null, -1);
 
             if (_playerUtils.isAuthed)
             {
@@ -230,69 +241,49 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+            Plugin.Log.Info("jfhurhfgruiehfligerhfuidhfiuhiuelhvlkehrgfuilfsdhvulkihguldfhvuilfhguifdhvjlfkvehiyushrfilhuiyfedhvuiyredhgluvisdfhukgjhrdf: " + leaderboardTableView.gameObject.activeInHierarchy.ToString());
             currentSongLinkLBWebView = $"https://thebedroom.party/?board={balls}";
-            Constants.EXAMPLEENTRIES.Clear();
-            for (int i = 0; i <= 10; i++)
+            _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
             {
-                Constants.EXAMPLEENTRIES.Add(Constants.GenerateRandomEntry(i));
-            }
-            leaderboardTableView.SetScores(CreateLeaderboardData(Constants.EXAMPLEENTRIES, page), -1);
-            //_requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
-            //{
-            //    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
-            //    {
-            //        if (!_plvc || !_plvc.isActiveAndEnabled) return;
-            //        HelloIMGLoader();
+                UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                {
+                    HelloIMGLoader();
 
-            //        if (result.Item3 != 0)
-            //        {
-            //            _panelView.playerGlobalRank.text = $"#{result.Item3}";
-            //        }
+                    if (result.Item2 != null)
+                    {
+                        if (result.Item2.Count == 0)
+                        {
+                            Plugin.Log.Info("hi");
+                            leaderboardTableView.SetScores(null, -1);
+                            errorText.gameObject.SetActive(true);
+                            loadingLB.gameObject.SetActive(false);
+                            ByeIMGLoader();
+                        }
+                        else
+                        {
+                            Plugin.Log.Info("bye");
+                            leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
+                            _uiUtils.RichMyText(leaderboardTableView);
+                            loadingLB.gameObject.SetActive(false);
+                        }
+                    }
+                    else
+                    {
 
-            //        _panelView.playerPP.text = $"{result.Item6.ToString("F2")}pp";
+                        leaderboardTableView.SetScores(null, -1);
+                        errorText.gameObject.SetActive(true);
+                        loadingLB.gameObject.SetActive(false);
+                        ByeIMGLoader();
+                    }
+                    errorText.text = "No Scores Yet!";
+                    _uiUtils.SetProfiles(result.Item2);
+                    totalPages = result.Item3;
+                    UpdatePageButtons();
+                });
+            });
+            //leaderboardTableView.SetScores(CreateLeaderboardData(Constants.EXAMPLEENTRIES, page), -1);
 
-            //        if (result.Item5 != 0)
-            //        {
-            //            headerText.SetText($"RANKED - {result.Item5.ToString("F2")}<b>✰</b>");
-            //        }
-            //        else
-            //        {
-            //            headerText.SetText("UNRANKED");
-            //        }
-
-            //        if (result.Item2 != null)
-            //        {
-            //            if (result.Item2.Count == 0)
-            //            {
-            //                errorReason = "No Scores Yet!";
-            //                leaderboardTableView.SetScores(null, -1);
-            //                errorText.gameObject.SetActive(true);
-            //                loadingLB.gameObject.SetActive(false);
-            //                ByeIMGLoader();
-            //                UpdatePageButtons();
-            //            }
-            //            else
-            //            {
-            //                //leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
-            //                _uiUtils.RichMyText(leaderboardTableView);
-            //                loadingLB.gameObject.SetActive(false);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            errorReason = "No Scores Yet!";
-            //            leaderboardTableView.SetScores(null, -1);
-            //            errorText.gameObject.SetActive(true);
-            //            loadingLB.gameObject.SetActive(false);
-            //            ByeIMGLoader();
-            //            errorText.gameObject.SetActive(true);
-            //        }
-            //        errorText.text = errorReason;
-            //        _uiUtils.SetProfiles(result.Item2);
-            //        totalPages = result.Item4;
-            //        UpdatePageButtons();
-            //    });
-            //});
+            */
         }
 
         private void ByeImages() => _ImageHolders.ForEach(holder => holder.profileImage.gameObject.SetActive(false));

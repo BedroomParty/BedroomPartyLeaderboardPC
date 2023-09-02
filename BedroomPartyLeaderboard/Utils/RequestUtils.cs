@@ -21,53 +21,55 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private LeaderboardView _leaderboardView;
         [Inject] private PanelView _panelView;
         [Inject] private readonly PlayerUtils _playerUtils;
-        private async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
+        private async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
             using (var httpClient = new HttpClient())
             {
                 try
                 {
-                    string requestString = getLBDownloadJSON(balls, page, 10, _leaderboardView.sortMethod);
+                    Plugin.Log.Info("jvcuohvyfiuedhgfifehfiyuhi");
+                    string requestString = getLBDownloadJSON(balls, page, _leaderboardView.sortMethod);
 
                     HttpResponseMessage response = await httpClient.GetAsync(requestString);
 
-                    int rank = 0;
-                    float pp = 0f;
                     int scorecount = 0;
-                    float stars = 0;
                     int totalPages = 0;
                     List<LeaderboardData.LeaderboardEntry> data = new List<LeaderboardData.LeaderboardEntry>();
 
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     JObject jsonObject = JObject.Parse(jsonResponse);
+                    Plugin.Log.Info(jsonResponse);
 
-                    if (jsonObject.TryGetValue("ScoreCount", out JToken scoreCountToken)) scorecount = scoreCountToken.Value<int>();
+                    if (jsonObject.TryGetValue("scoreCount", out JToken scoreCountToken)) scorecount = scoreCountToken.Value<int>();
                     else scorecount = 0;
 
                     totalPages = Mathf.CeilToInt((float)scorecount / 10);
 
-                    if (jsonObject.TryGetValue("Scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0) data = _leaderboardData.LoadBeatMapInfo(scoresArray);
+                    if (jsonObject.TryGetValue("scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0) data = _leaderboardData.LoadBeatMapInfo(scoresArray);
                     else data = new List<LeaderboardData.LeaderboardEntry>();
 
-                    callback((response.IsSuccessStatusCode, data, rank, totalPages, stars, pp));
+                    callback((response.IsSuccessStatusCode, data, totalPages));
                     return;
                 }
                 catch (HttpRequestException e)
                 {
                     Plugin.Log.Error("EXCEPTION: " + e.ToString());
-                    callback((false, null, 0, 0, 0f, 0f));
+                    callback((false, null, 0));
                 }
             }
         }
 
-        private string getLBDownloadJSON((string, int, string) balls, int page, int limit, string sort)
+        private string getLBDownloadJSON((string, int, string) balls, int page, string sort)
         {
-            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}sort={sort}&limit=10&page={page}&id={_playerUtils.localPlayerInfo.userID}";
+
+            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}&sort={sort}&limit=10&page={page + 1}&id={_playerUtils.localPlayerInfo.userID}";
+            Plugin.Log.Info(Data);
             return Data;
         }
 
-        public void GetBeatMapData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int, int, float, float)> callback)
+        public void GetBeatMapData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
+            Plugin.Log.Info("hgelrfgjioejhgfkuehgffelskjhgflukeihgfjekfuyrhgfyerf");
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
 
