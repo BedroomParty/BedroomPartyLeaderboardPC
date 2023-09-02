@@ -41,12 +41,12 @@ namespace BedroomPartyLeaderboard.Utils
                 string rank = scoreData["Rank"]?.ToString();
                 string userID = scoreData["UserID"]?.ToString();
                 string userName = scoreData["Username"]?.ToString();
-                int missCount = scoreData["Misses"]?.Value<int>() ?? 0;
-                int badCutCount = scoreData["BadCuts"]?.Value<int>() ?? 0;
-                float acc = scoreData["Accuracy"]?.Value<float>() ?? 0.0f;
-                bool fullCombo = scoreData["FullCombo"]?.Value<bool>() ?? false;
-                int score = scoreData["Score"]?.Value<int>() ?? 0;
-                string modifiers = scoreData["Modifiers"]?.ToString();
+                int missCount = scoreData["misses"]?.Value<int>() ?? 0;
+                int badCutCount = scoreData["badCuts"]?.Value<int>() ?? 0;
+                float acc = scoreData["accuracy"]?.Value<float>() ?? 0.0f;
+                bool fullCombo = scoreData["fullCombo"]?.Value<bool>() ?? false;
+                int score = scoreData["score"]?.Value<int>() ?? 0;
+                string modifiers = scoreData["modifiers"]?.ToString();
                 long timestamp = scoreData["TimeSet"]?.Value<long>() ?? 0;
                 leaderboard.Add(new LeaderboardEntry(
                     int.Parse(rank ?? "0"),
