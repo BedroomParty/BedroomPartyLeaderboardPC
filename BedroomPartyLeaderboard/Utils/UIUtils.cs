@@ -4,13 +4,10 @@ using BeatSaberMarkupLanguage.Components;
 using BedroomPartyLeaderboard.UI.Leaderboard;
 using HMUI;
 using IPA.Utilities;
-using IPA.Utilities.Async;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
 
@@ -55,19 +52,21 @@ namespace BedroomPartyLeaderboard.Utils
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                _leaderboardView._ImageHolders[i].setProfileImage($"{leaderboard[i].userID}");
+                _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
+                _leaderboardView._ImageHolders[i].setProfileImage($"https://cdn.assets.beatleader.xyz/76561199077754911R34.png");
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)
             {
                 _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(false);
             }
         }
 
         public void GetCoolMaterialAndApply()
         {
             Material mat = FindCoolMaterial();
-            foreach(var x in _leaderboardView._ImageHolders)
+            foreach (var x in _leaderboardView._ImageHolders)
             {
                 x.profileImage.material = mat;
             }
@@ -95,7 +94,8 @@ namespace BedroomPartyLeaderboard.Utils
             return cool;
         }
 
-
+        private bool obtainedAnchor = false;
+        private Vector2 normalAnchor = Vector2.zero;
         public void RichMyText(LeaderboardTableView tableView)
         {
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
@@ -112,6 +112,13 @@ namespace BedroomPartyLeaderboard.Utils
                 seperator.color = Constants.BP_COLOR2;
                 seperator.color0 = Color.white;
                 seperator.color1 = new Color(1, 1, 1, 0);
+                if (!obtainedAnchor)
+                {
+                    normalAnchor = nameText.rectTransform.anchoredPosition;
+                    obtainedAnchor = true;
+                }
+                Vector2 newPosition = new Vector2(normalAnchor.x + 2.5f, 0f);
+                nameText.rectTransform.anchoredPosition = newPosition;
             }
         }
         public class ImageHolder

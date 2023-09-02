@@ -1,5 +1,4 @@
-﻿using BeatSaberMarkupLanguage;
-using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BedroomPartyLeaderboard.UI.Leaderboard;
@@ -97,6 +96,7 @@ namespace BedroomPartyLeaderboard.UI
             {
                 int position = (entry.rank % 10) - 1;
                 _leaderboardView.StartCoroutine(SetProfileImageModal(position, profileImageModal));
+
                 if (Constants.isStaff(entry.userID))
                 {
                     RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
@@ -122,6 +122,7 @@ namespace BedroomPartyLeaderboard.UI
                 yield return null;
             }
             image.sprite = _leaderboardView._ImageHolders[pos].profileImage.sprite;
+            profileImageModal.gameObject.SetActive(true);
             profileImageModalLOADING.SetActive(false);
         }
     }

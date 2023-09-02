@@ -1,6 +1,5 @@
 ﻿using BeatSaberMarkupLanguage;
 using BedroomPartyLeaderboard.UI.Leaderboard;
-using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
@@ -113,8 +112,8 @@ namespace BedroomPartyLeaderboard.Utils
             _uiUtils.GetCoolMaterialAndApply();
             return;
 
-            using (var httpClient = Plugin.httpClient)
-            {
+            using (var httpClient = new HttpClient())
+            {   
                 int x = 0;
                 while (x < 3)
                 {
@@ -161,7 +160,17 @@ namespace BedroomPartyLeaderboard.Utils
 
         public async void GetAuthStatus(Action<bool> callback)
         {
-            await Task.Run(() => GetAuth(callback));
+            currentlyAuthing = true;
+            try
+            {
+                await Task.Run(() => GetAuth(callback));
+                currentlyAuthing = false;
+            }
+            catch (Exception e)
+            {
+                currentlyAuthing = false;
+                _leaderboardView.SetErrorState(true, "Failed to Auth\nSpeecil is silly :3");
+            }
         }
 
 
@@ -181,6 +190,7 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.playerAvatar.SetImage("https://cdn.assets.beatleader.xyz/76561199077754911R34.png");
                     _panelView.playerAvatarLoading.gameObject.SetActive(false);
 
+                    Plugin.Log.Info(localPlayerInfo.userID);
                     if (Constants.isStaff(localPlayerInfo.userID))
                     {
                         RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
@@ -195,6 +205,9 @@ namespace BedroomPartyLeaderboard.Utils
                         }
                         _panelView.playerUsername.color = Color.white;
                     }
+                    Task.Delay(1000);
+                    _panelView.promptText.gameObject.SetActive(false);
+                    _panelView.prompt_loader.SetActive(false);
                 }
                 else
                 {
@@ -221,7 +234,7 @@ namespace BedroomPartyLeaderboard.Utils
 
 
         // from scoresaber yoink teehee
-        internal static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
+        public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
         {
             var waitTask = Task.Run(async () =>
             {

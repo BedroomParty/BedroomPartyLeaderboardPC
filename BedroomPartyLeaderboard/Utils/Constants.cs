@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using UnityEngine;
 using Random = System.Random;
 
@@ -31,7 +32,7 @@ namespace BedroomPartyLeaderboard.Utils
         {
             if (staffIDs == null)
             {
-                staffIDs = Plugin.httpClient.GetAsync("https://api.thebedroom.party/staff").Result.ToString().Split(',');
+                staffIDs = new HttpClient().GetAsync("https://api.thebedroom.party/staff").Result.ToString().Split(',');
             }
             return staffIDs.Contains(uwu); // we do not talk about it :clueless:
         }

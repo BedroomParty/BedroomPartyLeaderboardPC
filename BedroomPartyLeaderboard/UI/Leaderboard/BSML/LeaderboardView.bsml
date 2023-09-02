@@ -46,7 +46,7 @@
 
 		<clickable-image size-delta-x="6" size-delta-y="6" anchor-pos-y="-5.5" anchor-pos-x="0" id='linkIcon' src="BedroomPartyLeaderboard.Images.link.png" on-click='openLBWebView' hover-hint='Open the leaderboard in the web view'/>
 	</bg>
-	<vertical anchor-pos-x="-23.5"
+	<vertical anchor-pos-x="-21"
 			  anchor-pos-y="5.3" spacing="-19.4">
 		<macro.for-each hosts="imageHolders">
 			<horizontal child-expand-height="true" child-align="MiddleCenter">

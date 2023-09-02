@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Zenject;
 
 namespace BedroomPartyLeaderboard.Utils
 {
     public class LeaderboardData
     {
+        [Inject] private LeaderboardView _leaderboardView;
         public struct LeaderboardEntry
         {
             public int rank;
@@ -36,21 +39,22 @@ namespace BedroomPartyLeaderboard.Utils
         public List<LeaderboardEntry> LoadBeatMapInfo(JArray jsonArray)
         {
             var leaderboard = new List<LeaderboardEntry>();
+            int i = 0;
             foreach (var scoreData in jsonArray)
             {
-                string rank = scoreData["Rank"]?.ToString();
-                string userID = scoreData["UserID"]?.ToString();
-                string userName = scoreData["Username"]?.ToString();
+                int rank = ((_leaderboardView.page * 10) - (10 - i)) + 1;
+                int userID = scoreData["id"]?.Value<int>() ?? 0;
+                string userName = scoreData["username"]?.ToString();
                 int missCount = scoreData["misses"]?.Value<int>() ?? 0;
                 int badCutCount = scoreData["badCuts"]?.Value<int>() ?? 0;
                 float acc = scoreData["accuracy"]?.Value<float>() ?? 0.0f;
                 bool fullCombo = scoreData["fullCombo"]?.Value<bool>() ?? false;
                 int score = scoreData["score"]?.Value<int>() ?? 0;
                 string modifiers = scoreData["modifiers"]?.ToString();
-                long timestamp = scoreData["TimeSet"]?.Value<long>() ?? 0;
+                long timestamp = scoreData["timeSet"]?.Value<long>() ?? 0;
                 leaderboard.Add(new LeaderboardEntry(
-                    int.Parse(rank ?? "0"),
-                    userID ?? "0",
+                    rank,
+                    userID.ToString(),
                     userName ?? "Player",
                     timestamp,
                     missCount,
@@ -60,6 +64,7 @@ namespace BedroomPartyLeaderboard.Utils
                     score,
                     modifiers ?? ""
                 ));
+                i++;
             }
             return leaderboard;
         }

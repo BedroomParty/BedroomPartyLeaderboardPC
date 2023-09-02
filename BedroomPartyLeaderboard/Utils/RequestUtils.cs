@@ -3,11 +3,8 @@ using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -27,18 +24,27 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 try
                 {
-                    Plugin.Log.Info("jvcuohvyfiuedhgfifehfiyuhi");
+                    Plugin.Log.Info("getLBDownloadJSON");
                     string requestString = getLBDownloadJSON(balls, page, _leaderboardView.sortMethod);
 
+                    Plugin.Log.Info("GetAsync");
                     HttpResponseMessage response = await httpClient.GetAsync(requestString);
+                    Plugin.Log.Info("GetAsync SUCCESS FUCK");
+
+
 
                     int scorecount = 0;
                     int totalPages = 0;
                     List<LeaderboardData.LeaderboardEntry> data = new List<LeaderboardData.LeaderboardEntry>();
 
-                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        callback((false, data, 0));
+                        return;
+                    }
+
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
                     JObject jsonObject = JObject.Parse(jsonResponse);
-                    Plugin.Log.Info(jsonResponse);
 
                     if (jsonObject.TryGetValue("scoreCount", out JToken scoreCountToken)) scorecount = scoreCountToken.Value<int>();
                     else scorecount = 0;
@@ -62,14 +68,13 @@ namespace BedroomPartyLeaderboard.Utils
         private string getLBDownloadJSON((string, int, string) balls, int page, string sort)
         {
 
-            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}&sort={sort}&limit=10&page={page + 1}&id={_playerUtils.localPlayerInfo.userID}";
+            var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}&sort={sort}&limit=10&page={page}&id={_playerUtils.localPlayerInfo.userID}";
             Plugin.Log.Info(Data);
             return Data;
         }
 
         public void GetBeatMapData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
-            Plugin.Log.Info("hgelrfgjioejhgfkuehgffelskjhgflukeihgfjekfuyrhgfyerf");
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
 
