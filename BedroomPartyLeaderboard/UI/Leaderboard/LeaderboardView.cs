@@ -212,9 +212,10 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             ByeImages();
             leaderboardTableView.SetScores(null, -1);
 
-            if (_playerUtils.isAuthed)
+            if (!_playerUtils.isAuthed)
             {
-                errorText.gameObject.SetActive(false);
+                if()
+                errorText.gameObject.SetActive(true);
                 errorReason = "Auth Fail";
                 return;
             }

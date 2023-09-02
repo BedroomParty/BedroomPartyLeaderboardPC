@@ -28,6 +28,8 @@ namespace BedroomPartyLeaderboard.Utils
             get { return _isAuthed; }
         }
 
+        public bool currentlyAuthing;
+
         private async Task<PlayerInfo> GetSteamInfo()
         {
             await WaitUntil(() => SteamManager.Initialized);
