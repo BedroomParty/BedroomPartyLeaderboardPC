@@ -14,9 +14,9 @@ namespace BedroomPartyLeaderboard.Utils
 {
     internal class RequestUtils
     {
-        [Inject] private LeaderboardData _leaderboardData;
-        [Inject] private LeaderboardView _leaderboardView;
-        [Inject] private PanelView _panelView;
+        [Inject] private readonly LeaderboardData _leaderboardData;
+        [Inject] private readonly LeaderboardView _leaderboardView;
+        [Inject] private readonly PanelView _panelView;
         [Inject] private readonly PlayerUtils _playerUtils;
         private async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
@@ -35,7 +35,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                     int scorecount = 0;
                     int totalPages = 0;
-                    List<LeaderboardData.LeaderboardEntry> data = new List<LeaderboardData.LeaderboardEntry>();
+                    List<LeaderboardData.LeaderboardEntry> data = new();
 
                     if (!response.IsSuccessStatusCode)
                     {

@@ -7,7 +7,7 @@ namespace BedroomPartyLeaderboard.Utils
 {
     public class LeaderboardData
     {
-        [Inject] private LeaderboardView _leaderboardView;
+        [Inject] private readonly LeaderboardView _leaderboardView;
         public struct LeaderboardEntry
         {
             public int rank;

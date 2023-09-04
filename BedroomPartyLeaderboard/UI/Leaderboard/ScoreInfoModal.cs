@@ -21,28 +21,28 @@ namespace BedroomPartyLeaderboard.UI
         public ModalView infoModal;
 
         [UIComponent("usernameScoreText")]
-        private ClickableText usernameScoreText;
+        private readonly ClickableText usernameScoreText;
 
         [UIComponent("dateScoreText")]
-        private TextMeshProUGUI dateScoreText;
+        private readonly TextMeshProUGUI dateScoreText;
 
         [UIComponent("accScoreText")]
-        private TextMeshProUGUI accScoreText;
+        private readonly TextMeshProUGUI accScoreText;
 
         [UIComponent("scoreScoreText")]
-        private TextMeshProUGUI scoreScoreText;
+        private readonly TextMeshProUGUI scoreScoreText;
 
         [UIComponent("fcScoreText")]
-        private TextMeshProUGUI fcScoreText;
+        private readonly TextMeshProUGUI fcScoreText;
 
         [UIComponent("maxComboScoreText")]
-        private TextMeshProUGUI maxComboScoreText;
+        private readonly TextMeshProUGUI maxComboScoreText;
 
         [UIComponent("modifiersScoreText")]
-        private TextMeshProUGUI modifiersScoreText;
+        private readonly TextMeshProUGUI modifiersScoreText;
 
         [UIComponent("ppScoreText")]
-        private TextMeshProUGUI ppScoreText;
+        private readonly TextMeshProUGUI ppScoreText;
 
         [UIComponent("profileImageModal")]
         public ImageView profileImageModal;
@@ -59,7 +59,7 @@ namespace BedroomPartyLeaderboard.UI
             Application.OpenURL(Constants.USER_PROFILE_LINK + currentEntry.userID);
         }
 
-        [Inject] LeaderboardView _leaderboardView;
+        [Inject] readonly LeaderboardView _leaderboardView;
 
         LeaderboardData.LeaderboardEntry currentEntry;
 
