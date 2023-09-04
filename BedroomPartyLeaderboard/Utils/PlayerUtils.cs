@@ -107,10 +107,7 @@ namespace BedroomPartyLeaderboard.Utils
             PlayerInfo _localPlayerInfo = Task.Run(() => GetPlayerInfo()).Result;
             localPlayerInfo = _localPlayerInfo;
             _panelView.playerUsername.text = localPlayerInfo.username;
-            _isAuthed = true;
-            callback(true);
             _uiUtils.GetCoolMaterialAndApply();
-            return;
 
             using var httpClient = new HttpClient();
             int x = 0;
