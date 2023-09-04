@@ -37,7 +37,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             if (!_playerUtils.isAuthed) return;
             if (BS_Utils.Gameplay.ScoreSubmission.Disabled) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
-            float modifiedScore = levelCompletionResults.modifiedScore;
+            int modifiedScore = levelCompletionResults.modifiedScore;
+            int multipliedScore = levelCompletionResults.multipliedScore;
             if (modifiedScore == 0 || maxScore == 0) return;
             if (levelCompletionResults.levelEndStateType == LevelCompletionResults.LevelEndStateType.Failed) return;
 
@@ -52,12 +53,12 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = playerLevelStats.beatmapCharacteristic.serializedName;
 
-            string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+            (string, int, string) balls = (mapId, difficulty, mapType);
 
             string mods = GetModifiersString(levelCompletionResults);
 
 
-            _requestUtils.SetBeatMapData(balls, _playerUtils.localPlayerInfo.authKey, _playerUtils.localPlayerInfo.username, badCut, misses, fc, acc, score, mods, result =>
+            _requestUtils.SetBeatMapData(balls, _playerUtils.localPlayerInfo.authKey, _playerUtils.localPlayerInfo.username, badCut, misses, fc, acc, score, mods, multipliedScore, modifiedScore, result =>
             {
                 Plugin.Log.Info("_requestUtils.SetBeatMapData");
             });

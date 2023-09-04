@@ -67,9 +67,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         private string getLBDownloadJSON((string, int, string) balls, int page, string sort)
         {
-
             var Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}&sort={sort}&limit=10&page={page}&id={_playerUtils.localPlayerInfo.userID}";
-            Plugin.Log.Info(Data);
             return Data;
         }
 
@@ -78,22 +76,12 @@ namespace BedroomPartyLeaderboard.Utils
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
 
-        public void SetBeatMapData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
+        public void SetBeatMapData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, int multipliedScore, int modifiedScore, Action<bool> callback)
         {
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback, multipliedScore, modifiedScore));
         }
 
-        private string getLBOverallJSON(string balls, string userID)
-        {
-            var Data = new JObject
-            {
-                { "Hash", balls },
-                { "ID", userID },
-            };
-            return Data.ToString();
-        }
-
-        private async Task UploadLeaderboardData(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback)
+        private async Task UploadLeaderboardData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback, int multipliedScore, int modifiedScore)
         {
             using (var httpClient = new HttpClient())
             {
@@ -107,13 +95,13 @@ namespace BedroomPartyLeaderboard.Utils
                     {
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _playerUtils.localPlayerInfo.authKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                        string requestBody = getLBUploadJSON(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods);
+                        string requestBody = getLBUploadJSON(balls, userID, badCuts, misses, fullCOmbo, acc, mods, modifiedScore, multipliedScore);
 
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                        HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(balls), content);
+                        HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(balls.Item1), content);
 
-                        if (response.StatusCode == HttpStatusCode.NotFound)
+                        if (response.StatusCode == HttpStatusCode.Conflict)
                         {
                             callback(response.IsSuccessStatusCode);
                             _panelView.prompt_loader.SetActive(false);
@@ -163,19 +151,21 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-        private string getLBUploadJSON(string balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods)
+        private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int modifiedScore, int multipliedScore)
         {
             var Data = new JObject
             {
-                { "Hash", balls },
-                { "UserID", userID },
-                { "Username", username },
-                { "BadCuts", badCuts },
-                { "Misses", misses },
-                { "FullCombo", fullCOmbo },
-                { "Accuracy", acc },
-                { "Score", score },
-                { "Modifiers", mods },
+                { "hash", balls.Item1 },
+                { "difficulty", balls.Item2 },
+                { "characteristic", balls.Item3 },
+                { "id", userID },
+                { "badCuts", badCuts },
+                { "misses", misses },
+                { "fullCombo", fullCOmbo },
+                { "accuracy", acc },
+                { "modifiedScore", modifiedScore },
+                { "multipliedScore", multipliedScore },
+                { "modifiers", mods },
             };
             return Data.ToString();
         }
