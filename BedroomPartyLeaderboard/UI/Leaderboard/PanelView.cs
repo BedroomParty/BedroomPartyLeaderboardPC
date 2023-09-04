@@ -12,11 +12,11 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     [ViewDefinition("BedroomPartyLeaderboard.UI.Leaderboard.BSML.PanelView.bsml")]
     internal class PanelView : BSMLAutomaticViewController
     {
-        [Inject] LeaderboardView _leaderboardView;
-        [Inject] PlayerUtils _playerUtils;
+        [Inject] readonly LeaderboardView _leaderboardView;
+        [Inject] readonly PlayerUtils _playerUtils;
 
         [UIComponent("BedroomPartyLeaderboard_logo")]
-        private ImageView BedroomPartyLeaderboard_logo;
+        private readonly ImageView BedroomPartyLeaderboard_logo;
 
         [UIObject("prompt_loader")]
         public GameObject prompt_loader;

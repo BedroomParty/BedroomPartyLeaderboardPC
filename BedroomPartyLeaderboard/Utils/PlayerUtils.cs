@@ -15,14 +15,14 @@ namespace BedroomPartyLeaderboard.Utils
 {
     internal class PlayerUtils
     {
-        [Inject] PanelView _panelView;
-        [Inject] LeaderboardView _leaderboardView;
-        [Inject] UIUtils _uiUtils;
+        [Inject] readonly PanelView _panelView;
+        [Inject] readonly LeaderboardView _leaderboardView;
+        [Inject] readonly UIUtils _uiUtils;
 
         protected private bool _isAuthed = false;
         public PlayerInfo localPlayerInfo;
 
-        public bool isAuthed
+        public bool IsAuthed
         {
             get { return _isAuthed; }
         }
@@ -47,7 +47,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         public Task<PlayerInfo> GetPlayerInfo()
         {
-            TaskCompletionSource<PlayerInfo> taskCompletionSource = new TaskCompletionSource<PlayerInfo>();
+            TaskCompletionSource<PlayerInfo> taskCompletionSource = new();
             string playerId = "";
             string playerName = "";
             string authKey = "";
@@ -93,7 +93,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         private string GetLoginString(string userID)
         {
-            JObject user = new JObject
+            JObject user = new()
             {
                 { "userID", userID }
             };
@@ -112,48 +112,46 @@ namespace BedroomPartyLeaderboard.Utils
             _uiUtils.GetCoolMaterialAndApply();
             return;
 
-            using (var httpClient = new HttpClient())
-            {   
-                int x = 0;
-                while (x < 3)
+            using var httpClient = new HttpClient();
+            int x = 0;
+            while (x < 3)
+            {
+                try
                 {
-                    try
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+                    string requestBody = GetLoginString(_localPlayerInfo.userID);
+                    HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content).ConfigureAwait(false);
+                    _isAuthed = response.StatusCode == HttpStatusCode.OK;
+
+                    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    JObject jsonResponse = JObject.Parse(responseContent);
+
+                    if (_isAuthed)
                     {
-                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
-                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
-                        string requestBody = GetLoginString(_localPlayerInfo.userID);
-                        HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-
-                        HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content).ConfigureAwait(false);
-                        _isAuthed = response.StatusCode == HttpStatusCode.OK;
-
-                        string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        JObject jsonResponse = JObject.Parse(responseContent);
-
-                        if (_isAuthed)
-                        {
-                            _panelView.prompt_loader.SetActive(false);
-                            _panelView.promptText.gameObject.SetActive(false);
-                            callback(true);
-                            return;
-                        }
-                        _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
-                        await Task.Delay(500);
-                        x++;
+                        _panelView.prompt_loader.SetActive(false);
+                        _panelView.promptText.gameObject.SetActive(false);
+                        callback(true);
+                        return;
                     }
-                    catch (HttpRequestException)
-                    {
-                        _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
-                        x++;
-                        await Task.Delay(5000);
-                    }
+                    _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
+                    await Task.Delay(500);
                     x++;
                 }
-                if (x < 2)
+                catch (HttpRequestException)
                 {
-                    callback(false);
+                    _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
+                    x++;
+                    await Task.Delay(5000);
                 }
+                x++;
+            }
+            if (x < 2)
+            {
+                callback(false);
             }
         }
 

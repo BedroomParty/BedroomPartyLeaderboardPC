@@ -6,7 +6,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 {
     internal class Results : IAffinity
     {
-        [Inject] RequestUtils _requestUtils;
+        [Inject] readonly RequestUtils _requestUtils;
         [Inject] private readonly PlayerUtils _playerUtils;
         public static string GetModifiersString(LevelCompletionResults levelCompletionResults)
         {
@@ -34,7 +34,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         [AffinityPatch(typeof(LevelCompletionResultsHelper), nameof(LevelCompletionResultsHelper.ProcessScore))]
         private void Postfix(ref PlayerData playerData, ref PlayerLevelStatsData playerLevelStats, ref LevelCompletionResults levelCompletionResults, ref IReadonlyBeatmapData transformedBeatmapData, ref IDifficultyBeatmap difficultyBeatmap, ref PlatformLeaderboardsModel platformLeaderboardsModel)
         {
-            if (!_playerUtils.isAuthed) return;
+            if (!_playerUtils.IsAuthed) return;
             if (BS_Utils.Gameplay.ScoreSubmission.Disabled) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             int modifiedScore = levelCompletionResults.modifiedScore;

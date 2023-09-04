@@ -25,13 +25,13 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     [ViewDefinition("BedroomPartyLeaderboard.UI.Leaderboard.BSML.LeaderboardView.bsml")]
     internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet, IInitializable
     {
-        [Inject] private PlatformLeaderboardViewController _plvc;
-        [Inject] PlayerUtils _playerUtils;
-        [Inject] PanelView _panelView;
-        [Inject] RequestUtils _requestUtils;
-        [Inject] LeaderboardData _leaderboardData;
-        [Inject] private ResultsViewController _resultsViewController;
-        [Inject] UIUtils _uiUtils;
+        [Inject] private readonly PlatformLeaderboardViewController _plvc;
+        [Inject] readonly PlayerUtils _playerUtils;
+        [Inject] readonly PanelView _panelView;
+        [Inject] readonly RequestUtils _requestUtils;
+        [Inject] readonly LeaderboardData _leaderboardData;
+        [Inject] private readonly ResultsViewController _resultsViewController;
+        [Inject] readonly UIUtils _uiUtils;
 
         public IDifficultyBeatmap currentDifficultyBeatmap;
         public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
@@ -41,37 +41,37 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         public string sortMethod = "top";
 
         [UIComponent("leaderboardTableView")]
-        private LeaderboardTableView leaderboardTableView = null;
+        private readonly LeaderboardTableView leaderboardTableView = null;
 
         [UIComponent("leaderboardTableView")]
-        private Transform leaderboardTransform = null;
+        private readonly Transform leaderboardTransform = null;
 
         [UIComponent("myHeader")]
-        private Backgroundable myHeader;
+        private readonly Backgroundable myHeader;
 
         [UIComponent("headerText")]
-        private TextMeshProUGUI headerText;
+        private readonly TextMeshProUGUI headerText;
 
         [UIComponent("errorText")]
-        private TextMeshProUGUI errorText;
+        private readonly TextMeshProUGUI errorText;
 
         [UIValue("imageHolders")]
         [Inject] public List<ImageHolder> _ImageHolders;
 
         [UIValue("buttonHolders")]
-        [Inject] private List<ButtonHolder> Buttonholders;
+        [Inject] private readonly List<ButtonHolder> Buttonholders;
 
         [UIComponent("scoreInfoModal")]
-        [Inject] private ScoreInfoModal scoreInfoModal;
+        [Inject] private readonly ScoreInfoModal scoreInfoModal;
 
         [UIComponent("up_button")]
-        private Button up_button;
+        private readonly Button up_button;
 
         [UIComponent("down_button")]
-        private Button down_button;
+        private readonly Button down_button;
 
         [UIObject("loadingLB")]
-        private GameObject loadingLB;
+        private readonly GameObject loadingLB;
 
         public int page = 1;
         public int totalPages;
@@ -102,7 +102,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         }
 
         [UIParams]
-        BSMLParserParams parserParams;
+        readonly BSMLParserParams parserParams;
 
         private GameObject _loadingControl;
         private ImageView _imgView;
@@ -221,7 +221,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             FuckOffButtons();
             ByeImages();
 
-            if (!_playerUtils.isAuthed)
+            if (!_playerUtils.IsAuthed)
             {
                 SetErrorState(true, "Failed to Auth");
                 return;
@@ -278,7 +278,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         public List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page)
         {
-            List<ScoreData> tableData = new List<ScoreData>();
+            List<ScoreData> tableData = new();
             for (int i = 0; i < leaderboard.Count; i++)
             {
                 int score = leaderboard[i].score;

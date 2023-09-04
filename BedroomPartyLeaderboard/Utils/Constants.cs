@@ -22,8 +22,8 @@ namespace BedroomPartyLeaderboard.Utils
 
         public const string STEAM_API_PATH = "./Beat Saber_Data/Plugins/x86_64/steam_api64.dll";
 
-        public static Color BP_COLOR = new Color(123f / 255f, 39 / 255f, 81f / 255f);
-        public static Color BP_COLOR2 = new Color(252f / 255, 208f / 255f, 185f / 255f);
+        public static Color BP_COLOR = new(123f / 255f, 39 / 255f, 81f / 255f);
+        public static Color BP_COLOR2 = new(252f / 255, 208f / 255f, 185f / 255f);
 
         public static string[] staffIDs;
         public const string BUG_REPORT_LINK = "https://thebedroom.party/?bugreports";
@@ -48,11 +48,11 @@ namespace BedroomPartyLeaderboard.Utils
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
-        public static List<LeaderboardData.LeaderboardEntry> EXAMPLEENTRIES = new List<LeaderboardData.LeaderboardEntry>();
+        public static List<LeaderboardData.LeaderboardEntry> EXAMPLEENTRIES = new();
 
         public static LeaderboardData.LeaderboardEntry GenerateRandomEntry(int position)
         {
-            Random random = new Random();
+            Random random = new();
             int rank = position; // Rank corresponds to position
             string userID = (position + 1).ToString(); // User ID as a number from 1 to 10
             string userName = "User" + random.Next(1, 100); // Generate a random user name

@@ -15,8 +15,8 @@ namespace BedroomPartyLeaderboard.Utils
 {
     internal class UIUtils
     {
-        [Inject] private PanelView _panelView;
-        [Inject] private LeaderboardView _leaderboardView;
+        [Inject] private readonly PanelView _panelView;
+        [Inject] private readonly LeaderboardView _leaderboardView;
 
         public class RainbowAnimation : MonoBehaviour
         {
@@ -117,13 +117,13 @@ namespace BedroomPartyLeaderboard.Utils
                     normalAnchor = nameText.rectTransform.anchoredPosition;
                     obtainedAnchor = true;
                 }
-                Vector2 newPosition = new Vector2(normalAnchor.x + 2.5f, 0f);
+                Vector2 newPosition = new(normalAnchor.x + 2.5f, 0f);
                 nameText.rectTransform.anchoredPosition = newPosition;
             }
         }
         public class ImageHolder
         {
-            private int index;
+            private readonly int index;
 
             public bool isLoading;
 
@@ -150,8 +150,8 @@ namespace BedroomPartyLeaderboard.Utils
 
         internal class ButtonHolder
         {
-            private int index;
-            private Action<LeaderboardData.LeaderboardEntry> onClick;
+            private readonly int index;
+            private readonly Action<LeaderboardData.LeaderboardEntry> onClick;
 
             public ButtonHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
             {

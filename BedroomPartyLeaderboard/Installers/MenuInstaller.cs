@@ -24,7 +24,7 @@ namespace BedroomPartyLeaderboard.Installers
             List<ImageHolder> Imageholder = Enumerable.Range(0, 10).Select(x => new ImageHolder(x)).ToList();
             Container.Bind<List<ImageHolder>>().FromInstance(Imageholder).AsSingle().WhenInjectedInto<LeaderboardView>();
 
-            ScoreInfoModal scoreInfoModal = new ScoreInfoModal();
+            ScoreInfoModal scoreInfoModal = new();
             List<ButtonHolder> buttonholder = Enumerable.Range(0, 10).Select(x => new ButtonHolder(x, scoreInfoModal.setScoreModalText)).ToList();
             Container.Bind<ScoreInfoModal>().FromInstance(scoreInfoModal).AsSingle().WhenInjectedInto<LeaderboardView>();
             Container.Bind<List<ButtonHolder>>().FromInstance(buttonholder).AsSingle().WhenInjectedInto<LeaderboardView>();
