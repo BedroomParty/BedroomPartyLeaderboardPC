@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using UnityEngine;
 using Random = System.Random;
 
@@ -9,7 +10,7 @@ namespace BedroomPartyLeaderboard.Utils
 {
     public class Constants
     {
-        public const string AUTH_END_POINT = "https://api.thebedroom.party/login";
+        public const string AUTH_END_POINT = "https://api.thebedroom.party/user/login";
 
         public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}";
         public static string LEADERBOARD_UPLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}/upload";
@@ -25,14 +26,16 @@ namespace BedroomPartyLeaderboard.Utils
         public static Color BP_COLOR = new(123f / 255f, 39 / 255f, 81f / 255f);
         public static Color BP_COLOR2 = new(252f / 255, 208f / 255f, 185f / 255f);
 
-        public static string[] staffIDs;
+        public static string[] staffIDs = null;
         public const string BUG_REPORT_LINK = "https://thebedroom.party/?bugreports";
 
-        public static bool isStaff(string uwu)
+        public static async Task<bool> isStaff(string uwu)
         {
+            using (var httpClient = new HttpClient())
             if (staffIDs == null)
             {
-                staffIDs = new HttpClient().GetAsync("https://api.thebedroom.party/staff").Result.ToString().Split(',');
+                string a = await httpClient.GetStringAsync("https://api.thebedroom.party/staff");
+                    staffIDs = a.Split(',');
             }
             return staffIDs.Contains(uwu); // we do not talk about it :clueless:
         }

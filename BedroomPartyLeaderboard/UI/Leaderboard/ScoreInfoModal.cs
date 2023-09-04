@@ -8,6 +8,7 @@ using IPA.Utilities.Async;
 using ModestTree;
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -97,7 +98,7 @@ namespace BedroomPartyLeaderboard.UI
                 int position = (entry.rank % 10) - 1;
                 _leaderboardView.StartCoroutine(SetProfileImageModal(position, profileImageModal));
 
-                if (Constants.isStaff(entry.userID))
+                if (Task.Run(() =>  Constants.isStaff(entry.userID)).Result)
                 {
                     RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
                     rainbowAnimation.speed = 0.4f;

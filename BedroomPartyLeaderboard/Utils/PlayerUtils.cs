@@ -189,7 +189,7 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.playerAvatarLoading.gameObject.SetActive(false);
 
                     Plugin.Log.Info(localPlayerInfo.userID);
-                    if (Constants.isStaff(localPlayerInfo.userID))
+                    if (Task.Run(() => Constants.isStaff(localPlayerInfo.userID)).Result)
                     {
                         RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
                         rainbowAnimation.speed = 0.35f;
