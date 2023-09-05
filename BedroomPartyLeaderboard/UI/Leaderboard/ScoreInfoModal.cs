@@ -80,7 +80,7 @@ namespace BedroomPartyLeaderboard.UI
             usernameScoreText.richText = true;
 
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc.ToString("F2")}%</color></size>";
-            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.score.ToString("N0")}</size>";
+            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.modifiedScore.ToString("N0")}</size>";
             scoreScoreText.text.Replace(",", " ");
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
 

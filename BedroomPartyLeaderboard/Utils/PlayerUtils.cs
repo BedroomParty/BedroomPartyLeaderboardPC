@@ -40,7 +40,7 @@ namespace BedroomPartyLeaderboard.Utils
                 Steamworks.CSteamID steamID = Steamworks.SteamUser.GetSteamID();
                 string playerId = steamID.m_SteamID.ToString();
                 string playerName = Steamworks.SteamFriends.GetPersonaName();
-                return new PlayerInfo(playerName, playerId, Constants.Base64Encode(authToken));
+                return new PlayerInfo(playerName, playerId, authToken, "");
             });
             return steamInfo;
         }
@@ -54,7 +54,9 @@ namespace BedroomPartyLeaderboard.Utils
 
             if (File.Exists(Constants.STEAM_API_PATH))
             {
-                taskCompletionSource.SetResult(Task.Run(() => GetSteamInfo()).Result);
+                PlayerInfo silly = Task.Run(() => GetSteamInfo()).Result;
+                playerId = silly.userID;
+                playerName = silly.username;
             }
             else
             {
@@ -70,8 +72,6 @@ namespace BedroomPartyLeaderboard.Utils
                                 {
                                     playerId = user.Data.ID.ToString();
                                     playerName = user.Data.OculusID;
-                                    authKey = userProofMessage.Data.Value + "," + authTokenMessage.Data;
-                                    taskCompletionSource.SetResult(new PlayerInfo(playerId, playerName, Constants.Base64Encode(authKey)));
                                 }
                                 else
                                 {
@@ -86,21 +86,20 @@ namespace BedroomPartyLeaderboard.Utils
                     });
                 });
             }
+            authKey = File.ReadAllText(Constants.API_KEY_PATH);
+            taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, authKey, ""));
             return taskCompletionSource.Task;
         }
 
-
-
-        private string GetLoginString(string userID)
+        private string GetLoginString(string userID, string apiKey)
         {
             JObject user = new()
             {
-                { "userID", userID }
+                { "id", long.Parse(userID) },
             };
 
             return user.ToString();
         }
-
 
         private async Task GetAuth(Action<bool> callback)
         {
@@ -118,14 +117,25 @@ namespace BedroomPartyLeaderboard.Utils
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                    string requestBody = GetLoginString(_localPlayerInfo.userID);
+                    string requestBody = GetLoginString(_localPlayerInfo.userID, _localPlayerInfo.authKey);
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content).ConfigureAwait(false);
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
                     _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
-                    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    Plugin.Log.Info(responseContent);
                     JObject jsonResponse = JObject.Parse(responseContent);
+
+                    if(jsonResponse.TryGetValue("sessionKey", out JToken silly)){
+                        localPlayerInfo.tempKey = silly.Value<string>();
+                    }
+                    else
+                    {
+                        callback(false);
+                        _panelView.promptText.text = $"<color=red>Error Authenticating, RESTART GAME.</color>";
+                        return;
+                    }
 
                     if (_isAuthed)
                     {
@@ -163,6 +173,7 @@ namespace BedroomPartyLeaderboard.Utils
             }
             catch (Exception e)
             {
+                Plugin.Log.Error(e);
                 currentlyAuthing = false;
                 _leaderboardView.SetErrorState(true, "Failed to Auth\nSpeecil is silly :3");
             }
@@ -218,12 +229,14 @@ namespace BedroomPartyLeaderboard.Utils
             public string username;
             public string userID;
             public readonly string authKey;
+            internal string tempKey;
 
-            public PlayerInfo(string username, string userID, string authKey)
+            public PlayerInfo(string username, string userID, string authKey, string tempKey)
             {
                 this.authKey = authKey;
                 this.username = username;
                 this.userID = userID;
+                this.tempKey = tempKey;
             }
         }
 

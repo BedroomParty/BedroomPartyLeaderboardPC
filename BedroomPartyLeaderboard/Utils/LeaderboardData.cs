@@ -18,10 +18,11 @@ namespace BedroomPartyLeaderboard.Utils
             public int badCutCount;
             public float acc;
             public bool fullCombo;
-            public int score;
+            public int modifiedScore;
+            public int multipliedScore;
             public string mods;
 
-            public LeaderboardEntry(int rank, string userID, string userName, long timestamp, int missCount, int badCutCount, float acc, bool fullCombo, int score, string mods)
+            public LeaderboardEntry(int rank, string userID, string userName, long timestamp, int missCount, int badCutCount, float acc, bool fullCombo, int modifiedScore, string mods, int multipliedScore)
             {
                 this.rank = rank;
                 this.userID = userID;
@@ -31,7 +32,8 @@ namespace BedroomPartyLeaderboard.Utils
                 this.badCutCount = badCutCount;
                 this.acc = acc;
                 this.fullCombo = fullCombo;
-                this.score = score;
+                this.modifiedScore = modifiedScore;
+                this.multipliedScore = multipliedScore;
                 this.mods = mods;
             }
         }
@@ -49,20 +51,22 @@ namespace BedroomPartyLeaderboard.Utils
                 int badCutCount = scoreData["badCuts"]?.Value<int>() ?? 0;
                 float acc = scoreData["accuracy"]?.Value<float>() ?? 0.0f;
                 bool fullCombo = scoreData["fullCombo"]?.Value<bool>() ?? false;
-                int score = scoreData["score"]?.Value<int>() ?? 0;
+                int modifiedScore = scoreData["modifedScore"]?.Value<int>() ?? 0;
+                int multipliedScore = scoreData["multipliedScore"]?.Value<int>() ?? 0;
                 string modifiers = scoreData["modifiers"]?.ToString();
                 long timestamp = scoreData["timeSet"]?.Value<long>() ?? 0;
                 leaderboard.Add(new LeaderboardEntry(
                     rank,
                     userID.ToString(),
-                    userName ?? "Player",
+                    userName ?? userID.ToString(),
                     timestamp,
                     missCount,
                     badCutCount,
                     acc,
                     fullCombo,
-                    score,
-                    modifiers ?? ""
+                    modifiedScore,
+                    modifiers ?? "",
+                    multipliedScore
                 ));
                 i++;
             }

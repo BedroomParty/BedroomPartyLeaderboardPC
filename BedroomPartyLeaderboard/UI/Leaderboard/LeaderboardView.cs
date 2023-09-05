@@ -73,7 +73,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIObject("loadingLB")]
         private readonly GameObject loadingLB;
 
-        public int page = 1;
+        public int page = 0;
         public int totalPages;
 
         [UIAction("OnPageUp")]
@@ -144,7 +144,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             if (index == 0) sortMethod = "top";
             else if (index == 1) sortMethod = "around";
             else sortMethod = "top";
-            page = 1;
+            page = 0;
             UpdatePageButtons();
             OnLeaderboardSet(currentDifficultyBeatmap);
         }
@@ -201,7 +201,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
             if (!_plvc) return;
             if (!_plvc.isActivated) return;
-            page = 1;
+            page = 0;
             parserParams.EmitEvent("hideInfoModal");
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
         }
@@ -241,8 +241,12 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             currentSongLinkLBWebView = $"https://thebedroom.party/?board={balls}";
             _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
             {
-
                 HelloIMGLoader();
+
+                foreach (var item in result.Item2)
+                {
+                    Plugin.Log.Info(item.userID);
+                }
 
                 if (result.Item2 != null)
                 {
@@ -254,9 +258,10 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     }
                     else
                     {
+                        loadingLB.gameObject.SetActive(false);
                         leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
                         _uiUtils.RichMyText(leaderboardTableView);
-                        loadingLB.gameObject.SetActive(false);
+                        _uiUtils.SetProfiles(result.Item2);
                     }
                 }
                 else
@@ -266,7 +271,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     ByeIMGLoader();
                     Plugin.Log.Error("Error");
                 }
-                _uiUtils.SetProfiles(result.Item2);
                 totalPages = result.Item3;
                 UpdatePageButtons();
             });
@@ -281,7 +285,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             List<ScoreData> tableData = new();
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                int score = leaderboard[i].score;
+                int score = leaderboard[i].modifiedScore;
                 tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score));
                 buttonEntryArray[i] = leaderboard[i];
                 Buttonholders[i].infoButton.gameObject.SetActive(true);

@@ -46,6 +46,8 @@ namespace BedroomPartyLeaderboard.Utils
                     string jsonResponse = await response.Content.ReadAsStringAsync();
                     JObject jsonObject = JObject.Parse(jsonResponse);
 
+                    Plugin.Log.Info(jsonResponse);
+
                     if (jsonObject.TryGetValue("scoreCount", out JToken scoreCountToken)) scorecount = scoreCountToken.Value<int>();
                     else scorecount = 0;
 
@@ -54,6 +56,7 @@ namespace BedroomPartyLeaderboard.Utils
                     if (jsonObject.TryGetValue("scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0) data = _leaderboardData.LoadBeatMapInfo(scoresArray);
                     else data = new List<LeaderboardData.LeaderboardEntry>();
 
+                    Plugin.Log.Info("BEFORE CALLBACK");
                     callback((response.IsSuccessStatusCode, data, totalPages));
                     return;
                 }

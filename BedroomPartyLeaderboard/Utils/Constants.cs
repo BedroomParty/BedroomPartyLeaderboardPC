@@ -12,6 +12,8 @@ namespace BedroomPartyLeaderboard.Utils
     {
         public const string AUTH_END_POINT = "https://api.thebedroom.party/user/login";
 
+        public const string API_KEY_PATH = "./UserData/BPLB/scary/DO_NOT_SHARE.SCARY";
+
         public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}";
         public static string LEADERBOARD_UPLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}/upload";
 
@@ -51,23 +53,5 @@ namespace BedroomPartyLeaderboard.Utils
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
-        public static List<LeaderboardData.LeaderboardEntry> EXAMPLEENTRIES = new();
-
-        public static LeaderboardData.LeaderboardEntry GenerateRandomEntry(int position)
-        {
-            Random random = new();
-            int rank = position; // Rank corresponds to position
-            string userID = (position + 1).ToString(); // User ID as a number from 1 to 10
-            string userName = "User" + random.Next(1, 100); // Generate a random user name
-            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(); // Current timestamp
-            int missCount = random.Next(0, 50);
-            int badCutCount = random.Next(0, 20);
-            float acc = (float)(random.NextDouble() * 100.0); // Random accuracy between 0 and 100
-            bool fullCombo = random.Next(0, 2) == 1; // Randomly true or false
-            int score = random.Next(1000, 100000); // Assuming scores between 1000 and 100000
-            string mods = "RandomMods"; // You can replace this with a random mods generator
-
-            return new LeaderboardData.LeaderboardEntry(rank, userID, userName, timestamp, missCount, badCutCount, acc, fullCombo, score, mods);
-        }
     }
 }
