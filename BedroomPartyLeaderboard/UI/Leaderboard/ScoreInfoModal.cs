@@ -77,7 +77,7 @@ namespace BedroomPartyLeaderboard.UI
 
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc:F2}%</color></size>";
             scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.modifiedScore:N0}</size>";
-            _ = scoreScoreText.text.Replace(",", " ");
+            scoreScoreText.text.Replace(",", " ");
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
 
             ppScoreText.gameObject.SetActive(false);
@@ -96,9 +96,9 @@ namespace BedroomPartyLeaderboard.UI
                 : string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
             parserParams.EmitEvent("showScoreInfo");
 
-            _ = UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+            UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-                profileImageModal.SetImage($"https://api.thebedroom/party/{entry.userID}/avatar");
+                profileImageModal.SetImage($"https://api.thebedroom.party/user/{entry.userID}/avatar");
                 profileImageModalLOADING.SetActive(false);
 
                 if (Task.Run(() => Constants.isStaff(entry.userID)).Result)

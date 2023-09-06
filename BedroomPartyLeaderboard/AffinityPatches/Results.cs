@@ -94,16 +94,6 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         [AffinityPatch(typeof(LevelCompletionResultsHelper), nameof(LevelCompletionResultsHelper.ProcessScore))]
         private void Postfix(ref PlayerData playerData, ref PlayerLevelStatsData playerLevelStats, ref LevelCompletionResults levelCompletionResults, ref IReadonlyBeatmapData transformedBeatmapData, ref IDifficultyBeatmap difficultyBeatmap, ref PlatformLeaderboardsModel platformLeaderboardsModel)
         {
-            if (!_playerUtils.IsAuthed)
-            {
-                return;
-            }
-
-            if (BS_Utils.Gameplay.ScoreSubmission.Disabled)
-            {
-                return;
-            }
-
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             int modifiedScore = levelCompletionResults.modifiedScore;
             int multipliedScore = levelCompletionResults.multipliedScore;
@@ -133,7 +123,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             string mods = GetModifiersString(levelCompletionResults);
 
 
-            _requestUtils.SetBeatMapData(balls, _playerUtils.localPlayerInfo.authKey, _playerUtils.localPlayerInfo.username, badCut, misses, fc, acc, score, mods, multipliedScore, modifiedScore, result =>
+            _requestUtils.SetBeatMapData(balls, _playerUtils.localPlayerInfo.userID, _playerUtils.localPlayerInfo.username, badCut, misses, fc, acc, score, mods, multipliedScore, modifiedScore, result =>
             {
                 Plugin.Log.Info("_requestUtils.SetBeatMapData");
             });

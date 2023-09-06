@@ -60,7 +60,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [Inject] private readonly List<ButtonHolder> Buttonholders;
 
         [UIComponent("scoreInfoModal")]
-        [Inject] private readonly ScoreInfoModal scoreInfoModal;
+        [Inject] public readonly ScoreInfoModal scoreInfoModal;
 
         [UIComponent("up_button")]
         private readonly Button up_button;
@@ -204,7 +204,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 _panelView.prompt_loader.SetActive(true);
                 _panelView.promptText.gameObject.SetActive(true);
                 _panelView.promptText.text = "Authenticating...";
-                _ = UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     _playerUtils.LoginUser();
 
@@ -234,7 +234,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
             currentDifficultyBeatmap = difficultyBeatmap;
-            _ = UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
         }
 
         private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
@@ -304,7 +304,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         private void ByeImages()
         {
-            _ImageHolders.ForEach(holder => holder.profileImage.sprite= null);
+            _ImageHolders.ForEach(holder => holder.profileImage.sprite = null);
         }
 
         private void HelloIMGLoader()
@@ -342,7 +342,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             string result;
             if (entry.userID == "76561199077754911")
             {
-                entry.userName = $"<color=blue>{entry.userID}</color>";
+                entry.userName = $"<color=blue>{entry.userName}</color>";
             }
 
             result = "<size=90%>" + entry.userName.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";

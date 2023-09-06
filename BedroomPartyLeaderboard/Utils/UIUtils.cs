@@ -17,7 +17,6 @@ namespace BedroomPartyLeaderboard.Utils
     {
         [Inject] private readonly PanelView _panelView;
         [Inject] private readonly LeaderboardView _leaderboardView;
-
         public class RainbowAnimation : MonoBehaviour
         {
             public float speed = 1f; // Speed of the color change
@@ -52,8 +51,9 @@ namespace BedroomPartyLeaderboard.Utils
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
+                if (leaderboard[i] == null || leaderboard[i].userName == "null") return;
                 _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
-                _leaderboardView._ImageHolders[i].setProfileImage($"https://api.thebedroom/party/{leaderboard[i].userID}/avatar");
+                _leaderboardView._ImageHolders[i].setProfileImage($"https://api.thebedroom.party/user/{leaderboard[i].userID}/avatar");
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)
@@ -71,6 +71,8 @@ namespace BedroomPartyLeaderboard.Utils
                 x.profileImage.material = mat;
             }
             _panelView.playerAvatar.material = mat;
+            _leaderboardView.scoreInfoModal.profileImageModal.material = mat;
+
         }
 
         private Material FindCoolMaterial()

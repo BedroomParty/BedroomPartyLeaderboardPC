@@ -57,13 +57,13 @@ namespace BedroomPartyLeaderboard.Utils
             }
             else
             {
-                _ = Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
+                Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
                 {
-                    _ = Oculus.Platform.Users.GetUserProof().OnComplete(userProofMessage =>
+                    Oculus.Platform.Users.GetUserProof().OnComplete(userProofMessage =>
                     {
                         if (!userProofMessage.IsError)
                         {
-                            _ = Oculus.Platform.Users.GetAccessToken().OnComplete(authTokenMessage =>
+                            Oculus.Platform.Users.GetAccessToken().OnComplete(authTokenMessage =>
                             {
                                 if (!authTokenMessage.IsError)
                                 {
@@ -100,7 +100,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         private async Task GetAuth(Action<bool> callback)
         {
-            PlayerInfo _localPlayerInfo = Task.Run(() => GetPlayerInfo()).Result;
+            PlayerInfo _localPlayerInfo = await Task.Run(() => GetPlayerInfo());
             localPlayerInfo = _localPlayerInfo;
             _panelView.playerUsername.text = localPlayerInfo.username;
             _uiUtils.GetCoolMaterialAndApply();
@@ -111,8 +111,8 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 try
                 {
-                    _ = httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
-                    _ = httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                     string requestBody = GetLoginString(_localPlayerInfo.userID, _localPlayerInfo.authKey);
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
@@ -179,7 +179,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         public void LoginUser()
         {
-            _ = Task.Run(() => GetAuthStatus(result =>
+            Task.Run(() => GetAuthStatus(result =>
             {
                 if (_isAuthed)
                 {
@@ -190,7 +190,7 @@ namespace BedroomPartyLeaderboard.Utils
                         _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                         _leaderboardView.UpdatePageButtons();
                     }
-                    _panelView.playerAvatar.SetImage("https://cdn.assets.beatleader.xyz/76561199077754911R34.png");
+                    _panelView.playerAvatar.SetImage($"https://api.thebedroom.party/user/{localPlayerInfo.userID}/avatar");
                     _panelView.playerAvatarLoading.gameObject.SetActive(false);
 
                     if (Task.Run(() => Constants.isStaff(localPlayerInfo.userID)).Result)
@@ -207,7 +207,7 @@ namespace BedroomPartyLeaderboard.Utils
                         }
                         _panelView.playerUsername.color = Color.white;
                     }
-                    _ = Task.Delay(1000);
+                    Task.Delay(2000);
                     _panelView.promptText.gameObject.SetActive(false);
                     _panelView.prompt_loader.SetActive(false);
                 }
