@@ -345,7 +345,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 entry.userName = $"<color=blue>{entry.userID}</color>";
             }
 
-            result = "<size=90%>" + entry.userID.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";
+            result = "<size=90%>" + entry.userName.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";
             entry.rank = rankFUCK;
             return new ScoreData(score, result, rankFUCK, false);
         }

@@ -72,7 +72,7 @@ namespace BedroomPartyLeaderboard.UI
             TimeSpan relativeTime = TimeUtils.GetRelativeTime(entry.timestamp.ToString());
             dateScoreText.text = string.Format("<size=4.8><color=white>{0}</color></size>", TimeUtils.GetRelativeTimeString(relativeTime));
 
-            usernameScoreText.text = $"<size=180%>{entry.userID}</color>";
+            usernameScoreText.text = $"<size=180%>{entry.userName}</color>";
             usernameScoreText.richText = true;
 
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc:F2}%</color></size>";
