@@ -53,7 +53,7 @@ namespace BedroomPartyLeaderboard.Utils
             for (int i = 0; i < leaderboard.Count; i++)
             {
                 _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
-                _leaderboardView._ImageHolders[i].setProfileImage($"https://cdn.assets.beatleader.xyz/76561199077754911R34.png");
+                _leaderboardView._ImageHolders[i].setProfileImage($"https://api.thebedroom/party/{leaderboard[i].userID}/avatar");
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)
@@ -66,7 +66,7 @@ namespace BedroomPartyLeaderboard.Utils
         public void GetCoolMaterialAndApply()
         {
             Material mat = FindCoolMaterial();
-            foreach (var x in _leaderboardView._ImageHolders)
+            foreach (ImageHolder x in _leaderboardView._ImageHolders)
             {
                 x.profileImage.material = mat;
             }
@@ -78,7 +78,11 @@ namespace BedroomPartyLeaderboard.Utils
             Material cool = null;
             foreach (Material material in Resources.FindObjectsOfTypeAll<Material>())
             {
-                if (material == null) continue;
+                if (material == null)
+                {
+                    continue;
+                }
+
                 if (material.name.Contains("UINoGlowRoundEdge"))
                 {
                     cool = material;
@@ -101,14 +105,14 @@ namespace BedroomPartyLeaderboard.Utils
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
             {
                 cell.showSeparator = true;
-                var nameText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText");
-                var rankText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText");
-                var scoreText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText");
+                TextMeshProUGUI nameText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText");
+                TextMeshProUGUI rankText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText");
+                TextMeshProUGUI scoreText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText");
                 nameText.richText = true;
                 rankText.richText = true;
                 scoreText.richText = true;
                 rankText.text = $"<size=120%><u>{rankText.text}</u></size>";
-                var seperator = cell.GetField<Image, LeaderboardTableCell>("_separatorImage") as ImageView;
+                ImageView seperator = cell.GetField<Image, LeaderboardTableCell>("_separatorImage") as ImageView;
                 seperator.color = Constants.BP_COLOR2;
                 seperator.color0 = Color.white;
                 seperator.color1 = new Color(1, 1, 1, 0);
@@ -163,7 +167,10 @@ namespace BedroomPartyLeaderboard.Utils
             public Button infoButton;
 
             [UIAction("infoClick")]
-            private void infoClick() => onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
+            private void infoClick()
+            {
+                onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
+            }
         }
     }
 }

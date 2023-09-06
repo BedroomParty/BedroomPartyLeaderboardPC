@@ -1,4 +1,5 @@
-﻿using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage;
+using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
 using BedroomPartyLeaderboard.UI.Leaderboard;
@@ -7,7 +8,6 @@ using HMUI;
 using IPA.Utilities.Async;
 using ModestTree;
 using System;
-using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -60,43 +60,46 @@ namespace BedroomPartyLeaderboard.UI
             Application.OpenURL(Constants.USER_PROFILE_LINK + currentEntry.userID);
         }
 
-        [Inject] readonly LeaderboardView _leaderboardView;
-
-        LeaderboardData.LeaderboardEntry currentEntry;
-
-        const int scoreDetails = 4;
-
-        const float infoFontSize = 4.2f;
+        [Inject] private readonly LeaderboardView _leaderboardView;
+        private LeaderboardData.LeaderboardEntry currentEntry;
+        private const int scoreDetails = 4;
+        private const float infoFontSize = 4.2f;
 
         public void setScoreModalText(LeaderboardData.LeaderboardEntry entry)
         {
             currentEntry = entry;
             profileImageModalLOADING.SetActive(true);
-            string formattedDate = "Error";
             TimeSpan relativeTime = TimeUtils.GetRelativeTime(entry.timestamp.ToString());
             dateScoreText.text = string.Format("<size=4.8><color=white>{0}</color></size>", TimeUtils.GetRelativeTimeString(relativeTime));
 
             usernameScoreText.text = $"<size=180%>{entry.userID}</color>";
             usernameScoreText.richText = true;
 
-            accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc.ToString("F2")}%</color></size>";
-            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.modifiedScore.ToString("N0")}</size>";
-            scoreScoreText.text.Replace(",", " ");
+            accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc:F2}%</color></size>";
+            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.modifiedScore:N0}</size>";
+            _ = scoreScoreText.text.Replace(",", " ");
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
 
             ppScoreText.gameObject.SetActive(false);
 
-            if (entry.mods.IsEmpty()) modifiersScoreText.gameObject.SetActive(false);
-            else modifiersScoreText.gameObject.SetActive(true);
+            if (entry.mods.IsEmpty())
+            {
+                modifiersScoreText.gameObject.SetActive(false);
+            }
+            else
+            {
+                modifiersScoreText.gameObject.SetActive(true);
+            }
 
-            if (entry.fullCombo) fcScoreText.text = "<size=4><color=green>Full Combo!</color></size>";
-            else fcScoreText.text = string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
+            fcScoreText.text = entry.fullCombo
+                ? "<size=4><color=green>Full Combo!</color></size>"
+                : string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
             parserParams.EmitEvent("showScoreInfo");
 
-            UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+            _ = UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-                int position = (entry.rank % 10) - 1;
-                _leaderboardView.StartCoroutine(SetProfileImageModal(position, profileImageModal));
+                profileImageModal.SetImage($"https://api.thebedroom/party/{entry.userID}/avatar");
+                profileImageModalLOADING.SetActive(false);
 
                 if (Task.Run(() => Constants.isStaff(entry.userID)).Result)
                 {
@@ -113,18 +116,6 @@ namespace BedroomPartyLeaderboard.UI
                     usernameScoreText.color = Color.white;
                 }
             });
-        }
-
-        private IEnumerator SetProfileImageModal(int pos, ImageView image)
-        {
-            profileImageModalLOADING.gameObject.SetActive(true);
-            while (!_leaderboardView._ImageHolders[pos].isLoading)
-            {
-                yield return null;
-            }
-            image.sprite = _leaderboardView._ImageHolders[pos].profileImage.sprite;
-            profileImageModal.gameObject.SetActive(true);
-            profileImageModalLOADING.SetActive(false);
         }
     }
 }

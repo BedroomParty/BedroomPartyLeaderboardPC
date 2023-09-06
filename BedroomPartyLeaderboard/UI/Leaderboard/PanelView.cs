@@ -12,8 +12,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     [ViewDefinition("BedroomPartyLeaderboard.UI.Leaderboard.BSML.PanelView.bsml")]
     internal class PanelView : BSMLAutomaticViewController
     {
-        [Inject] readonly LeaderboardView _leaderboardView;
-        [Inject] readonly PlayerUtils _playerUtils;
+        [Inject] private readonly LeaderboardView _leaderboardView;
+        [Inject] private readonly PlayerUtils _playerUtils;
 
         [UIComponent("BedroomPartyLeaderboard_logo")]
         private readonly ImageView BedroomPartyLeaderboard_logo;

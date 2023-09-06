@@ -15,17 +15,14 @@ namespace BedroomPartyLeaderboard.Utils
 {
     internal class PlayerUtils
     {
-        [Inject] readonly PanelView _panelView;
-        [Inject] readonly LeaderboardView _leaderboardView;
-        [Inject] readonly UIUtils _uiUtils;
+        [Inject] private readonly PanelView _panelView;
+        [Inject] private readonly LeaderboardView _leaderboardView;
+        [Inject] private readonly UIUtils _uiUtils;
 
-        protected private bool _isAuthed = false;
+        private protected bool _isAuthed = false;
         public PlayerInfo localPlayerInfo;
 
-        public bool IsAuthed
-        {
-            get { return _isAuthed; }
-        }
+        public bool IsAuthed => _isAuthed;
 
         public bool currentlyAuthing;
 
@@ -60,13 +57,13 @@ namespace BedroomPartyLeaderboard.Utils
             }
             else
             {
-                Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
+                _ = Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
                 {
-                    Oculus.Platform.Users.GetUserProof().OnComplete(userProofMessage =>
+                    _ = Oculus.Platform.Users.GetUserProof().OnComplete(userProofMessage =>
                     {
                         if (!userProofMessage.IsError)
                         {
-                            Oculus.Platform.Users.GetAccessToken().OnComplete(authTokenMessage =>
+                            _ = Oculus.Platform.Users.GetAccessToken().OnComplete(authTokenMessage =>
                             {
                                 if (!authTokenMessage.IsError)
                                 {
@@ -108,14 +105,14 @@ namespace BedroomPartyLeaderboard.Utils
             _panelView.playerUsername.text = localPlayerInfo.username;
             _uiUtils.GetCoolMaterialAndApply();
 
-            using var httpClient = new HttpClient();
+            using HttpClient httpClient = new();
             int x = 0;
             while (x < 3)
             {
                 try
                 {
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                    _ = httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
+                    _ = httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                     string requestBody = GetLoginString(_localPlayerInfo.userID, _localPlayerInfo.authKey);
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
@@ -182,7 +179,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         public void LoginUser()
         {
-            Task.Run(() => GetAuthStatus(result =>
+            _ = Task.Run(() => GetAuthStatus(result =>
             {
                 if (_isAuthed)
                 {
@@ -210,7 +207,7 @@ namespace BedroomPartyLeaderboard.Utils
                         }
                         _panelView.playerUsername.color = Color.white;
                     }
-                    Task.Delay(1000);
+                    _ = Task.Delay(1000);
                     _panelView.promptText.gameObject.SetActive(false);
                     _panelView.prompt_loader.SetActive(false);
                 }
@@ -243,14 +240,19 @@ namespace BedroomPartyLeaderboard.Utils
         // from scoresaber yoink teehee
         public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
         {
-            var waitTask = Task.Run(async () =>
+            Task waitTask = Task.Run(async () =>
             {
-                while (!condition()) await Task.Delay(frequency);
+                while (!condition())
+                {
+                    await Task.Delay(frequency);
+                }
             });
 
             if (waitTask != await Task.WhenAny(waitTask,
                     Task.Delay(timeout)))
+            {
                 throw new TimeoutException();
+            }
         }
     }
 }

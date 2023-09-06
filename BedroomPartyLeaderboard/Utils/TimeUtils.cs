@@ -15,7 +15,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         public static TimeSpan GetRelativeTime(string timeSet)
         {
-            var dateTime = long.Parse(timeSet).AsUnixTime();
+            DateTime dateTime = long.Parse(timeSet).AsUnixTime();
             return DateTime.UtcNow - dateTime;
         }
 
@@ -38,12 +38,12 @@ namespace BedroomPartyLeaderboard.Utils
                 case < 30 * Day: return timeSpan.Days + " days ago";
                 case < 12 * Month:
                     {
-                        var months = Convert.ToInt32(Math.Floor((double)timeSpan.Days / 30));
+                        int months = Convert.ToInt32(Math.Floor((double)timeSpan.Days / 30));
                         return months <= 1 ? "1 month ago" : months + " months ago";
                     }
                 default:
                     {
-                        var years = Convert.ToInt32(Math.Floor((double)timeSpan.Days / 365));
+                        int years = Convert.ToInt32(Math.Floor((double)timeSpan.Days / 365));
                         return years <= 1 ? "1 year ago" : years + " years ago";
                     }
             }

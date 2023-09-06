@@ -24,12 +24,12 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet, IInitializable
     {
         [Inject] private readonly PlatformLeaderboardViewController _plvc;
-        [Inject] readonly PlayerUtils _playerUtils;
-        [Inject] readonly PanelView _panelView;
-        [Inject] readonly RequestUtils _requestUtils;
-        [Inject] readonly LeaderboardData _leaderboardData;
+        [Inject] private readonly PlayerUtils _playerUtils;
+        [Inject] private readonly PanelView _panelView;
+        [Inject] private readonly RequestUtils _requestUtils;
+        [Inject] private readonly LeaderboardData _leaderboardData;
         [Inject] private readonly ResultsViewController _resultsViewController;
-        [Inject] readonly UIUtils _uiUtils;
+        [Inject] private readonly UIUtils _uiUtils;
 
         public IDifficultyBeatmap currentDifficultyBeatmap;
         public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
@@ -75,10 +75,16 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         public int totalPages;
 
         [UIAction("OnPageUp")]
-        private void OnPageUp() => UpdatePageChanged(-1);
+        private void OnPageUp()
+        {
+            UpdatePageChanged(-1);
+        }
 
         [UIAction("OnPageDown")]
-        private void OnPageDown() => UpdatePageChanged(1);
+        private void OnPageDown()
+        {
+            UpdatePageChanged(1);
+        }
 
         private void UpdatePageChanged(int inc)
         {
@@ -95,12 +101,12 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 down_button.interactable = false;
                 return;
             }
-            up_button.interactable = (page > 1);
-            down_button.interactable = (page < totalPages - 1);
+            up_button.interactable = page > 1;
+            down_button.interactable = page < totalPages - 1;
         }
 
         [UIParams]
-        readonly BSMLParserParams parserParams;
+        private readonly BSMLParserParams parserParams;
 
         private GameObject _loadingControl;
         private ImageView _imgView;
@@ -113,7 +119,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         {
             myHeader.background.material = Utilities.ImageResources.NoGlowMat;
             _loadingControl = leaderboardTransform.Find("LoadingControl").gameObject;
-            var loadingContainer = _loadingControl.transform.Find("LoadingContainer");
+            Transform loadingContainer = _loadingControl.transform.Find("LoadingContainer");
             loadingContainer.gameObject.SetActive(false);
             Destroy(loadingContainer.Find("Text").gameObject);
             Destroy(_loadingControl.transform.Find("RefreshContainer").gameObject);
@@ -125,40 +131,42 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             ImageSkew(ref _imgView) = 0.18f;
             ImageGradient(ref _imgView) = true;
         }
-        private void FuckOffButtons() => Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
+        private void FuckOffButtons()
+        {
+            Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
+        }
 
         [UIAction("openLBWebView")]
         public void openLBWebView()
         {
-            if (!(string.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" "))) Application.OpenURL(currentSongLinkLBWebView);
+            if (!(string.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" ")))
+            {
+                Application.OpenURL(currentSongLinkLBWebView);
+            }
         }
 
         [UIAction("openBUGWebView")]
-        public void openBUGWebView() => Application.OpenURL(Constants.BUG_REPORT_LINK);
+        public void openBUGWebView()
+        {
+            Application.OpenURL(Constants.BUG_REPORT_LINK);
+        }
 
         [UIAction("OnIconSelected")]
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
         {
-            if (index == 0) sortMethod = "top";
-            else if (index == 1) sortMethod = "around";
-            else sortMethod = "top";
+            sortMethod = index == 0 ? "top" : index == 1 ? "around" : "top";
+
             page = 0;
             UpdatePageButtons();
             OnLeaderboardSet(currentDifficultyBeatmap);
         }
 
         [UIValue("leaderboardIcons")]
-        private List<IconSegmentedControl.DataItem> leaderboardIcons
-        {
-            get
-            {
-                return new List<IconSegmentedControl.DataItem>()
+        private List<IconSegmentedControl.DataItem> leaderboardIcons => new()
                 {
                     new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Globe.png"), "Bedroom Party"),
                     new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), "Around you")
                 };
-            }
-        }
 
         public void SetErrorState(bool active, string reason)
         {
@@ -172,20 +180,31 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         }
 
         [UIAction("openWebsite")]
-        public void openWebsite() => Application.OpenURL("https://thebedroom.party");
+        public void openWebsite()
+        {
+            Application.OpenURL("https://thebedroom.party");
+        }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            if (!base.isActiveAndEnabled) return;
-            if (!_plvc) return;
-            var header = _plvc.transform.Find("HeaderPanel");
+            if (!base.isActiveAndEnabled)
+            {
+                return;
+            }
+
+            if (!_plvc)
+            {
+                return;
+            }
+
+            Transform header = _plvc.transform.Find("HeaderPanel");
             if (firstActivation)
             {
                 _panelView.prompt_loader.SetActive(true);
                 _panelView.promptText.gameObject.SetActive(true);
                 _panelView.promptText.text = "Authenticating...";
-                UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                _ = UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     _playerUtils.LoginUser();
 
@@ -197,8 +216,16 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            if (!_plvc) return;
-            if (!_plvc.isActivated) return;
+            if (!_plvc)
+            {
+                return;
+            }
+
+            if (!_plvc.isActivated)
+            {
+                return;
+            }
+
             page = 0;
             parserParams.EmitEvent("hideInfoModal");
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
@@ -207,12 +234,16 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
             currentDifficultyBeatmap = difficultyBeatmap;
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
+            _ = UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
         }
 
         private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
-            if (!_plvc || !_plvc.isActiveAndEnabled) return;
+            if (!_plvc || !_plvc.isActiveAndEnabled)
+            {
+                return;
+            }
+
             await Task.Delay(1);
             leaderboardTableView.SetScores(null, -1);
             loadingLB.gameObject.SetActive(true);
@@ -228,7 +259,10 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             SetErrorState(false, "");
 
 
-            if (!_plvc || !_plvc.isActiveAndEnabled) return;
+            if (!_plvc || !_plvc.isActiveAndEnabled)
+            {
+                return;
+            }
 
             await Task.Delay(500);
 
@@ -269,9 +303,20 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             });
         }
 
-        private void ByeImages() => _ImageHolders.ForEach(holder => holder.profileImage.gameObject.SetActive(false));
-        private void HelloIMGLoader() => _ImageHolders.ForEach(holder => holder.profileloading.SetActive(true));
-        private void ByeIMGLoader() => _ImageHolders.ForEach(holder => holder.profileloading.SetActive(false));
+        private void ByeImages()
+        {
+            _ImageHolders.ForEach(holder => holder.profileImage.gameObject.SetActive(false));
+        }
+
+        private void HelloIMGLoader()
+        {
+            _ImageHolders.ForEach(holder => holder.profileloading.SetActive(true));
+        }
+
+        private void ByeIMGLoader()
+        {
+            _ImageHolders.ForEach(holder => holder.profileloading.SetActive(false));
+        }
 
         public List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page)
         {
@@ -279,29 +324,41 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             for (int i = 0; i < leaderboard.Count; i++)
             {
                 int score = leaderboard[i].modifiedScore;
-                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score));
+                int rank = int.Parse(page.ToString()[0] + (i + 1).ToString());
+                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score, rank));
                 buttonEntryArray[i] = leaderboard[i];
                 Buttonholders[i].infoButton.gameObject.SetActive(true);
             }
             return tableData;
         }
 
-        public ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int score)
+        public ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int score, int rankFUCK)
         {
             string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
-            string formattedCombo = "";
-            if (entry.fullCombo) formattedCombo = " -<color=green> FC </color>";
-            else formattedCombo = string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
-
+            string formattedCombo = entry.fullCombo
+                ? " -<color=green> FC </color>"
+                : string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;
-            if (entry.userID == "3033139560125578") entry.userName = $"<color=blue>{entry.userName}</color>";
+            if (entry.userID == "3033139560125578")
+            {
+                entry.userName = $"<color=blue>{entry.userName}</color>";
+            }
+
             result = "<size=90%>" + entry.userID.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";
-            return new ScoreData(score, result, entry.rank, false);
+            entry.rank = rankFUCK;
+            return new ScoreData(score, result, rankFUCK, false);
         }
 
-        public void Initialize() => _resultsViewController.continueButtonPressedEvent += FUCKOFFIHATETHISIWANTTODIE;
-        public void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController) => OnLeaderboardSet(currentDifficultyBeatmap);
+        public void Initialize()
+        {
+            _resultsViewController.continueButtonPressedEvent += FUCKOFFIHATETHISIWANTTODIE;
+        }
+
+        public void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController)
+        {
+            OnLeaderboardSet(currentDifficultyBeatmap);
+        }
     }
 }

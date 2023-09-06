@@ -11,8 +11,15 @@ namespace BedroomPartyLeaderboard.Utils
 
         public const string API_KEY_PATH = "./UserData/BPLB/scary/DO_NOT_SHARE.SCARY";
 
-        public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}";
-        public static string LEADERBOARD_UPLOAD_END_POINT(string hash) => $"https://api.thebedroom.party/leaderboard/{hash}/upload";
+        public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash)
+        {
+            return $"https://api.thebedroom.party/leaderboard/{hash}";
+        }
+
+        public static string LEADERBOARD_UPLOAD_END_POINT(string hash)
+        {
+            return $"https://api.thebedroom.party/leaderboard/{hash}/upload";
+        }
 
         public const string USER_URL = "https://api.thebedroom.party/user";
         public const string PLAYLIST_PATH = "./Playlists/";
@@ -30,25 +37,28 @@ namespace BedroomPartyLeaderboard.Utils
 
         public static async Task<bool> isStaff(string uwu)
         {
-            using (var httpClient = new HttpClient())
+            using (HttpClient httpClient = new())
+            {
                 if (staffIDs == null)
                 {
                     string a = await httpClient.GetStringAsync("https://api.thebedroom.party/staff");
                     staffIDs = a.Split(',');
                 }
-            return staffIDs.Contains(uwu); // we do not talk about it :clueless:
-        }
+            }
 
-        public static string profilePictureLink(string kms)
-        {
-            return $"https://cdn.phazed.xyz/QSBoard/High/{kms}.png";
+            return staffIDs.Contains(uwu); // we do not talk about it :clueless:
         }
 
         public static string Base64Encode(string plainText)
         {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
+        public static string Base64Decode(string plainText)
+        {
+            byte[] plainTextBytes = System.Convert.FromBase64String(plainText);
+            return System.Text.Encoding.UTF8.GetString(plainTextBytes);
+        }
     }
 }

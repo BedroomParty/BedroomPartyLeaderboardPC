@@ -453,6 +453,7 @@
     <Compile Include="UI\Leaderboard\PanelView.cs" />
     <Compile Include="UI\Leaderboard\ScoreInfoModal.cs" />
     <Compile Include="Utils\Constants.cs" />
+    <Compile Include="Utils\ExternalPlayerInfo.cs" />
     <Compile Include="Utils\LeaderboardData.cs" />
     <Compile Include="Utils\LeaderboardUtils.cs" />
     <Compile Include="Utils\PlayerUtils.cs" />
