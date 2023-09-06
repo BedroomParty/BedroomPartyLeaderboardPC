@@ -273,8 +273,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             currentSongLinkLBWebView = $"https://thebedroom.party/?board={balls}";
             _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
             {
+                totalPages = result.Item3;
                 HelloIMGLoader();
-
+                UpdatePageButtons();
                 if (result.Item2 != null)
                 {
                     if (result.Item2.Count == 0)
@@ -298,14 +299,12 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     ByeIMGLoader();
                     Plugin.Log.Error("Error");
                 }
-                totalPages = result.Item3;
-                UpdatePageButtons();
             });
         }
 
         private void ByeImages()
         {
-            _ImageHolders.ForEach(holder => holder.profileImage.gameObject.SetActive(false));
+            _ImageHolders.ForEach(holder => holder.profileImage.sprite= null);
         }
 
         private void HelloIMGLoader()
@@ -341,9 +340,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
 
             string result;
-            if (entry.userID == "3033139560125578")
+            if (entry.userID == "76561199077754911")
             {
-                entry.userName = $"<color=blue>{entry.userName}</color>";
+                entry.userName = $"<color=blue>{entry.userID}</color>";
             }
 
             result = "<size=90%>" + entry.userID.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";

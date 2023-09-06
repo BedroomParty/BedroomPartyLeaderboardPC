@@ -42,7 +42,11 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIAction("playerUsernameCLICK")]
         public void playerUsernameCLICK()
         {
-            if (string.IsNullOrEmpty(_playerUtils.localPlayerInfo.userID)) return;
+            if (string.IsNullOrEmpty(_playerUtils.localPlayerInfo.userID))
+            {
+                return;
+            }
+
             Application.OpenURL($"https://thebedroom.party/?user={_playerUtils.localPlayerInfo.userID}");
         }
     }

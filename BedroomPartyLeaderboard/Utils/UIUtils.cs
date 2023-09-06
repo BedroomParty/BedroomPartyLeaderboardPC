@@ -59,7 +59,7 @@ namespace BedroomPartyLeaderboard.Utils
             for (int i = leaderboard.Count; i <= 10; i++)
             {
                 _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
-                _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(false);
+                _leaderboardView._ImageHolders[i].profileImage.sprite = null;
             }
         }
 
