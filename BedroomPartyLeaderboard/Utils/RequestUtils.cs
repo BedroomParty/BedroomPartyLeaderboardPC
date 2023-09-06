@@ -1,5 +1,6 @@
 ﻿using BedroomPartyLeaderboard.UI.Leaderboard;
 using IPA.Utilities.Async;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -18,18 +19,15 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly PanelView _panelView;
         [Inject] private readonly PlayerUtils _playerUtils;
-        private async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
+        public async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
             using (var httpClient = new HttpClient())
             {
                 try
                 {
-                    Plugin.Log.Info("getLBDownloadJSON");
                     string requestString = getLBDownloadJSON(balls, page, _leaderboardView.sortMethod);
 
-                    Plugin.Log.Info("GetAsync");
                     HttpResponseMessage response = await httpClient.GetAsync(requestString);
-                    Plugin.Log.Info("GetAsync SUCCESS FUCK");
 
 
 
@@ -44,20 +42,16 @@ namespace BedroomPartyLeaderboard.Utils
                     }
 
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    JObject jsonObject = JObject.Parse(jsonResponse);
 
-                    Plugin.Log.Info(jsonResponse);
 
-                    if (jsonObject.TryGetValue("scoreCount", out JToken scoreCountToken)) scorecount = scoreCountToken.Value<int>();
-                    else scorecount = 0;
+                    LeaderboardData.BPLeaderboard leaderboardData = JsonConvert.DeserializeObject<LeaderboardData.BPLeaderboard>(jsonResponse);
 
+                    scorecount = leaderboardData.scoreCount;
                     totalPages = Mathf.CeilToInt((float)scorecount / 10);
 
-                    if (jsonObject.TryGetValue("scores", out JToken scoresToken) && scoresToken is JArray scoresArray && scoresArray.Count > 0) data = _leaderboardData.LoadBeatMapInfo(scoresArray);
-                    else data = new List<LeaderboardData.LeaderboardEntry>();
+                    data = leaderboardData.scores;
 
-                    Plugin.Log.Info("BEFORE CALLBACK");
-                    callback((response.IsSuccessStatusCode, data, totalPages));
+                    callback((true, data, totalPages));
                     return;
                 }
                 catch (HttpRequestException e)

@@ -8,8 +8,6 @@ using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
-using ModestTree;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
@@ -190,7 +188,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     _playerUtils.LoginUser();
-                    
+
                 });
             }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
@@ -242,11 +240,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
             {
                 HelloIMGLoader();
-
-                foreach (var item in result.Item2)
-                {
-                    Plugin.Log.Info(item.userID);
-                }
 
                 if (result.Item2 != null)
                 {
@@ -304,7 +297,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
             string result;
             if (entry.userID == "3033139560125578") entry.userName = $"<color=blue>{entry.userName}</color>";
-            result = "<size=90%>" + entry.userName.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";
+            result = "<size=90%>" + entry.userID.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";
             return new ScoreData(score, result, entry.rank, false);
         }
 

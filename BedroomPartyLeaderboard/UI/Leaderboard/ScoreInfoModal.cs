@@ -76,7 +76,7 @@ namespace BedroomPartyLeaderboard.UI
             TimeSpan relativeTime = TimeUtils.GetRelativeTime(entry.timestamp.ToString());
             dateScoreText.text = string.Format("<size=4.8><color=white>{0}</color></size>", TimeUtils.GetRelativeTimeString(relativeTime));
 
-            usernameScoreText.text = $"<size=180%>{entry.userName}</color>";
+            usernameScoreText.text = $"<size=180%>{entry.userID}</color>";
             usernameScoreText.richText = true;
 
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc.ToString("F2")}%</color></size>";
@@ -98,7 +98,7 @@ namespace BedroomPartyLeaderboard.UI
                 int position = (entry.rank % 10) - 1;
                 _leaderboardView.StartCoroutine(SetProfileImageModal(position, profileImageModal));
 
-                if (Task.Run(() =>  Constants.isStaff(entry.userID)).Result)
+                if (Task.Run(() => Constants.isStaff(entry.userID)).Result)
                 {
                     RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
                     rainbowAnimation.speed = 0.4f;

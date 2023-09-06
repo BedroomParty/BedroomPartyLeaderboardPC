@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
-using Random = System.Random;
 
 namespace BedroomPartyLeaderboard.Utils
 {
@@ -34,11 +31,11 @@ namespace BedroomPartyLeaderboard.Utils
         public static async Task<bool> isStaff(string uwu)
         {
             using (var httpClient = new HttpClient())
-            if (staffIDs == null)
-            {
-                string a = await httpClient.GetStringAsync("https://api.thebedroom.party/staff");
+                if (staffIDs == null)
+                {
+                    string a = await httpClient.GetStringAsync("https://api.thebedroom.party/staff");
                     staffIDs = a.Split(',');
-            }
+                }
             return staffIDs.Contains(uwu); // we do not talk about it :clueless:
         }
 

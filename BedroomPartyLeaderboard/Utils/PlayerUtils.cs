@@ -124,10 +124,10 @@ namespace BedroomPartyLeaderboard.Utils
                     _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                     string responseContent = await response.Content.ReadAsStringAsync();
-                    Plugin.Log.Info(responseContent);
                     JObject jsonResponse = JObject.Parse(responseContent);
 
-                    if(jsonResponse.TryGetValue("sessionKey", out JToken silly)){
+                    if (jsonResponse.TryGetValue("sessionKey", out JToken silly))
+                    {
                         localPlayerInfo.tempKey = silly.Value<string>();
                     }
                     else
@@ -196,7 +196,6 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.playerAvatar.SetImage("https://cdn.assets.beatleader.xyz/76561199077754911R34.png");
                     _panelView.playerAvatarLoading.gameObject.SetActive(false);
 
-                    Plugin.Log.Info(localPlayerInfo.userID);
                     if (Task.Run(() => Constants.isStaff(localPlayerInfo.userID)).Result)
                     {
                         RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
