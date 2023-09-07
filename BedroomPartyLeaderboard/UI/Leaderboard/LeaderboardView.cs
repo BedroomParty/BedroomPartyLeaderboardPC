@@ -326,7 +326,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 int rank = int.Parse(page.ToString()[0] + (i + 1).ToString());
                 tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score, rank));
                 buttonEntryArray[i] = leaderboard[i];
-                Buttonholders[i].infoButton.gameObject.SetActive(true);
+                Buttonholders[i].infoButton.gameObject.SetActive(false);
             }
             return tableData;
         }

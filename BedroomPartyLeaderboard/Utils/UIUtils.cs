@@ -4,6 +4,7 @@ using BeatSaberMarkupLanguage.Components;
 using BedroomPartyLeaderboard.UI.Leaderboard;
 using HMUI;
 using IPA.Utilities;
+using OVR.OpenVR;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -11,6 +12,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.XR;
 using Zenject;
 
 namespace BedroomPartyLeaderboard.Utils
@@ -53,7 +55,12 @@ namespace BedroomPartyLeaderboard.Utils
         {
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                if (leaderboard[i] == null || leaderboard[i].userName == "null") return;
+                if (leaderboard[i] == null || leaderboard[i].userName == "null")
+                {
+                    _leaderboardView._ImageHolders[i].profileImage.sprite = null;
+                    _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                    return;
+                }
                 _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
                 _leaderboardView._ImageHolders[i].setProfileImage($"https://api.thebedroom.party/user/{leaderboard[i].userID}/avatar");
             }
@@ -74,7 +81,6 @@ namespace BedroomPartyLeaderboard.Utils
             }
             _panelView.playerAvatar.material = mat;
             _leaderboardView.scoreInfoModal.profileImageModal.material = mat;
-
         }
 
         private Material FindCoolMaterial()
@@ -129,22 +135,43 @@ namespace BedroomPartyLeaderboard.Utils
                 Vector2 newPosition = new(normalAnchor.x + 2.5f, 0f);
                 nameText.rectTransform.anchoredPosition = newPosition;
 
-
                 // TODO: everything
                 cell.interactable = true;
                 ButtonHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
                 CellClicker clicky = cell.gameObject.AddComponent<CellClicker>();
                 clicky.onClick = buttonHolder.infoClick;
-
+                clicky.index = cell.idx;
+                clicky.seperator = seperator;
             }
         }
 
-        public class CellClicker : MonoBehaviour, IPointerClickHandler
+        public class CellClicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
         {
             public Action onClick;
+
+            public int index;
+
+            public ImageView seperator;
+
             public void OnPointerClick(PointerEventData data)
             {
                 onClick();
+            }
+
+            public void OnPointerEnter(PointerEventData eventData)
+            {
+                seperator.transform.localScale = new Vector3(seperator.transform.localScale.x, seperator.transform.localScale.y * 2f, seperator.transform.localScale.z);
+                seperator.color = Color.white;
+                seperator.color0 = Color.white;
+                seperator.color1 = new Color(1, 1, 1, 0);
+            }
+
+            public void OnPointerExit(PointerEventData eventData)
+            {
+                seperator.transform.localScale = new Vector3(seperator.transform.localScale.x, seperator.transform.localScale.y / 2f, seperator.transform.localScale.z);
+                seperator.color = Constants.BP_COLOR2;
+                seperator.color0 = Color.white;
+                seperator.color1 = new Color(1, 1, 1, 0);
             }
         }
 
@@ -192,7 +219,6 @@ namespace BedroomPartyLeaderboard.Utils
             [UIAction("infoClick")]
             public void infoClick()
             {
-                Plugin.Log.Info("hello");
                 onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
             }
         }
