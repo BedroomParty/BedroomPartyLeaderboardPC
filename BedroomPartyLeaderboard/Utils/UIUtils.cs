@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
@@ -132,7 +133,18 @@ namespace BedroomPartyLeaderboard.Utils
                 // TODO: everything
                 cell.interactable = true;
                 ButtonHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
-                cell.gameObject.GetComponent<Button>().onClick.AddListener(buttonHolder.infoClick);
+                CellClicker clicky = cell.gameObject.AddComponent<CellClicker>();
+                clicky.onClick = buttonHolder.infoClick;
+
+            }
+        }
+
+        public class CellClicker : MonoBehaviour, IPointerClickHandler
+        {
+            public Action onClick;
+            public void OnPointerClick(PointerEventData data)
+            {
+                onClick();
             }
         }
 
@@ -180,6 +192,7 @@ namespace BedroomPartyLeaderboard.Utils
             [UIAction("infoClick")]
             public void infoClick()
             {
+                Plugin.Log.Info("hello");
                 onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
             }
         }
