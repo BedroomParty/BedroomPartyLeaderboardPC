@@ -74,18 +74,11 @@ namespace BedroomPartyLeaderboard.Utils
 
         private async Task UploadLeaderboardData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback, int multipliedScore, int modifiedScore)
         {
-            Plugin.Log.Info("UPLOADD BEGIN");
             using HttpClient httpClient = new();
             int x = 0;
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
             _panelView.promptText.text = "Uploading Score...";
-            Plugin.Log.Info($"HASH: {balls.Item1}");
-            Plugin.Log.Info($"DIFF: {balls.Item2}");
-            Plugin.Log.Info($"CHAR: {balls.Item3}");
-            Plugin.Log.Info($"userID: {userID}");
-            Plugin.Log.Info($"usernamer: {username}");
-            Plugin.Log.Info($"TEMP KEY: {_playerUtils.localPlayerInfo.tempKey}");
             while (x < 3)
             {
                 try
@@ -97,10 +90,8 @@ namespace BedroomPartyLeaderboard.Utils
                     string requestBody = getLBUploadJSON(balls, userID, badCuts, misses, fullCOmbo, acc, mods, modifiedScore, multipliedScore);
 
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
-                    Plugin.Log.Info("post BEGIN");
 
                     HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(balls.Item1), content);
-                    Plugin.Log.Info("yippee");
 
                     if (response.StatusCode == HttpStatusCode.Conflict)
                     {
@@ -115,7 +106,6 @@ namespace BedroomPartyLeaderboard.Utils
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        Plugin.Log.Info("OKAY");
                         string jsonResponse = await response.Content.ReadAsStringAsync();
                         callback(response.IsSuccessStatusCode);
                         _panelView.prompt_loader.SetActive(false);
@@ -159,7 +149,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 { "difficulty", balls.Item2 },
                 { "characteristic", balls.Item3 },
-                { "id", long.Parse(userID) },
+                { "id", userID },
                 { "badCuts", badCuts },
                 { "misses", misses },
                 { "fullCombo", fullCOmbo },

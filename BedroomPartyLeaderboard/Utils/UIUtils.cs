@@ -4,15 +4,12 @@ using BeatSaberMarkupLanguage.Components;
 using BedroomPartyLeaderboard.UI.Leaderboard;
 using HMUI;
 using IPA.Utilities;
-using OVR.OpenVR;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.XR;
 using Zenject;
 
 namespace BedroomPartyLeaderboard.Utils
@@ -135,23 +132,39 @@ namespace BedroomPartyLeaderboard.Utils
                 Vector2 newPosition = new(normalAnchor.x + 2.5f, 0f);
                 nameText.rectTransform.anchoredPosition = newPosition;
 
-                // TODO: everything
                 cell.interactable = true;
                 ButtonHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
                 CellClicker clicky = cell.gameObject.AddComponent<CellClicker>();
                 clicky.onClick = buttonHolder.infoClick;
                 clicky.index = cell.idx;
                 clicky.seperator = seperator;
+
+                /*
+                if(currentRichedCell == 9)
+                {
+                    var silly = GameObject.Instantiate<ImageView>(seperator, _leaderboardView.leaderboardTransform);
+                    silly.transform.position = seperator.transform.position;
+                    silly.transform.localPosition = seperator.transform.localPosition;
+                    silly.transform.localPosition += new Vector3(0, -6.04f, 0);
+                }
+                */
+
+                currentRichedCell++;
             }
         }
 
         public class CellClicker : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
         {
             public Action onClick;
-
             public int index;
-
             public ImageView seperator;
+            private Vector3 originalScale;
+            private bool isScaled = false;
+
+            private void Start()
+            {
+                originalScale = seperator.transform.localScale;
+            }
 
             public void OnPointerClick(PointerEventData data)
             {
@@ -160,7 +173,11 @@ namespace BedroomPartyLeaderboard.Utils
 
             public void OnPointerEnter(PointerEventData eventData)
             {
-                seperator.transform.localScale = new Vector3(seperator.transform.localScale.x, seperator.transform.localScale.y * 2f, seperator.transform.localScale.z);
+                if (!isScaled)
+                {
+                    seperator.transform.localScale = originalScale * 1.8f;
+                    isScaled = true;
+                }
                 seperator.color = Color.white;
                 seperator.color0 = Color.white;
                 seperator.color1 = new Color(1, 1, 1, 0);
@@ -168,12 +185,23 @@ namespace BedroomPartyLeaderboard.Utils
 
             public void OnPointerExit(PointerEventData eventData)
             {
-                seperator.transform.localScale = new Vector3(seperator.transform.localScale.x, seperator.transform.localScale.y / 2f, seperator.transform.localScale.z);
+                if (isScaled)
+                {
+                    seperator.transform.localScale = originalScale;
+                    isScaled = false;
+                }
                 seperator.color = Constants.BP_COLOR2;
                 seperator.color0 = Color.white;
                 seperator.color1 = new Color(1, 1, 1, 0);
             }
+
+            private void OnDestroy()
+            {
+                onClick = null;
+            }
         }
+
+
 
         public class ImageHolder
         {

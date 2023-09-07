@@ -9,6 +9,7 @@ using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -33,6 +34,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         public IDifficultyBeatmap currentDifficultyBeatmap;
         public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
+        private CancellationTokenSource cancellationTokenSource;
+
 
         private string currentSongLinkLBWebView = string.Empty;
         public static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
@@ -42,7 +45,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         private readonly LeaderboardTableView leaderboardTableView = null;
 
         [UIComponent("leaderboardTableView")]
-        private readonly Transform leaderboardTransform = null;
+        public readonly Transform leaderboardTransform = null;
 
         [UIComponent("myHeader")]
         private readonly Backgroundable myHeader;
@@ -207,7 +210,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     Task.Run(() => _playerUtils.LoginUserAsync());
-
+                    _uiUtils.GetCoolMaterialAndApply();
                 });
             }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
@@ -234,17 +237,33 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
         {
             currentDifficultyBeatmap = difficultyBeatmap;
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap));
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+            }
+            cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap, cancellationToken));
         }
 
-        private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
+
+        private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap, CancellationToken cancellationToken)
         {
             if (!_plvc || !_plvc.isActiveAndEnabled)
             {
                 return;
             }
 
-            await Task.Delay(1);
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+            }
+            cancellationTokenSource = new CancellationTokenSource();
+            cancellationToken = cancellationTokenSource.Token;
+
             SetErrorState(false, "");
             leaderboardTableView.SetScores(null, -1);
             loadingLB.gameObject.SetActive(true);
@@ -254,7 +273,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             if (!_playerUtils.IsAuthed)
             {
                 await Task.Delay(2000);
-                if(!_playerUtils.IsAuthed)
+                if (!_playerUtils.IsAuthed)
                 {
                     SetErrorState(true, "Failed to Auth");
                     return;
@@ -263,13 +282,27 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
             SetErrorState(false, "");
 
-            await Task.Delay(500);
+            await Task.Delay(400);
 
             string mapId = difficultyBeatmap.level.levelID.Substring(13);
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
             currentSongLinkLBWebView = $"https://thebedroom.party/?board={balls}";
+
+            await Task.Delay(50);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                SetErrorState(false, "");
+                loadingLB.gameObject.SetActive(true);
+                ByeIMGLoader();
+                leaderboardTableView.SetScores(null, -1);
+                return;
+            }
+
+
+            await Task.Delay(50);
             _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
             {
                 totalPages = result.Item3;
@@ -285,6 +318,14 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     }
                     else
                     {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            SetErrorState(false, "");
+                            loadingLB.gameObject.SetActive(true);
+                            ByeIMGLoader();
+                            leaderboardTableView.SetScores(null, -1);
+                            return;
+                        }
                         loadingLB.gameObject.SetActive(false);
                         leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
                         _uiUtils.RichMyText(leaderboardTableView);
@@ -299,7 +340,17 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     Plugin.Log.Error("Error");
                 }
             });
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                SetErrorState(false, "");
+                loadingLB.gameObject.SetActive(true);
+                ByeIMGLoader();
+                leaderboardTableView.SetScores(null, -1);
+                return;
+            }
         }
+
 
         private void ByeImages()
         {

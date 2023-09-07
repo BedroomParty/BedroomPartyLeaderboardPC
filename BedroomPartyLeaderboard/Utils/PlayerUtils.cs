@@ -103,7 +103,6 @@ namespace BedroomPartyLeaderboard.Utils
             PlayerInfo _localPlayerInfo = await GetPlayerInfoAsync();
             localPlayerInfo = _localPlayerInfo;
             _panelView.playerUsername.text = localPlayerInfo.username;
-            _uiUtils.GetCoolMaterialAndApply();
 
             using HttpClient httpClient = new();
             int x = 0;
@@ -164,6 +163,18 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 await GetAuthAsync();
                 currentlyAuthing = false;
+                if (_leaderboardView.currentDifficultyBeatmap != null)
+                {
+                    _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                    _leaderboardView.UpdatePageButtons();
+                }
+                _panelView.prompt_loader.SetActive(false);
+                _panelView.promptText.text = $"<color=green>Successfully signed in!</color>";
+                _panelView.playerAvatar.SetImage($"https://api.thebedroom.party/user/{localPlayerInfo.userID}/avatar");
+                _panelView.playerAvatarLoading.gameObject.SetActive(false);
+                _panelView.promptText.gameObject.SetActive(false);
+                _panelView.prompt_loader.SetActive(false);
+                await Task.Delay(5000);
             }
             catch (Exception e)
             {
@@ -180,15 +191,7 @@ namespace BedroomPartyLeaderboard.Utils
                 await GetAuthStatusAsync();
                 if (_isAuthed)
                 {
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = $"<color=green>Successfully signed in!</color>";
-                    if (_leaderboardView.currentDifficultyBeatmap != null)
-                    {
-                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
-                        _leaderboardView.UpdatePageButtons();
-                    }
-                    _panelView.playerAvatar.SetImage($"https://api.thebedroom.party/user/{localPlayerInfo.userID}/avatar");
-                    _panelView.playerAvatarLoading.gameObject.SetActive(false);
+
 
                     if (await Task.Run(() => Constants.isStaff(localPlayerInfo.userID)))
                     {
@@ -204,9 +207,6 @@ namespace BedroomPartyLeaderboard.Utils
                         }
                         _panelView.playerUsername.color = Color.white;
                     }
-                    await Task.Delay(2000);
-                    _panelView.promptText.gameObject.SetActive(false);
-                    _panelView.prompt_loader.SetActive(false);
                 }
                 else
                 {
