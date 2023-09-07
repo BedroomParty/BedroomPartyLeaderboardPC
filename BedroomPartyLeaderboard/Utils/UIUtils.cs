@@ -128,6 +128,8 @@ namespace BedroomPartyLeaderboard.Utils
                 Vector2 newPosition = new(normalAnchor.x + 2.5f, 0f);
                 nameText.rectTransform.anchoredPosition = newPosition;
 
+
+                // TODO: everything
                 cell.interactable = true;
                 ButtonHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
                 cell.gameObject.GetComponent<Button>().onClick.AddListener(buttonHolder.infoClick);
