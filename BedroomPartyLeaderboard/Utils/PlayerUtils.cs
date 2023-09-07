@@ -92,6 +92,7 @@ namespace BedroomPartyLeaderboard.Utils
                     taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
                     return taskCompletionSource.Task;
                 }
+                playerId = sillyvar[1];
                 authKey = sillyvar[0];
             }
             else
@@ -121,7 +122,7 @@ namespace BedroomPartyLeaderboard.Utils
         {
             JObject user = new()
             {
-                { "id", userID },
+                { "id", long.Parse(userID) },
             };
 
             return user.ToString();
@@ -138,7 +139,7 @@ namespace BedroomPartyLeaderboard.Utils
                 _isAuthed = false;
                 return;
             }
-            using HttpClient httpClient = Plugin.httpClient;
+            using HttpClient httpClient = new();
             int x = 0;
             while (x < 3)
             {
@@ -197,11 +198,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 await GetAuthAsync();
                 currentlyAuthing = false;
-                if (_leaderboardView.currentDifficultyBeatmap != null)
-                {
-                    _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
-                    _leaderboardView.UpdatePageButtons();
-                }
+
                 _panelView.prompt_loader.SetActive(false);
                 _panelView.promptText.text = $"<color=green>Successfully signed in!</color>";
                 _panelView.playerAvatar.SetImage($"https://api.thebedroom.party/user/{localPlayerInfo.userID}/avatar");
@@ -225,9 +222,12 @@ namespace BedroomPartyLeaderboard.Utils
                 await GetAuthStatusAsync();
                 if (_isAuthed)
                 {
-
-
-                    if (await Task.Run(() => Constants.isStaff(localPlayerInfo.userID)))
+                    if (_leaderboardView.currentDifficultyBeatmap != null)
+                    {
+                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                        _leaderboardView.UpdatePageButtons();
+                    }
+                    if (Task.Run(() => Constants.isStaff(localPlayerInfo.userID).Result).Result)
                     {
                         RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
                         rainbowAnimation.speed = 0.35f;

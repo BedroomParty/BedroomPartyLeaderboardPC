@@ -29,8 +29,8 @@ namespace BedroomPartyLeaderboard.Utils
 
         public const string STEAM_API_PATH = "./Beat Saber_Data/Plugins/x86_64/steam_api64.dll";
 
-        public static Color BP_COLOR = new(123f / 255f, 39 / 255f, 81f / 255f);
-        public static Color BP_COLOR2 = new(252f / 255, 208f / 255f, 185f / 255f);
+        public static Color BP_COLOR = new(0.674509804f, 0.760784314f, 0.850980392f);
+        public static Color BP_COLOR2 = new(0.839215686f, 0.705882353f, 0.988235294f);
 
         public static string[] staffIDs = null;
         public const string BUG_REPORT_LINK = "https://thebedroom.party/?bugreports";
