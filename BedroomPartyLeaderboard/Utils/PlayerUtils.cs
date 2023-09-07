@@ -92,7 +92,7 @@ namespace BedroomPartyLeaderboard.Utils
         {
             JObject user = new()
             {
-                { "id", long.Parse(userID) },
+                { "id", userID },
             };
 
             return user.ToString();
