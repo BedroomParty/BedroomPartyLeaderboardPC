@@ -83,9 +83,38 @@ namespace BedroomPartyLeaderboard.Utils
                     });
                 });
             }
-            authKey = File.ReadAllText(Constants.API_KEY_PATH);
+            if (NullCheckFilePath(Constants.API_KEY_PATH))
+            {
+                string[] sillyvar = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
+                if (sillyvar[1] != playerId)
+                {
+                    // the player id in the file doesn't match the current player id, so we can't auth
+                    taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
+                    return taskCompletionSource.Task;
+                }
+                authKey = sillyvar[0];
+            }
+            else
+            {
+                // no file exists, so we can't auth
+                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
+                return taskCompletionSource.Task;
+            }
+
+            // if we get here, we have a valid auth key
             taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, authKey, ""));
             return taskCompletionSource.Task;
+        }
+
+
+        private bool NullCheckFilePath(string path)
+        {
+            if (!File.Exists(path))
+            {
+                Directory.CreateDirectory(path.Substring(0, path.LastIndexOf('/')));
+                return false;
+            }
+            return true;
         }
 
         private string GetLoginString(string userID)
@@ -104,7 +133,12 @@ namespace BedroomPartyLeaderboard.Utils
             localPlayerInfo = _localPlayerInfo;
             _panelView.playerUsername.text = localPlayerInfo.username;
 
-            using HttpClient httpClient = new();
+            if(localPlayerInfo.authKey == null)
+            {
+                _isAuthed = false;
+                return;
+            }
+            using HttpClient httpClient = Plugin.httpClient;
             int x = 0;
             while (x < 3)
             {

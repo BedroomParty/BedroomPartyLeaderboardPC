@@ -19,6 +19,7 @@ namespace BedroomPartyLeaderboard
             Log = logger;
             zenjector.Install<MenuInstaller>(Location.Menu);
             httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "BedroomPartyLeaderboard-Mod/PC");
         }
     }
 }

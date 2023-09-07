@@ -21,7 +21,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly PlayerUtils _playerUtils;
         public async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
-            using HttpClient httpClient = new();
+            using HttpClient httpClient = Plugin.httpClient;
             try
             {
                 string requestString = getLBDownloadJSON(balls, page, _leaderboardView.sortMethod);
@@ -74,7 +74,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         private async Task UploadLeaderboardData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback, int multipliedScore, int modifiedScore)
         {
-            using HttpClient httpClient = new();
+            using HttpClient httpClient = Plugin.httpClient;
             int x = 0;
             _panelView.prompt_loader.SetActive(true);
             _panelView.promptText.gameObject.SetActive(true);
