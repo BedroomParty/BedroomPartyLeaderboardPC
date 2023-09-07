@@ -245,6 +245,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             }
 
             await Task.Delay(1);
+            SetErrorState(false, "");
             leaderboardTableView.SetScores(null, -1);
             loadingLB.gameObject.SetActive(true);
             FuckOffButtons();
@@ -252,17 +253,15 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
             if (!_playerUtils.IsAuthed)
             {
-                SetErrorState(true, "Failed to Auth");
-                return;
+                await Task.Delay(2000);
+                if(!_playerUtils.IsAuthed)
+                {
+                    SetErrorState(true, "Failed to Auth");
+                    return;
+                }
             }
 
             SetErrorState(false, "");
-
-
-            if (!_plvc || !_plvc.isActiveAndEnabled)
-            {
-                return;
-            }
 
             await Task.Delay(500);
 

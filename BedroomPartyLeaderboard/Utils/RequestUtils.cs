@@ -157,7 +157,6 @@ namespace BedroomPartyLeaderboard.Utils
         {
             JObject Data = new()
             {
-                { "hash", balls.Item1 },
                 { "difficulty", balls.Item2 },
                 { "characteristic", balls.Item3 },
                 { "id", long.Parse(userID) },
