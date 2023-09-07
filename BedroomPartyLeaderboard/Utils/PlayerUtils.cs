@@ -158,6 +158,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         public async Task GetAuthStatusAsync()
         {
+            _leaderboardView.SetErrorState(false, "");
             currentlyAuthing = true;
             try
             {
