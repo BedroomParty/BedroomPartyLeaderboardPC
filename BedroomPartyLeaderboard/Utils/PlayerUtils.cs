@@ -85,6 +85,7 @@ namespace BedroomPartyLeaderboard.Utils
             }
             if (NullCheckFilePath(Constants.API_KEY_PATH))
             {
+                Plugin.Log.Info("FILE NOT FOUND");
                 string[] sillyvar = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
                 if (sillyvar[1] != playerId)
                 {
@@ -97,10 +98,13 @@ namespace BedroomPartyLeaderboard.Utils
             }
             else
             {
+                Plugin.Log.Info("FILE NOT FOUND");
                 // no file exists, so we can't auth
                 taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
                 return taskCompletionSource.Task;
             }
+
+            Plugin.Log.Info("SUCCESS SCARY FILE");
 
             // if we get here, we have a valid auth key
             taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, authKey, ""));
@@ -122,7 +126,7 @@ namespace BedroomPartyLeaderboard.Utils
         {
             JObject user = new()
             {
-                { "id", long.Parse(userID) },
+                { "id", userID },
             };
 
             return user.ToString();
@@ -136,6 +140,7 @@ namespace BedroomPartyLeaderboard.Utils
 
             if(localPlayerInfo.authKey == null)
             {
+                Plugin.Log.Info("AUTH KEY NULL");
                 _isAuthed = false;
                 return;
             }
@@ -155,11 +160,13 @@ namespace BedroomPartyLeaderboard.Utils
                     _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                     string responseContent = await response.Content.ReadAsStringAsync();
+                    Plugin.Log.Info($"{responseContent}");  
                     JObject jsonResponse = JObject.Parse(responseContent);
 
                     if (jsonResponse.TryGetValue("sessionKey", out JToken silly))
                     {
                         localPlayerInfo.tempKey = silly.Value<string>();
+                        Plugin.Log.Info("TEMP KEY");
                     }
                     else
                     {

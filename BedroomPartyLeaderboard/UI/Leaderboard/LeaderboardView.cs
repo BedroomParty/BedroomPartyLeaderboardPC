@@ -373,7 +373,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             for (int i = 0; i < leaderboard.Count; i++)
             {
                 int score = leaderboard[i].modifiedScore;
-                int rank = int.Parse(page.ToString()[0] + (i + 1).ToString());
+                int rank = ((page + 1) * 10) - (10 - i);
                 tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score, rank));
                 buttonEntryArray[i] = leaderboard[i];
                 Buttonholders[i].infoButton.gameObject.SetActive(false);
