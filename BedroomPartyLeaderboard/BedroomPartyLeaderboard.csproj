@@ -87,11 +87,6 @@
       <HintPath>$(BeatSaberDir)\Plugins\SongCore.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="SteamVR">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\SteamVR.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="Steamworks.NET">
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Steamworks.NET.dll</HintPath>
       <Private>False</Private>

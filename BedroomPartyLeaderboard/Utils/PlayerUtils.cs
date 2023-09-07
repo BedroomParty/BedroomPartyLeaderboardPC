@@ -105,7 +105,7 @@ namespace BedroomPartyLeaderboard.Utils
             _panelView.playerUsername.text = localPlayerInfo.username;
             _uiUtils.GetCoolMaterialAndApply();
 
-            using HttpClient httpClient = Plugin.httpClient;
+            using HttpClient httpClient = new();
             int x = 0;
             while (x < 3)
             {

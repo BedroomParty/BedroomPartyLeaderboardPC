@@ -57,7 +57,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [Inject] public List<ImageHolder> _ImageHolders;
 
         [UIValue("buttonHolders")]
-        [Inject] private readonly List<ButtonHolder> Buttonholders;
+        [Inject] public List<ButtonHolder> Buttonholders;
 
         [UIComponent("scoreInfoModal")]
         [Inject] public readonly ScoreInfoModal scoreInfoModal;
@@ -206,7 +206,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 _panelView.promptText.text = "Authenticating...";
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
-                    _playerUtils.LoginUserAsync();
+                    Task.Run(() => _playerUtils.LoginUserAsync());
 
                 });
             }

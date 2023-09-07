@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Zenject;
 
@@ -102,6 +103,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         private bool obtainedAnchor = false;
         private Vector2 normalAnchor = Vector2.zero;
+        private int currentRichedCell = 0;
         public void RichMyText(LeaderboardTableView tableView)
         {
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
@@ -125,8 +127,13 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 Vector2 newPosition = new(normalAnchor.x + 2.5f, 0f);
                 nameText.rectTransform.anchoredPosition = newPosition;
+
+                cell.interactable = true;
+                ButtonHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
+                cell.gameObject.GetComponent<Button>().onClick.AddListener(buttonHolder.infoClick);
             }
         }
+
         public class ImageHolder
         {
             private readonly int index;
@@ -156,8 +163,8 @@ namespace BedroomPartyLeaderboard.Utils
 
         internal class ButtonHolder
         {
-            private readonly int index;
-            private readonly Action<LeaderboardData.LeaderboardEntry> onClick;
+            public int index;
+            public Action<LeaderboardData.LeaderboardEntry> onClick;
 
             public ButtonHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
             {
@@ -169,7 +176,7 @@ namespace BedroomPartyLeaderboard.Utils
             public Button infoButton;
 
             [UIAction("infoClick")]
-            private void infoClick()
+            public void infoClick()
             {
                 onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
             }
