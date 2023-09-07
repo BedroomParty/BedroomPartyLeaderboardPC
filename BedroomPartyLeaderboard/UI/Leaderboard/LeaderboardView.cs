@@ -206,7 +206,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 _panelView.promptText.text = "Authenticating...";
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
-                    _playerUtils.LoginUser();
+                    _playerUtils.LoginUserAsync();
 
                 });
             }

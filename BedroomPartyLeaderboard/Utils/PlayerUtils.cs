@@ -26,7 +26,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         public bool currentlyAuthing;
 
-        private async Task<PlayerInfo> GetSteamInfo()
+        private async Task<PlayerInfo> GetSteamInfoAsync()
         {
             await WaitUntil(() => SteamManager.Initialized);
 
@@ -42,7 +42,7 @@ namespace BedroomPartyLeaderboard.Utils
             return steamInfo;
         }
 
-        public Task<PlayerInfo> GetPlayerInfo()
+        public Task<PlayerInfo> GetPlayerInfoAsync()
         {
             TaskCompletionSource<PlayerInfo> taskCompletionSource = new();
             string playerId = "";
@@ -51,7 +51,7 @@ namespace BedroomPartyLeaderboard.Utils
 
             if (File.Exists(Constants.STEAM_API_PATH))
             {
-                PlayerInfo silly = Task.Run(() => GetSteamInfo()).Result;
+                PlayerInfo silly = Task.Run(() => GetSteamInfoAsync()).Result;
                 playerId = silly.userID;
                 playerName = silly.username;
             }
@@ -88,7 +88,7 @@ namespace BedroomPartyLeaderboard.Utils
             return taskCompletionSource.Task;
         }
 
-        private string GetLoginString(string userID, string apiKey)
+        private string GetLoginString(string userID)
         {
             JObject user = new()
             {
@@ -98,14 +98,14 @@ namespace BedroomPartyLeaderboard.Utils
             return user.ToString();
         }
 
-        private async Task GetAuth(Action<bool> callback)
+        private async Task GetAuthAsync()
         {
-            PlayerInfo _localPlayerInfo = await Task.Run(() => GetPlayerInfo());
+            PlayerInfo _localPlayerInfo = await GetPlayerInfoAsync();
             localPlayerInfo = _localPlayerInfo;
             _panelView.playerUsername.text = localPlayerInfo.username;
             _uiUtils.GetCoolMaterialAndApply();
 
-            using HttpClient httpClient = new();
+            using HttpClient httpClient = Plugin.httpClient;
             int x = 0;
             while (x < 3)
             {
@@ -114,7 +114,7 @@ namespace BedroomPartyLeaderboard.Utils
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", localPlayerInfo.authKey);
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                    string requestBody = GetLoginString(_localPlayerInfo.userID, _localPlayerInfo.authKey);
+                    string requestBody = GetLoginString(_localPlayerInfo.userID);
                     HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
                     HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
@@ -129,16 +129,13 @@ namespace BedroomPartyLeaderboard.Utils
                     }
                     else
                     {
-                        callback(false);
-                        _panelView.promptText.text = $"<color=red>Error Authenticating, RESTART GAME.</color>";
-                        return;
+                        throw new Exception("Error Authenticating, RESTART GAME.");
                     }
 
                     if (_isAuthed)
                     {
                         _panelView.prompt_loader.SetActive(false);
                         _panelView.promptText.gameObject.SetActive(false);
-                        callback(true);
                         return;
                     }
                     _panelView.promptText.text = $"<color=red>Error Authenticating... attempt {x + 1} of 3</color>";
@@ -155,32 +152,31 @@ namespace BedroomPartyLeaderboard.Utils
             }
             if (x < 2)
             {
-                callback(false);
+                throw new Exception("Error Authenticating.");
             }
         }
 
-
-        public async void GetAuthStatus(Action<bool> callback)
+        public async Task GetAuthStatusAsync()
         {
             currentlyAuthing = true;
             try
             {
-                await Task.Run(() => GetAuth(callback));
+                await GetAuthAsync();
                 currentlyAuthing = false;
             }
             catch (Exception e)
             {
                 Plugin.Log.Error(e);
                 currentlyAuthing = false;
-                _leaderboardView.SetErrorState(true, "Failed to Auth\nSpeecil is silly :3");
+                _leaderboardView.SetErrorState(true, "Failed to Auth");
             }
         }
 
-
-        public void LoginUser()
+        public async Task LoginUserAsync()
         {
-            Task.Run(() => GetAuthStatus(result =>
+            try
             {
+                await GetAuthStatusAsync();
                 if (_isAuthed)
                 {
                     _panelView.prompt_loader.SetActive(false);
@@ -193,7 +189,7 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.playerAvatar.SetImage($"https://api.thebedroom.party/user/{localPlayerInfo.userID}/avatar");
                     _panelView.playerAvatarLoading.gameObject.SetActive(false);
 
-                    if (Task.Run(() => Constants.isStaff(localPlayerInfo.userID)).Result)
+                    if (await Task.Run(() => Constants.isStaff(localPlayerInfo.userID)))
                     {
                         RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
                         rainbowAnimation.speed = 0.35f;
@@ -207,7 +203,7 @@ namespace BedroomPartyLeaderboard.Utils
                         }
                         _panelView.playerUsername.color = Color.white;
                     }
-                    Task.Delay(2000);
+                    await Task.Delay(2000);
                     _panelView.promptText.gameObject.SetActive(false);
                     _panelView.prompt_loader.SetActive(false);
                 }
@@ -216,8 +212,14 @@ namespace BedroomPartyLeaderboard.Utils
                     _panelView.promptText.text = "<color=red>Error Authenticating</color>";
                     _panelView.prompt_loader.SetActive(false);
                     Plugin.Log.Error("Not authenticated!");
+                    _leaderboardView.SetErrorState(true, "Failed to Auth");
                 }
-            }));
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.Error("LoginUserAsync failed: " + ex.Message);
+                _leaderboardView.SetErrorState(true, "Failed to Auth");
+            }
         }
 
         public struct PlayerInfo
@@ -236,7 +238,6 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-
         // from scoresaber yoink teehee
         public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
         {
@@ -248,8 +249,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             });
 
-            if (waitTask != await Task.WhenAny(waitTask,
-                    Task.Delay(timeout)))
+            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
             {
                 throw new TimeoutException();
             }
