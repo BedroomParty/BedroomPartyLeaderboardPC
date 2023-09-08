@@ -115,6 +115,16 @@ namespace BedroomPartyLeaderboard.UI
                     }
                     usernameScoreText.color = Color.white;
                 }
+
+                if (usernameScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
+                {
+                    UnityEngine.Object.Destroy(usernameScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>());
+                }
+                TextHoverEffect textHoverEffect = usernameScoreText.gameObject.AddComponent<UIUtils.TextHoverEffect>();
+                textHoverEffect.daComponent = usernameScoreText;
+                textHoverEffect.daStyle = FontStyles.Underline;
+                textHoverEffect.origStyle = FontStyles.Normal;
+
             });
         }
     }

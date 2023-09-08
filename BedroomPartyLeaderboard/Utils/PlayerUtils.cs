@@ -63,8 +63,8 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 // structure: authkey,playerid with no spaces and base64 encoded
                 string[] sillyvar = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
-                    playerId = sillyvar[1];
-                    authKey = sillyvar[0];
+                playerId = sillyvar[1];
+                authKey = sillyvar[0];
             }
             else
             {
@@ -73,7 +73,7 @@ namespace BedroomPartyLeaderboard.Utils
                 return taskCompletionSource.Task;
             }
 
-            if(playerId == "" || authKey == "")
+            if (playerId == "" || authKey == "")
             {
                 taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
                 return taskCompletionSource.Task;
@@ -113,7 +113,7 @@ namespace BedroomPartyLeaderboard.Utils
             localPlayerInfo = _localPlayerInfo;
             _panelView.playerUsername.text = localPlayerInfo.username;
 
-            if(localPlayerInfo.authKey == null)
+            if (localPlayerInfo.authKey == null)
             {
                 Plugin.Log.Info("AUTH KEY NULL");
                 _isAuthed = false;
@@ -135,7 +135,7 @@ namespace BedroomPartyLeaderboard.Utils
                     _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                     string responseContent = await response.Content.ReadAsStringAsync();
-                    Plugin.Log.Info($"{responseContent}");  
+                    Plugin.Log.Info($"{responseContent}");
                     JObject jsonResponse = JObject.Parse(responseContent);
 
                     if (jsonResponse.TryGetValue("sessionKey", out JToken silly))
@@ -203,25 +203,9 @@ namespace BedroomPartyLeaderboard.Utils
                 await GetAuthStatusAsync();
                 if (_isAuthed)
                 {
-                    if (_leaderboardView.currentDifficultyBeatmap != null)
-                    {
-                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
-                        _leaderboardView.UpdatePageButtons();
-                    }
-                    if (await Task.Run(() => Constants.isStaff(localPlayerInfo.userID).Result))
-                    {
-                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
-                        rainbowAnimation.speed = 0.35f;
-                    }
-                    else
-                    {
-                        RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.GetComponent<RainbowAnimation>();
-                        if (rainbowAnimation != null)
-                        {
-                            UnityEngine.Object.Destroy(rainbowAnimation);
-                        }
-                        _panelView.playerUsername.color = Color.white;
-                    }
+                    Task.Run(() => assignStaff());
+                    await WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
+                    _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                 }
                 else
                 {
@@ -235,6 +219,25 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 Plugin.Log.Error("LoginUserAsync failed: " + ex.Message);
                 _leaderboardView.SetErrorState(true, "Failed to Auth");
+            }
+        }
+
+
+        public async Task assignStaff()
+        {
+            if (await Task.Run(() => Constants.isStaff(localPlayerInfo.userID).Result))
+            {
+                RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
+                rainbowAnimation.speed = 0.35f;
+            }
+            else
+            {
+                RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.GetComponent<RainbowAnimation>();
+                if (rainbowAnimation != null)
+                {
+                    UnityEngine.Object.Destroy(rainbowAnimation);
+                }
+                _panelView.playerUsername.color = Color.white;
             }
         }
 

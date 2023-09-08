@@ -212,6 +212,10 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     Task.Run(() => _playerUtils.LoginUserAsync());
                     _uiUtils.GetCoolMaterialAndApply();
                 });
+                TextHoverEffect textHoverEffect = _panelView.playerUsername.gameObject.AddComponent<UIUtils.TextHoverEffect>();
+                textHoverEffect.daComponent = _panelView.playerUsername;
+                textHoverEffect.daStyle = FontStyles.Underline;
+                textHoverEffect.origStyle = FontStyles.Normal;
             }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
@@ -264,11 +268,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             cancellationTokenSource = new CancellationTokenSource();
             cancellationToken = cancellationTokenSource.Token;
 
-            SetErrorState(false, "");
-            leaderboardTableView.SetScores(null, -1);
-            loadingLB.gameObject.SetActive(true);
-            FuckOffButtons();
-            ByeImages();
+
 
             if (!_playerUtils.IsAuthed)
             {
@@ -281,8 +281,18 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             }
 
             SetErrorState(false, "");
+            leaderboardTableView.SetScores(null, -1);
+            loadingLB.gameObject.SetActive(true);
+            FuckOffButtons();
+            ByeImages();
 
-            await Task.Delay(400);
+            await Task.Delay(200);
+
+            SetErrorState(false, "");
+            leaderboardTableView.SetScores(null, -1);
+            loadingLB.gameObject.SetActive(true);
+            FuckOffButtons();
+            ByeImages();
 
             string mapId = difficultyBeatmap.level.levelID.Substring(13);
             int difficulty = difficultyBeatmap.difficultyRank;
@@ -300,7 +310,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 leaderboardTableView.SetScores(null, -1);
                 return;
             }
-
 
             await Task.Delay(50);
             _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>

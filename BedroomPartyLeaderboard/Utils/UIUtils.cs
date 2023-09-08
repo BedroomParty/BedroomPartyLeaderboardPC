@@ -107,7 +107,6 @@ namespace BedroomPartyLeaderboard.Utils
 
         private bool obtainedAnchor = false;
         private Vector2 normalAnchor = Vector2.zero;
-        private int currentRichedCell = 0;
         public void RichMyText(LeaderboardTableView tableView)
         {
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
@@ -140,16 +139,16 @@ namespace BedroomPartyLeaderboard.Utils
                 clicky.seperator = seperator;
 
                 /*
-                if(currentRichedCell == 9)
+                if (cell.idx == 9)
                 {
-                    var silly = GameObject.Instantiate<ImageView>(seperator, _leaderboardView.leaderboardTransform);
+                    ImageView silly = GameObject.Instantiate<Image>(seperator, _leaderboardView.leaderboardTransform) as ImageView;
                     silly.transform.position = seperator.transform.position;
                     silly.transform.localPosition = seperator.transform.localPosition;
-                    silly.transform.localPosition += new Vector3(0, -6.04f, 0);
+                    silly.transform.localPosition += new Vector3(0, -0.1f, 0);
+
+                    return;
                 }
                 */
-
-                currentRichedCell++;
             }
         }
 
@@ -201,7 +200,31 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
+        public class TextHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+        {
+            public TextMeshProUGUI daComponent;
+            private bool isScaled;
+            public FontStyles daStyle;
+            public FontStyles origStyle;
 
+            public void OnPointerEnter(PointerEventData eventData)
+            {
+                if (!isScaled)
+                {
+                    daComponent.fontStyle = daStyle;
+                    isScaled = true;
+                }
+            }
+
+            public void OnPointerExit(PointerEventData eventData)
+            {
+                if (isScaled)
+                {
+                    daComponent.fontStyle = origStyle;
+                    isScaled = false;
+                }
+            }
+        }
 
         public class ImageHolder
         {

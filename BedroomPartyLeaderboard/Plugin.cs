@@ -1,7 +1,6 @@
 ﻿using BedroomPartyLeaderboard.Installers;
 using IPA;
 using SiraUtil.Zenject;
-using System.Net.Http;
 using IPALogger = IPA.Logging.Logger;
 
 namespace BedroomPartyLeaderboard
