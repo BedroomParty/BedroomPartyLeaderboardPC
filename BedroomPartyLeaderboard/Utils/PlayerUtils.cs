@@ -42,6 +42,7 @@ namespace BedroomPartyLeaderboard.Utils
             return steamInfo;
         }
 
+        // this is a mess, but it works
         public Task<PlayerInfo> GetPlayerInfoAsync()
         {
             TaskCompletionSource<PlayerInfo> taskCompletionSource = new();
@@ -49,62 +50,47 @@ namespace BedroomPartyLeaderboard.Utils
             string playerName = "";
             string authKey = "";
 
+            bool crossRefernce = false;
+
+            // make it so that if the user is logged in with steam, we use their steam info
             if (File.Exists(Constants.STEAM_API_PATH))
             {
+                crossRefernce = true;
                 PlayerInfo silly = Task.Run(() => GetSteamInfoAsync()).Result;
                 playerId = silly.userID;
                 playerName = silly.username;
             }
-            else
-            {
-                Oculus.Platform.Users.GetLoggedInUser().OnComplete(user =>
-                {
-                    Oculus.Platform.Users.GetUserProof().OnComplete(userProofMessage =>
-                    {
-                        if (!userProofMessage.IsError)
-                        {
-                            Oculus.Platform.Users.GetAccessToken().OnComplete(authTokenMessage =>
-                            {
-                                if (!authTokenMessage.IsError)
-                                {
-                                    playerId = user.Data.ID.ToString();
-                                    playerName = user.Data.OculusID;
-                                }
-                                else
-                                {
-                                    taskCompletionSource.SetException(new Exception("Failed to get access token."));
-                                }
-                            });
-                        }
-                        else
-                        {
-                            taskCompletionSource.SetException(new Exception("Failed to get user proof."));
-                        }
-                    });
-                });
-            }
             if (NullCheckFilePath(Constants.API_KEY_PATH))
             {
-                Plugin.Log.Info("FILE NOT FOUND");
+                // structure: authkey,playerid with no spaces and base64 encoded
                 string[] sillyvar = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
-                if (sillyvar[1] != playerId)
+                if (sillyvar[2] != null)
                 {
-                    // the player id in the file doesn't match the current player id, so we can't auth
-                    taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
-                    return taskCompletionSource.Task;
+                    if (crossRefernce)
+                    {
+                        if(playerId != sillyvar[1])
+                        {
+                            // if the player id's don't match, we cant auth
+                            taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
+                            return taskCompletionSource.Task;
+                        }
+                    }
+                    playerId = sillyvar[1];
+                    authKey = sillyvar[0];
                 }
-                playerId = sillyvar[1];
-                authKey = sillyvar[0];
             }
             else
             {
-                Plugin.Log.Info("FILE NOT FOUND");
                 // no file exists, so we can't auth
                 taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
                 return taskCompletionSource.Task;
             }
 
-            Plugin.Log.Info("SUCCESS SCARY FILE");
+            if(playerId == "" || authKey == "")
+            {
+                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
+                return taskCompletionSource.Task;
+            }
 
             // if we get here, we have a valid auth key
             taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, authKey, ""));
@@ -112,6 +98,7 @@ namespace BedroomPartyLeaderboard.Utils
         }
 
 
+        // checks if the file exists, if not, creates it
         private bool NullCheckFilePath(string path)
         {
             if (!File.Exists(path))
@@ -121,6 +108,7 @@ namespace BedroomPartyLeaderboard.Utils
             }
             return true;
         }
+
 
         private string GetLoginString(string userID)
         {
@@ -212,7 +200,6 @@ namespace BedroomPartyLeaderboard.Utils
                 _panelView.playerAvatarLoading.gameObject.SetActive(false);
                 _panelView.promptText.gameObject.SetActive(false);
                 _panelView.prompt_loader.SetActive(false);
-                await Task.Delay(5000);
             }
             catch (Exception e)
             {
@@ -234,7 +221,7 @@ namespace BedroomPartyLeaderboard.Utils
                         _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                         _leaderboardView.UpdatePageButtons();
                     }
-                    if (Task.Run(() => Constants.isStaff(localPlayerInfo.userID).Result).Result)
+                    if (await Task.Run(() => Constants.isStaff(localPlayerInfo.userID).Result))
                     {
                         RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
                         rainbowAnimation.speed = 0.35f;

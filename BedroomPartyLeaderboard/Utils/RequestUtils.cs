@@ -39,8 +39,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-
-
+                Plugin.Log.Info(jsonResponse);
                 LeaderboardData.BPLeaderboard leaderboardData = JsonConvert.DeserializeObject<LeaderboardData.BPLeaderboard>(jsonResponse);
                 scorecount = leaderboardData.scoreCount;
                 totalPages = Mathf.CeilToInt((float)scorecount / 10);
