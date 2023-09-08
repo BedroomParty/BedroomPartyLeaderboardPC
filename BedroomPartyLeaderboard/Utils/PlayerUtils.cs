@@ -55,7 +55,6 @@ namespace BedroomPartyLeaderboard.Utils
             // make it so that if the user is logged in with steam, we use their steam info
             if (File.Exists(Constants.STEAM_API_PATH))
             {
-                crossRefernce = true;
                 PlayerInfo silly = Task.Run(() => GetSteamInfoAsync()).Result;
                 playerId = silly.userID;
                 playerName = silly.username;
@@ -64,20 +63,8 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 // structure: authkey,playerid with no spaces and base64 encoded
                 string[] sillyvar = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
-                if (sillyvar[2] != null)
-                {
-                    if (crossRefernce)
-                    {
-                        if(playerId != sillyvar[1])
-                        {
-                            // if the player id's don't match, we cant auth
-                            taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
-                            return taskCompletionSource.Task;
-                        }
-                    }
                     playerId = sillyvar[1];
                     authKey = sillyvar[0];
-                }
             }
             else
             {
