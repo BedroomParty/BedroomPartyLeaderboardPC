@@ -1,6 +1,7 @@
 ﻿using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.MenuButtons;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Zenject;
+using static BeatSaberMarkupLanguage.Components.CustomListTableData;
 using static BedroomPartyLeaderboard.Utils.UIUtils;
 using static LeaderboardTableView;
 using Button = UnityEngine.UI.Button;
@@ -81,29 +83,15 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIObject("loadingLB")]
         private readonly GameObject loadingLB;
 
-
-        private List<object> _seasonButtons = Enumerable.Range(1, 9)
-            .Select(i =>
-            {
-                if (i == 1)
-                {
-                    return new MenuButton($"Current", "", () => SetSeason(9 - i + 1)) as object;
-                }
-                return new MenuButton($"Season {9 - i + 1}", "", () => SetSeason(9 - i + 1)) as object;
-            }).ToList();
+        [UIComponent("seasonsList")]
+        private readonly CustomListTableData seasonsList;
 
 
-        [UIValue("seasonButtons"), UsedImplicitly]
-        private List<object> seasonButtons
+        [UIAction("seasonSelectCell")]
+        private void SeasonSelectCell(TableView tableView, int row)
         {
-            get => _seasonButtons;
-
-            set
-            {
-                _seasonButtons = value;
-                NotifyPropertyChanged();
-            }
-        } 
+            SetSeason(row);
+        }
 
         private static void SetSeason(int l)
         {
@@ -114,19 +102,23 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             leaderboardView.parserParams.EmitEvent("hideSeasonSelectModal");
         }
 
-        private void SetSeasonButtons(int currentSeason)
+        private void SetSeasonList(int currentSeason)
         {
             Plugin.Log.Notice("SetSeasonButtons");
-            seasonButtons = Enumerable.Range(1, currentSeason)
+            List<CustomCellInfo> seasonButtons = Enumerable.Range(0, currentSeason - 1)
                 .Select(i =>
                 {
-                    if (i == currentSeason)
+                    if (i == currentSeason - 1)
                     {
-                        return new MenuButton($"Current", "", () => SetSeason(i)) as object;
+                        return new CustomCellInfo($"Current", $"Season {currentSeason}", BeatSaberMarkupLanguage.Utilities.ImageResources.BlankSprite);
                     }
-                    return new MenuButton($"Season {i}", "", () => SetSeason(i)) as object;
+                    return new CustomCellInfo($"{i}", "Season", BeatSaberMarkupLanguage.Utilities.ImageResources.BlankSprite);
                 }).ToList();
-            NotifyPropertyChanged("seasonButtons");
+            Plugin.Log.Notice("silly0");
+            seasonsList.data = seasonButtons;
+            Plugin.Log.Notice("silly");
+            seasonsList.tableView.ReloadData();
+            Plugin.Log.Notice("silly2");
         }
 
 
@@ -306,7 +298,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             await Constants.WaitUntil(() => currentDifficultyBeatmap != null);
             OnLeaderboardSet(currentDifficultyBeatmap);
             await Task.Delay(3000);
-            SetSeasonButtons(4);
+            SetSeasonList(4);
             _panelView.prompt_loader.SetActive(false);
             _panelView.promptText.gameObject.SetActive(false);
             return;
