@@ -99,7 +99,7 @@
 			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='60' size-delta-y='80' clickerino-offerino-closerino='true'
 		move-to-center='true'>
 					<horizontal horizontal-fit='PreferredSize' child-align='MiddleLeft' pad='2'>
-								<list id='seasonsList' size-delta-y='80' list-width='30' cell-size='12' select-cell='seasonSelectCell'/>
+								<list id='seasonsList' size-delta-y='80' list-width='55' cell-size='12' select-cell='seasonSelectCell' visible-cells='6'/>
 					</horizontal>
 			</modal>
 			<macro.as-host host="scoreInfoModal">

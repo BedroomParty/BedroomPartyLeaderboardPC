@@ -105,14 +105,14 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         private void SetSeasonList(int currentSeason)
         {
             Plugin.Log.Notice("SetSeasonButtons");
-            List<CustomCellInfo> seasonButtons = Enumerable.Range(0, currentSeason - 1)
+            List<CustomCellInfo> seasonButtons = Enumerable.Range(0, currentSeason)
                 .Select(i =>
                 {
-                    if (i == currentSeason - 1)
+                    if (currentSeason - i == currentSeason)
                     {
-                        return new CustomCellInfo($"Current", $"Season {currentSeason}", BeatSaberMarkupLanguage.Utilities.ImageResources.BlankSprite);
+                        return new CustomCellInfo($"Current", $"Season {currentSeason}", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
                     }
-                    return new CustomCellInfo($"{i}", "Season", BeatSaberMarkupLanguage.Utilities.ImageResources.BlankSprite);
+                    return new CustomCellInfo($"{currentSeason - i}", "Season", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
                 }).ToList();
             Plugin.Log.Notice("silly0");
             seasonsList.data = seasonButtons;
@@ -298,7 +298,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             await Constants.WaitUntil(() => currentDifficultyBeatmap != null);
             OnLeaderboardSet(currentDifficultyBeatmap);
             await Task.Delay(3000);
-            SetSeasonList(4);
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(4));
             _panelView.prompt_loader.SetActive(false);
             _panelView.promptText.gameObject.SetActive(false);
             return;
