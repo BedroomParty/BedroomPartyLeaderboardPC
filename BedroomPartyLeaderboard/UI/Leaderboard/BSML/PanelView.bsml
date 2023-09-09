@@ -16,6 +16,9 @@
 					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
 							<clickable-text id="playerUsername" font-size="6" text="loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
 					</horizontal>
+					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
+						<clickable-text id="seasonText" font-size="6" text="Season 0" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
+					</horizontal>
 				</vertical>
 			</horizontal>
 		</vertical>

@@ -6,9 +6,9 @@ using Zenject;
 namespace BedroomPartyLeaderboard.AffinityPatches
 {
 
-    internal class SongSelect : IAffinity
+    internal class AuthPatch : IAffinity
     {
-        [Inject] private readonly PlayerUtils _playerUtils;
+        [Inject] private readonly AuthenticationManager _authenticationManager;
 
         [AffinityPostfix]
         [AffinityPatch(typeof(PlatformLeaderboardViewController), "DidActivate")]
@@ -18,7 +18,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             {
                 return;
             }
-            Task.Run(() => _playerUtils.LoginUserAsync());
+            Task.Run(() => _authenticationManager.LoginUserAsync());
         }
     }
 }

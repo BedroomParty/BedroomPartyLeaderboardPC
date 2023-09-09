@@ -18,7 +18,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly LeaderboardData _leaderboardData;
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly PanelView _panelView;
-        [Inject] private readonly PlayerUtils _playerUtils;
+        [Inject] private readonly AuthenticationManager _authenticationManager;
         public async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
             using HttpClient httpClient = new();
@@ -57,7 +57,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         private string getLBDownloadJSON((string, int, string) balls, int page, string sort)
         {
-            string Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}&sort={sort}&limit=10&page={page}&id={_playerUtils.localPlayerInfo.userID}";
+            string Data = $"{Constants.LEADERBOARD_DOWNLOAD_END_POINT(balls.Item1)}?char={balls.Item3}&diff={balls.Item2}&sort={sort}&limit=10&page={page}&id={_authenticationManager._localPlayerInfo.userID}";
             return Data;
         }
 
@@ -84,7 +84,7 @@ namespace BedroomPartyLeaderboard.Utils
                 {
                     Plugin.Log.Info($"Attempt {x}");
 
-                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _playerUtils.localPlayerInfo.tempKey);
+                    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _authenticationManager._localPlayerInfo.tempKey);
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                     string requestBody = getLBUploadJSON(balls, userID, badCuts, misses, fullCOmbo, acc, mods, modifiedScore, multipliedScore);
 

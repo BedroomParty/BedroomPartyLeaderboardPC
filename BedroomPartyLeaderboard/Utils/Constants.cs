@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -35,7 +36,7 @@ namespace BedroomPartyLeaderboard.Utils
         public static string[] staffIDs = null;
         public const string BUG_REPORT_LINK = "https://thebedroom.party/?bugreports";
 
-        public static async Task<bool> isStaff(string uwu)
+        public static async Task<bool> isStaff(string staffString)
         {
             using (HttpClient httpClient = new())
             {
@@ -46,7 +47,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             }
 
-            return staffIDs.Contains(uwu); // we do not talk about it :clueless:
+            return staffIDs.Contains(staffString);
         }
 
         public static string Base64Encode(string plainText)
@@ -59,6 +60,22 @@ namespace BedroomPartyLeaderboard.Utils
         {
             byte[] plainTextBytes = System.Convert.FromBase64String(plainText);
             return System.Text.Encoding.UTF8.GetString(plainTextBytes);
+        }
+
+        public static async Task WaitUntil(Func<bool> condition, int frequency = 25, int timeout = -1)
+        {
+            Task waitTask = Task.Run(async () =>
+            {
+                while (!condition())
+                {
+                    await Task.Delay(frequency);
+                }
+            });
+
+            if (waitTask != await Task.WhenAny(waitTask, Task.Delay(timeout)))
+            {
+                throw new TimeoutException();
+            }
         }
     }
 }

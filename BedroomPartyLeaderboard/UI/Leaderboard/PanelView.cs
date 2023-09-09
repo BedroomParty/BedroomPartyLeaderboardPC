@@ -13,7 +13,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     internal class PanelView : BSMLAutomaticViewController
     {
         [Inject] private readonly LeaderboardView _leaderboardView;
-        [Inject] private readonly PlayerUtils _playerUtils;
+        [Inject] private readonly AuthenticationManager _authenticationManager;
 
         [UIComponent("BedroomPartyLeaderboard_logo")]
         private readonly ImageView BedroomPartyLeaderboard_logo;
@@ -33,6 +33,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIComponent("playerUsername")]
         public TextMeshProUGUI playerUsername;
 
+        [UIComponent("seasonText")]
+        public TextMeshProUGUI seasonText;
+
         [UIAction("FunnyModalMoment")]
         public void FunnyModalMoment()
         {
@@ -42,12 +45,18 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIAction("playerUsernameCLICK")]
         public void playerUsernameCLICK()
         {
-            if (string.IsNullOrEmpty(_playerUtils.localPlayerInfo.userID))
+            if (string.IsNullOrEmpty(_authenticationManager._localPlayerInfo.userID))
             {
                 return;
             }
 
-            Application.OpenURL($"https://thebedroom.party/?user={_playerUtils.localPlayerInfo.userID}");
+            Application.OpenURL($"https://thebedroom.party/?user={_authenticationManager._localPlayerInfo.userID}");
+        }
+
+        [UIAction("seasonTextCLICK")]
+        public void seasonTextCLICK()
+        {
+            _leaderboardView.showSeasonSelectModal();
         }
     }
 }

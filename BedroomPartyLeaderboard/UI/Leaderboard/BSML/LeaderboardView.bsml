@@ -96,6 +96,16 @@
 					</horizontal>
 				</vertical>
 			</modal>
+			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='60' size-delta-y='40' clickerino-offerino-closerino='true'
+		move-to-center='true'>
+					<horizontal horizontal-fit='PreferredSize'>
+						<grid cell-size-y='9' cell-size-x='15' spacing-x='2' spacing-y='2' align='Center'>
+							<macro.for-each items='seasonButtons'>
+								<button id='menu-button' pref-width='15' pref-height='9' text='~text' on-click='button-click'></button>
+							</macro.for-each>
+						</grid>
+					</horizontal>
+			</modal>
 			<macro.as-host host="scoreInfoModal">
 				<modal id="scoreInfo" show-event="showScoreInfo" hide-event="hideScoreInfo" size-delta-x="60" size-delta-y="42" clickerino-offerino-closerino="true" move-to-center="true">
 					<stack>
