@@ -31,6 +31,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [Inject] private readonly LeaderboardData _leaderboardData;
         [Inject] private readonly ResultsViewController _resultsViewController;
         [Inject] private readonly UIUtils _uiUtils;
+        [Inject] private readonly TweeningService _tweeningService;
 
         public IDifficultyBeatmap currentDifficultyBeatmap;
         public IDifficultyBeatmapSet currentDifficultyBeatmapSet;
@@ -227,15 +228,37 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             {
                 return;
             }
+            _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
 
             if (!_plvc.isActivated)
             {
                 return;
             }
-
             page = 0;
             parserParams.EmitEvent("hideInfoModal");
-            _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+        }
+
+        void FadeOut(LeaderboardTableView tableView)
+        {
+            foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
+            {
+                if (!(cell.gameObject.activeSelf && leaderboardTransform.gameObject.activeSelf)) continue;
+                _tweeningService.FadeText(cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText"), false, 0.3f);
+                _tweeningService.FadeText(cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText"), false, 0.3f);
+                _tweeningService.FadeText(cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText"), false, 0.3f);
+            }
+        }
+
+        private void HandleNoLeaderboardEntries()
+        { 
+            if (!errorText.gameObject.activeSelf && leaderboardTransform.gameObject.activeSelf)
+            {
+                _tweeningService.FadeText(errorText, true, 0.3f);
+            }
+            if (leaderboardTableView.gameObject.activeSelf && leaderboardTransform.gameObject.activeSelf)
+            {
+                FadeOut(leaderboardTableView);
+            }
         }
 
         public void OnLeaderboardSet(IDifficultyBeatmap difficultyBeatmap)
@@ -267,8 +290,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             }
             cancellationTokenSource = new CancellationTokenSource();
             cancellationToken = cancellationTokenSource.Token;
-
-
 
             if (!_playerUtils.IsAuthed)
             {
@@ -308,6 +329,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 loadingLB.gameObject.SetActive(true);
                 ByeIMGLoader();
                 leaderboardTableView.SetScores(null, -1);
+                FadeOut(leaderboardTableView);
                 return;
             }
 
@@ -321,7 +343,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 {
                     if (result.Item2.Count == 0)
                     {
-                        SetErrorState(true, "No Scores Found");
+                        SetErrorState(false, "No Scores Found");
+                        HandleNoLeaderboardEntries();
                         loadingLB.gameObject.SetActive(false);
                         ByeIMGLoader();
                     }
@@ -343,7 +366,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 }
                 else
                 {
-                    SetErrorState(true, "Error");
+                    SetErrorState(false, "Error");
+                    HandleNoLeaderboardEntries();
                     loadingLB.gameObject.SetActive(false);
                     ByeIMGLoader();
                     Plugin.Log.Error("Error");

@@ -20,6 +20,8 @@ namespace BedroomPartyLeaderboard.Installers
             Container.Bind<RequestUtils>().AsSingle();
             Container.Bind<UIUtils>().AsSingle();
             Container.BindInterfacesTo<Results>().AsSingle();
+            //Container.BindInterfacesTo<SongSelect>().AsSingle();
+            Container.Bind<TweeningService>().AsSingle();
             Container.Bind<LeaderboardData>().AsSingle();
             List<ImageHolder> Imageholder = Enumerable.Range(0, 10).Select(x => new ImageHolder(x)).ToList();
             Container.Bind<List<ImageHolder>>().FromInstance(Imageholder).AsSingle().WhenInjectedInto<LeaderboardView>();

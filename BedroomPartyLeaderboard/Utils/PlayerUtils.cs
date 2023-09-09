@@ -203,6 +203,7 @@ namespace BedroomPartyLeaderboard.Utils
                 await GetAuthStatusAsync();
                 if (_isAuthed)
                 {
+                    Plugin.Log.Info("authed");
                     Task.Run(() => assignStaff());
                     await WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
                     _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);

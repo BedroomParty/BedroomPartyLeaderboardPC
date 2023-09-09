@@ -441,6 +441,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AffinityPatches\Results.cs" />
+    <Compile Include="AffinityPatches\SongSelect.cs" />
     <Compile Include="Installers\MenuInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
