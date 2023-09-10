@@ -98,9 +98,15 @@
 			</modal>
 			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='60' size-delta-y='80' clickerino-offerino-closerino='true'
 		move-to-center='true'>
+				<vertical>
 					<horizontal horizontal-fit='PreferredSize' child-align='MiddleLeft' pad='2'>
-								<list id='seasonsList' size-delta-y='80' list-width='55' cell-size='12' select-cell='seasonSelectCell' visible-cells='6'/>
+						<list id='seasonsList' size-delta-y='80' list-width='55' cell-size='12' select-cell='seasonSelectCell' visible-cells='6'/>
 					</horizontal>
+					<horizontal>
+						<button text='Playlist' on-click='downloadPlaylistCLICK'  preferred-width='25'/>
+						<button text='Leaderboard' on-click='openWebLeaderboardCLICK' preferred-width='25'/>
+					</horizontal>
+				</vertical>
 			</modal>
 			<macro.as-host host="scoreInfoModal">
 				<modal id="scoreInfo" show-event="showScoreInfo" hide-event="hideScoreInfo" size-delta-x="60" size-delta-y="42" clickerino-offerino-closerino="true" move-to-center="true">

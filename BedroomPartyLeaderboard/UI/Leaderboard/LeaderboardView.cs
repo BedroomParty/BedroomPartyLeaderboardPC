@@ -1,15 +1,12 @@
 ﻿using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
-using BeatSaberMarkupLanguage.Components.Settings;
-using BeatSaberMarkupLanguage.MenuButtons;
 using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using BedroomPartyLeaderboard.Utils;
 using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
-using JetBrains.Annotations;
 using LeaderboardCore.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -86,39 +83,58 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIComponent("seasonsList")]
         private readonly CustomListTableData seasonsList;
 
+        [UIAction("downloadPlaylistCLICK")]
+        private void downloadPlaylistCLICK()
+        {
+            Application.OpenURL($"https://thebedroom.party/playlist/{season}");
+        }
+
+        [UIAction("openWebLeaderboardCLICK")]
+        private void openWebLeaderboardCLICK()
+        {
+            Application.OpenURL($"https://thebedroom.party/leaderboard/{season}");
+        }
+
+        private int currentSeason;
 
         [UIAction("seasonSelectCell")]
         private void SeasonSelectCell(TableView tableView, int row)
         {
-            SetSeason(row);
+            if (row == 0)
+            {
+                SetSeason(currentSeason); // Use the actual current season integer
+            }
+            else
+            {
+                // For other cells, calculate the season based on the row
+                int selectedSeason = currentSeason - row;
+                SetSeason(selectedSeason);
+            }
         }
+
 
         private static void SetSeason(int l)
         {
             Plugin.Log.Info("CURRENT SEASON: " + l);
             LeaderboardView leaderboardView = Resources.FindObjectsOfTypeAll<LeaderboardView>().FirstOrDefault();
             leaderboardView.season = l;
-            leaderboardView.OnLeaderboardSet(leaderboardView.currentDifficultyBeatmap);
-            leaderboardView.parserParams.EmitEvent("hideSeasonSelectModal");
         }
 
-        private void SetSeasonList(int currentSeason)
+        private void SetSeasonList(int _currentSeason)
         {
+            currentSeason =  _currentSeason;
             Plugin.Log.Notice("SetSeasonButtons");
-            List<CustomCellInfo> seasonButtons = Enumerable.Range(0, currentSeason)
+            List<CustomCellInfo> seasonButtons = Enumerable.Range(0, _currentSeason)
                 .Select(i =>
                 {
-                    if (currentSeason - i == currentSeason)
+                    if (_currentSeason - i == _currentSeason)
                     {
-                        return new CustomCellInfo($"Current", $"Season {currentSeason}", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
+                        return new CustomCellInfo($"Season {_currentSeason}", $"Current - Speed Tech & linear jumps", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
                     }
-                    return new CustomCellInfo($"{currentSeason - i}", "Season", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
+                    return new CustomCellInfo($"Season {_currentSeason - i}", "insert Some silly style of mapping", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
                 }).ToList();
-            Plugin.Log.Notice("silly0");
             seasonsList.data = seasonButtons;
-            Plugin.Log.Notice("silly");
             seasonsList.tableView.ReloadData();
-            Plugin.Log.Notice("silly2");
         }
 
 
@@ -233,6 +249,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal void showSeasonSelectModal()
         {
             parserParams.EmitEvent("showSeasonSelectModal");
+            int f = new System.Random().Next(0, 6);
+            Plugin.Log.Info(f.ToString());
+            SetSeasonList(f);
         }
 
         [UIAction("openWebsite")]
