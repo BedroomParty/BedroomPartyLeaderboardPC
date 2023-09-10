@@ -80,9 +80,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIObject("loadingLB")]
         private readonly GameObject loadingLB;
 
-        [UIComponent("seasonsList")]
-        private readonly CustomListTableData seasonsList;
-
         [UIAction("downloadPlaylistCLICK")]
         private void downloadPlaylistCLICK()
         {
@@ -116,14 +113,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     }
                     return new SeasonListItem(_currentSeason - i, $"Season {_currentSeason - i}", "No Pauses", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
                 }).ToList();
-
-            List<object> seasonsListA = new List<object>();
-            foreach (var seasonButton in seasonButtons)
-            {
-                seasonsListA.Add(seasonButton);
-            }
-            seasonList.data = seasonsListA;
-            seasonsList.tableView.ReloadData();
+            seasonList.data = seasonButtons.Cast<object>().ToList();
+            seasonList.tableView.ReloadData();
         }
 
 
