@@ -96,28 +96,28 @@
 					</horizontal>
 				</vertical>
 			</modal>
-			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='70' size-delta-y='85' clickerino-offerino-closerino='true'
-		move-to-center='true'>
-				<vertical pad='3' spacing='15'>
-					<custom-list id="seasonList" show-scrollbar="true" size-delta-y="60" contents="seasonsContents" clickable-cells="false" cell-size="12" list-width="50">
-						<horizontal id="backgroundImage" bg="panel-top" preferred-height="8" vertical-fit="PreferredSize" preferred-width="40" horizontal-fit="PreferredSize">
-							<stack pref-width="9" preferred-height="9" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-20">
+			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='63.75' size-delta-y='63.75' clickerino-offerino-closerino='true' move-to-center='true'>
+				<vertical pad='2' spacing='11.25'>
+					<custom-list id="seasonList" show-scrollbar="true" size-delta-y="45" contents="seasonsContents" clickable-cells="false" cell-size="9" list-width="50">
+						<horizontal id="backgroundImage" bg="panel-top" preferred-height="9" vertical-fit="PreferredSize" preferred-width="45" horizontal-fit="PreferredSize">
+							<stack pref-width="8.8125" preferred-height="8.8125" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-19.125">
 								<image id="seasonImage" src="BedroomPartyLeaderboard.Images.blank.png" preserve-aspect="true"/>
 							</stack>
-							<vertical preferred-width="30" preferred-height="10" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-1">
-								<text text="~seasonNumber"/>
-								<text text="~seasonDescription"/>
+							<vertical preferred-width="22.5" preferred-height="7.5" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-2.5">
+								<text text="~seasonNumber" font-size="4"/>
+								<text text="~seasonDescription" font-size="3"/>
 							</vertical>
-							<stack>
-								<action-button size-delta-x="15" size-delta-y="5" text="Playlist" preferred-width="15" on-click="seasonPlaylistClicked"/>
+							<stack vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="17.5">
+								<button word-wrapping="false" preferred-height="6.75" size-delta-x="8.25" font-size="2.0625" size-delta-y="4.5" text="Playlist" preferred-width="8.25" on-click="seasonPlaylistClicked"/>
 							</stack>
-							<stack>
-								<action-button size-delta-x="15" size-delta-y="5" text="Leaderboard" preferred-width="15" on-click="seasonLeaderboardClicked"/>
+							<stack vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="6.5" anchor-pos-y="-0.15">
+								<button word-wrapping="false" size-delta-x="9.75" pref-height="6.75" font-size="2.0625" size-delta-y="4.5" text="Leaderboard" preferred-width="11.25" on-click="seasonLeaderboardClicked"/>
 							</stack>
 						</horizontal>
 					</custom-list>
 				</vertical>
 			</modal>
+
 			<macro.as-host host="scoreInfoModal">
 				<modal id="scoreInfo" show-event="showScoreInfo" hide-event="hideScoreInfo" size-delta-x="60" size-delta-y="42" clickerino-offerino-closerino="true" move-to-center="true">
 					<stack>
