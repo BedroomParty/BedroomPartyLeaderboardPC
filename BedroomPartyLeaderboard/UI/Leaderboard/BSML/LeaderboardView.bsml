@@ -96,15 +96,18 @@
 					</horizontal>
 				</vertical>
 			</modal>
-			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='60' size-delta-y='80' clickerino-offerino-closerino='true'
+			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='70' size-delta-y='85' clickerino-offerino-closerino='true'
 		move-to-center='true'>
-				<vertical>
-					<horizontal horizontal-fit='PreferredSize' child-align='MiddleLeft' pad='2'>
-						<list id='seasonsList' size-delta-y='80' list-width='55' cell-size='12' select-cell='seasonSelectCell' visible-cells='6'/>
+				<vertical pad='3' spacing='15'>
+					  <horizontal bg='panel-top' pad-left='15' pad-right='15' horizontal-fit='PreferredSize'>
+						<text text='Season Info' align='Center' font-size='6'/>
+						</horizontal>
+					<horizontal horizontal-fit='PreferredSize' child-align='MiddleLeft'>
+							<list id='seasonsList'  list-width='60' cell-size='8' select-cell='seasonSelectCell'/>
 					</horizontal>
-					<horizontal>
-						<button text='Playlist' on-click='downloadPlaylistCLICK'  preferred-width='25'/>
-						<button text='Leaderboard' on-click='openWebLeaderboardCLICK' preferred-width='25'/>
+					<horizontal pad='3' spacing='2'>
+						<action-button text='Download Playlist' on-click='downloadPlaylistCLICK'  preferred-width='28' pref-height='10' word-wrapping='false'/>
+						<action-button text='View Leaderboard' on-click='openWebLeaderboardCLICK' preferred-width='28' pref-height='10' word-wrapping='false'/>
 					</horizontal>
 				</vertical>
 			</modal>
