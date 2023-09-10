@@ -230,7 +230,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal void showSeasonSelectModal()
         {
             parserParams.EmitEvent("showSeasonSelectModal");
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(12));
         }
 
         [UIAction("openWebsite")]
