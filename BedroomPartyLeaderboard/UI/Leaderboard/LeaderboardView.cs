@@ -97,45 +97,35 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         private int currentSeason;
 
-        [UIAction("seasonSelectCell")]
-        private void SeasonSelectCell(TableView tableView, int row)
-        {
-            if (row == 0)
-            {
-                SetSeason(currentSeason); // Use the actual current season integer
-            }
-            else
-            {
-                // For other cells, calculate the season based on the row
-                int selectedSeason = currentSeason - row;
-                SetSeason(selectedSeason);
-            }
-        }
+        [UIComponent("seasonList")]
+        public CustomCellListTableData seasonList;
 
-
-        private static void SetSeason(int l)
-        {
-            Plugin.Log.Info("CURRENT SEASON: " + l);
-            LeaderboardView leaderboardView = Resources.FindObjectsOfTypeAll<LeaderboardView>().FirstOrDefault();
-            leaderboardView.season = l;
-        }
+        [UIValue("seasonsContents")]
+        private List<object> seasonsContents => new List<object>();
 
         private void SetSeasonList(int _currentSeason)
         {
-            currentSeason =  _currentSeason;
+            currentSeason = _currentSeason;
             Plugin.Log.Notice("SetSeasonButtons");
-            List<CustomCellInfo> seasonButtons = Enumerable.Range(0, _currentSeason)
+            List<SeasonListItem> seasonButtons = Enumerable.Range(0, _currentSeason)
                 .Select(i =>
                 {
                     if (_currentSeason - i == _currentSeason)
                     {
-                        return new CustomCellInfo($"Season {_currentSeason}", $"Current - Speed Tech & linear jumps", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
+                        return new SeasonListItem(_currentSeason, $"Season {_currentSeason}", "Speed Tech", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
                     }
-                    return new CustomCellInfo($"Season {_currentSeason - i}", "insert Some silly style of mapping", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
+                    return new SeasonListItem(_currentSeason - i, $"Season {_currentSeason - i}", "No Pauses", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
                 }).ToList();
-            seasonsList.data = seasonButtons;
+
+            List<object> seasonsListA = new List<object>();
+            foreach (var seasonButton in seasonButtons)
+            {
+                seasonsListA.Add(seasonButton);
+            }
+            seasonList.data = seasonsListA;
             seasonsList.tableView.ReloadData();
         }
+
 
 
         internal int page = 0;
@@ -316,7 +306,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             _panelView.seasonText.richText = true;
             _panelView.seasonText.text = $"<size=70%>Season 1</size>\n<size=60%>Speed Tech</size>";
             await Task.Delay(3000);
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(1));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(4));
             _panelView.prompt_loader.SetActive(false);
             _panelView.promptText.gameObject.SetActive(false);
             return;

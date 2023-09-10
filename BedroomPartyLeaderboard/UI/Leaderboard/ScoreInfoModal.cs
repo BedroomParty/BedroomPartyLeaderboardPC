@@ -60,7 +60,6 @@ namespace BedroomPartyLeaderboard.UI
             Application.OpenURL(Constants.USER_PROFILE_LINK + currentEntry.userID);
         }
 
-        [Inject] private readonly LeaderboardView _leaderboardView;
         private LeaderboardData.LeaderboardEntry currentEntry;
         private const int scoreDetails = 4;
         private const float infoFontSize = 4.2f;
