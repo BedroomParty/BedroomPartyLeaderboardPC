@@ -4,32 +4,52 @@
 		<text rich-text="true" id="promptText" text="" active="false" anchor-pos-x="0" anchor-pos-y="10" align="BottomLeft" italics="true" />
 	</horizontal>
 	<horizontal anchor-pos-x="-2" spacing="10" anchor-pos-y="0" ignore-layout="true" pref-height="20" horizontal-fit="Unconstrained">
-		<vertical pref-width="20" child-align="MiddleLeft">
-			<horizontal pref-height="14">
-				<clickable-image id="BedroomPartyLeaderboard_logo" on-click="FunnyModalMoment" src="BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
-			</horizontal>
-		</vertical>
-
+		<stack ignore-layout="true" anchor-pos-x="-37">
+			<vertical pref-width="20" child-align="MiddleLeft">
+				<horizontal pref-height="14">
+					<clickable-image id="BedroomPartyLeaderboard_logo" on-click="FunnyModalMoment" src="BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
+				</horizontal>
+			</vertical>
+		</stack>
 		<vertical child-align="MiddleCenter">
 			<horizontal pref-height="10">
 				<vertical spacing="6" child-expand-width="false" child-control-width="false" child-align="MiddleCenter">
 					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
-							<clickable-text id="playerUsername" font-size="6" text="loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
+							<clickable-text id="playerUsername" font-size="6" text="Loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
 					</horizontal>
-					<horizontal pref-height="6" pad="1" spacing="2" horizontal-fit="PreferredSize">
-						<clickable-text id="seasonText" font-size="6" text="Season 0" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
+					<horizontal pref-height="4" pad="1" spacing="2" horizontal-fit="PreferredSize">
+						<stack ignore-layout="true" anchor-pos-y="1.5" >
+							<clickable-text id="seasonText" font-size="4.5" text="Season 1" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
+						</stack>
+						<stack ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-20">
+							<text id="pointsText" font-size="4.5" text="2" rich-text="true" align="Center" word-wrapping="false"/>
+						</stack>
+						<stack ignore-layout="true" anchor-pos-y="1.75" anchor-pos-x="-15" size-delta-x="5">
+							<image id="pointsImage" src="BedroomPartyLeaderboard.Images.pp.png" preferred-height="5" preferred-width="5" preserve-aspect="true"/>
+						</stack>
+						
+						<stack ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="20">
+							<text id="rankText" font-size="4.5" text="#2" rich-text="true" align="Center" word-wrapping="false"/>
+						</stack>
+						<stack ignore-layout="true" anchor-pos-y="1.75" anchor-pos-x="15" size-delta-x="5">
+							<image id="rankImage" src="BedroomPartyLeaderboard.Images.Globe.png" preferred-height="5" preferred-width="5" preserve-aspect="true"/>
+						</stack>
+						<stack ignore-layout="true" anchor-pos-y="-3.5">
+							<text id="seasonDescription" font-size="3.5" text="Season Description" rich-text="true" align="Center"  word-wrapping="false"/>
+						</stack>
 					</horizontal>
 				</vertical>
 			</horizontal>
 		</vertical>
-
-		<vertical pref-width="20" child-align="MiddleRight">
-			<horizontal pref-height="14">
-				<stack >
-					<image id="playerAvatar" src="BedroomPartyLeaderboard.Images.blank.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
-					<loading-indicator  id="playerAvatarLoading" preserve-aspect="true" preferred-height="5" preferred-width="5"/>
-				</stack>
-			</horizontal>
-		</vertical>
+		<stack ignore-layout="true" anchor-pos-x="37">
+			<vertical pref-width="20" child-align="MiddleRight">
+				<horizontal pref-height="14">
+					<stack >
+						<image id="playerAvatar" src="BedroomPartyLeaderboard.Images.blank.png" preserve-aspect="true" preferred-height="7" preferred-width="7"/>
+						<loading-indicator  id="playerAvatarLoading" preserve-aspect="true" preferred-height="5" preferred-width="5"/>
+					</stack>
+				</horizontal>
+			</vertical>
+		</stack>
 	</horizontal>
 </bg>

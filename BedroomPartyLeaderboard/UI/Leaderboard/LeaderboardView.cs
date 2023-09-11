@@ -229,6 +229,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         internal void showSeasonSelectModal()
         {
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(12));
             parserParams.EmitEvent("showSeasonSelectModal");
         }
 
@@ -295,9 +296,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             await Constants.WaitUntil(() => currentDifficultyBeatmap != null);
             OnLeaderboardSet(currentDifficultyBeatmap);
             _panelView.seasonText.richText = true;
-            _panelView.seasonText.text = $"<size=70%>Season 1</size>\n<size=60%>Speed Tech</size>";
             await Task.Delay(3000);
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(4));
             _panelView.prompt_loader.SetActive(false);
             _panelView.promptText.gameObject.SetActive(false);
             return;
