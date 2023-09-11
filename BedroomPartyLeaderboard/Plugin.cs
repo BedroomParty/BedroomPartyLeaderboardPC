@@ -1,6 +1,8 @@
 ﻿using BedroomPartyLeaderboard.Installers;
+using HarmonyLib;
 using IPA;
 using SiraUtil.Zenject;
+using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
 
 namespace BedroomPartyLeaderboard
@@ -10,12 +12,15 @@ namespace BedroomPartyLeaderboard
     {
         internal static IPALogger Log { get; private set; }
 
+        internal static Harmony harmony;
+
         [Init]
         public Plugin(IPALogger logger, Zenjector zenjector)
         {
             Log = logger;
+            harmony = new Harmony("Speecil.BeatSaber.BedroomPartyLeaderboard");
             zenjector.Install<MenuInstaller>(Location.Menu);
-            zenjector.Install<GameInstaller>(Location.StandardPlayer);
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
     }
 }

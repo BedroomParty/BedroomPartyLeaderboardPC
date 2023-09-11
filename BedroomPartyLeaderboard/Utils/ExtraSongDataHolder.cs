@@ -5,10 +5,10 @@ namespace BedroomPartyLeaderboard.Utils
     internal static class ExtraSongDataHolder
     {
         internal static int pauses;
-        internal static List<float> avgHandAccRight;
-        internal static List<float> avgHandAccLeft;
-        internal static List<float> avgHandTDRight;
-        internal static List<float> avgHandTDLeft;
+        internal static List<float> avgHandAccRight = new();
+        internal static List<float> avgHandAccLeft = new();
+        internal static List<float> avgHandTDRight = new();
+        internal static List<float> avgHandTDLeft = new();
         internal static int perfectStreak;
 
         internal static void reset()

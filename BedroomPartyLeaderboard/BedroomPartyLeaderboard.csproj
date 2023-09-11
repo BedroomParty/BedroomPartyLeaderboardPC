@@ -41,6 +41,11 @@
     <DisableZipRelease>True</DisableZipRelease>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="BeatmapCore, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="BeatSaviorData, Version=2.1.15.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -445,10 +450,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AffinityPatches\ExtraSongData.cs" />
+    <Compile Include="HarmonyPatches\ExtraSongData.cs" />
     <Compile Include="AffinityPatches\Results.cs" />
     <Compile Include="AffinityPatches\AuthPatch.cs" />
-    <Compile Include="Installers\GameInstaller.cs" />
     <Compile Include="Installers\MenuInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
