@@ -13,7 +13,6 @@ namespace BedroomPartyLeaderboard.Installers
     {
         public override void InstallBindings()
         {
-            ExtraSongDataHolder.reset();
             Container.BindInterfacesTo<ExtraSongData>().AsSingle();
         }
     }
