@@ -95,23 +95,12 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         [AffinityPatch(typeof(LevelCompletionResultsHelper), nameof(LevelCompletionResultsHelper.ProcessScore))]
         private void Postfix(ref PlayerData playerData, ref PlayerLevelStatsData playerLevelStats, ref LevelCompletionResults levelCompletionResults, ref IReadonlyBeatmapData transformedBeatmapData, ref IDifficultyBeatmap difficultyBeatmap, ref PlatformLeaderboardsModel platformLeaderboardsModel)
         {
-            if (BS_Utils.Gameplay.ScoreSubmission.Disabled)
-            {
-                return;
-            }
+            if (BS_Utils.Gameplay.ScoreSubmission.Disabled) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             int modifiedScore = levelCompletionResults.modifiedScore;
             int multipliedScore = levelCompletionResults.multipliedScore;
-            if (modifiedScore == 0 || maxScore == 0)
-            {
-                return;
-            }
-
-            if (levelCompletionResults.levelEndStateType == LevelCompletionResults.LevelEndStateType.Failed)
-            {
-                return;
-            }
-
+            if (modifiedScore == 0 || maxScore == 0) return;
+            if (levelCompletionResults.levelEndStateType == LevelCompletionResults.LevelEndStateType.Failed) return;
             float acc = modifiedScore / maxScore * 100;
             int score = levelCompletionResults.modifiedScore;
             int badCut = levelCompletionResults.badCutsCount;
@@ -122,13 +111,11 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             string mapType = playerLevelStats.beatmapCharacteristic.serializedName;
             (string, int, string) balls = (mapId, difficulty, mapType);
             string mods = GetModifiersString(levelCompletionResults);
-
             int pauses = ExtraSongDataHolder.pauses;
             int maxCombo = levelCompletionResults.maxCombo;
             float avgHandAccRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccRight);
             float avgHandAccLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccLeft);
             int perfectStreak = ExtraSongDataHolder.perfectStreak;
-
             _requestUtils.SetBeatMapData(balls, _authenticationManager._localPlayerInfo.userID, _authenticationManager._localPlayerInfo.username, badCut, misses, fc, acc, score, mods, multipliedScore, modifiedScore, result =>
             {
                 Plugin.Log.Info("_requestUtils.SetBeatMapData");

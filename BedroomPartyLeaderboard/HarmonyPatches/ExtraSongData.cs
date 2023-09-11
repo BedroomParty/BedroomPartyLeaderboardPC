@@ -1,6 +1,5 @@
 ﻿using BedroomPartyLeaderboard.Utils;
 using HarmonyLib;
-using SiraUtil.Affinity;
 using System;
 
 namespace BedroomPartyLeaderboard.HarmonyPatches
@@ -61,7 +60,7 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
                     currentPerfectHits = 0;
                 }
             }
-        }       
+        }
 
         [HarmonyPatch(typeof(PauseController), "Pause")]
         internal class PauseControllerPause

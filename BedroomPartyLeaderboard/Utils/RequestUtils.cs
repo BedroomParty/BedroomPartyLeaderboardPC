@@ -1,5 +1,4 @@
-﻿using BedroomPartyLeaderboard.AffinityPatches;
-using BedroomPartyLeaderboard.UI.Leaderboard;
+﻿using BedroomPartyLeaderboard.UI.Leaderboard;
 using IPA.Utilities.Async;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
