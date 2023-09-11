@@ -20,9 +20,6 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly PanelView _panelView;
         [Inject] private readonly AuthenticationManager _authenticationManager;
-        [Inject] private readonly Results _results;
-
-
 
         public async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
