@@ -1,14 +1,7 @@
-﻿using BeatSaberMarkupLanguage;
-using BeatSaberMarkupLanguage.Attributes;
+﻿using BeatSaberMarkupLanguage.Attributes;
 using HMUI;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using UnityEngine;
-using Zenject;
 using Application = UnityEngine.Application;
 
 namespace BedroomPartyLeaderboard.UI.Leaderboard

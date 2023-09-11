@@ -8,6 +8,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
     {
         [Inject] private readonly RequestUtils _requestUtils;
         [Inject] private readonly AuthenticationManager _authenticationManager;
+
         public static string GetModifiersString(LevelCompletionResults levelCompletionResults)
         {
             string mods = "";
@@ -116,16 +117,17 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             int badCut = levelCompletionResults.badCutsCount;
             int misses = levelCompletionResults.missedCount;
             bool fc = levelCompletionResults.fullCombo;
-
-            string mapId = difficultyBeatmap.level.levelID.Substring(13);
-
+            string mapId = difficultyBeatmap.level.levelID.Substring(13).Split('_')[0];
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = playerLevelStats.beatmapCharacteristic.serializedName;
-
             (string, int, string) balls = (mapId, difficulty, mapType);
-
             string mods = GetModifiersString(levelCompletionResults);
 
+            int pauses = ExtraSongDataHolder.pauses;
+            int maxCombo = levelCompletionResults.maxCombo;
+            float avgHandAccRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccRight);
+            float avgHandAccLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccLeft);
+            int perfectStreak = ExtraSongDataHolder.perfectStreak;
 
             _requestUtils.SetBeatMapData(balls, _authenticationManager._localPlayerInfo.userID, _authenticationManager._localPlayerInfo.username, badCut, misses, fc, acc, score, mods, multipliedScore, modifiedScore, result =>
             {

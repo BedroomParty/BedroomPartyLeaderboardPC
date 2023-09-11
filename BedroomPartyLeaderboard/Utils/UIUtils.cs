@@ -6,6 +6,7 @@ using HMUI;
 using IPA.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Tweening;
 using UnityEngine;
@@ -85,25 +86,8 @@ namespace BedroomPartyLeaderboard.Utils
         private Material FindCoolMaterial()
         {
             Material cool = null;
-            foreach (Material material in Resources.FindObjectsOfTypeAll<Material>())
-            {
-                if (material == null)
-                {
-                    continue;
-                }
-
-                if (material.name.Contains("UINoGlowRoundEdge"))
-                {
-                    cool = material;
-                    break;
-                }
-            }
-
-            if (cool == null)
-            {
-                Plugin.Log.Error("Material 'UINoGlowRoundEdge' not found.");
-            }
-
+            cool = Resources.FindObjectsOfTypeAll<Material>().First(x => x.name == "UINoGlowRoundEdge");
+            if (cool == null) Plugin.Log.Error("Material 'UINoGlowRoundEdge' not found.");
             return cool;
         }
 

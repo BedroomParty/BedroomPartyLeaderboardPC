@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Zenject;
-using static BeatSaberMarkupLanguage.Components.CustomListTableData;
 using static BedroomPartyLeaderboard.Utils.UIUtils;
 using static LeaderboardTableView;
 using Button = UnityEngine.UI.Button;

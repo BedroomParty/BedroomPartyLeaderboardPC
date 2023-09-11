@@ -2,7 +2,6 @@
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
-using BedroomPartyLeaderboard.UI.Leaderboard;
 using BedroomPartyLeaderboard.Utils;
 using HMUI;
 using IPA.Utilities.Async;
@@ -11,7 +10,6 @@ using System;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using Zenject;
 using static BedroomPartyLeaderboard.Utils.UIUtils;
 
 namespace BedroomPartyLeaderboard.UI

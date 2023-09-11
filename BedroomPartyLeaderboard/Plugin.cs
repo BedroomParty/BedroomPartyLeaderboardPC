@@ -15,6 +15,7 @@ namespace BedroomPartyLeaderboard
         {
             Log = logger;
             zenjector.Install<MenuInstaller>(Location.Menu);
+            zenjector.Install<GameInstaller>(Location.StandardPlayer);
         }
     }
 }

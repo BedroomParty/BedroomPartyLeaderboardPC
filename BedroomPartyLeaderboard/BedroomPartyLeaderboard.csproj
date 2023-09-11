@@ -42,6 +42,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BeatmapCore, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="BeatSaviorData, Version=2.1.15.0, Culture=neutral, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Plugins\BeatSaviorData.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="BSML, Version=1.6.10.0, Culture=neutral, processorArchitecture=MSIL">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
@@ -440,8 +445,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AffinityPatches\ExtraSongData.cs" />
     <Compile Include="AffinityPatches\Results.cs" />
     <Compile Include="AffinityPatches\AuthPatch.cs" />
+    <Compile Include="Installers\GameInstaller.cs" />
     <Compile Include="Installers\MenuInstaller.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -451,6 +458,7 @@
     <Compile Include="UI\Leaderboard\SeasonListItem.cs" />
     <Compile Include="Utils\Constants.cs" />
     <Compile Include="Utils\ExternalPlayerInfo.cs" />
+    <Compile Include="Utils\ExtraSongDataHolder.cs" />
     <Compile Include="Utils\LeaderboardData.cs" />
     <Compile Include="Utils\LeaderboardUtils.cs" />
     <Compile Include="Utils\AuthenticationManager.cs" />
@@ -478,9 +486,7 @@
       <Version>13.0.3</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Images\Player.png" />
   </ItemGroup>
