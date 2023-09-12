@@ -2,8 +2,10 @@
 using BeatSaberMarkupLanguage.ViewControllers;
 using BedroomPartyLeaderboard.Utils;
 using HMUI;
+using IPA.Utilities;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace BedroomPartyLeaderboard.UI.Leaderboard
@@ -36,6 +38,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIComponent("seasonText")]
         public TextMeshProUGUI seasonText;
 
+        [UIComponent("pointsText")]
+        public TextMeshProUGUI ppText;
+
         [UIAction("FunnyModalMoment")]
         public void FunnyModalMoment()
         {
@@ -53,9 +58,11 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             Application.OpenURL($"https://thebedroom.party/?user={_authenticationManager._localPlayerInfo.userID}");
         }
 
+        private int pp = 1;
         [UIAction("seasonTextCLICK")]
         public void seasonTextCLICK()
         {
+            ppText.text = $"{pp *= 10}";
             _leaderboardView.showSeasonSelectModal();
         }
     }

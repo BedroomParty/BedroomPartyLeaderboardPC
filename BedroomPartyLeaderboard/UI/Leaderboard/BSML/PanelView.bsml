@@ -15,19 +15,16 @@
 			<horizontal pref-height="10">
 				<vertical spacing="6" child-expand-width="false" child-control-width="false" child-align="MiddleCenter">
 					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
-							<clickable-text id="playerUsername" font-size="6" text="Loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
+						<clickable-text id="playerUsername" font-size="6" text="Loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
 					</horizontal>
 					<horizontal pref-height="4" pad="1" spacing="2" horizontal-fit="PreferredSize">
-						<stack ignore-layout="true" anchor-pos-y="1.5" >
+						<stack ignore-layout="true" anchor-pos-y="1.5" horizontal-fit="PreferredSize">
 							<clickable-text id="seasonText" font-size="4.5" text="Season 1" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
 						</stack>
-						<stack ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-20">
-							<text id="pointsText" font-size="4.5" text="2" rich-text="true" align="Center" word-wrapping="false"/>
-						</stack>
-						<stack ignore-layout="true" anchor-pos-y="1.75" anchor-pos-x="-15" size-delta-x="5">
-							<image id="pointsImage" src="BedroomPartyLeaderboard.Images.pp.png" preferred-height="5" preferred-width="5" preserve-aspect="true"/>
-						</stack>
-						
+						<horizontal ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-16" preferred-width="70" spacing="0.5" child-align="MiddleRight">
+							<text id="pointsText" font-size="4.5" text="1" rich-text="true" align="Right" word-wrapping="false"/>
+							<image id="pointsImage" src="BedroomPartyLeaderboard.Images.pp.png" min-width="4" min-height="4" preserve-aspect="true"/>
+						</horizontal>
 						<stack ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="20">
 							<text id="rankText" font-size="4.5" text="#2" rich-text="true" align="Center" word-wrapping="false"/>
 						</stack>
