@@ -220,8 +220,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         internal void showInfoModal()
         {
-            parserParams.EmitEvent("showInfoModal");
             parserParams.EmitEvent("hideSeasonSelectModal");
+            parserParams.EmitEvent("hideScoreInfo");
+            parserParams.EmitEvent("showInfoModal");
         }
 
         [UIAction("hideDaModalBruh")]
@@ -233,6 +234,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal void showSeasonSelectModal()
         {
             parserParams.EmitEvent("showSeasonSelectModal");
+            parserParams.EmitEvent("hideScoreInfo");
+            parserParams.EmitEvent("hideInfoModal");
         }
 
         [UIAction("openWebsite")]
