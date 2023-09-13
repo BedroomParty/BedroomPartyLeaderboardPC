@@ -97,6 +97,8 @@ namespace BedroomPartyLeaderboard.UI
                 ? "<size=4><color=green>Full Combo!</color></size>"
                 : string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
             parserParams.EmitEvent("showScoreInfo");
+            parserParams.EmitEvent("hideSeasonSelectModal");
+            parserParams.EmitEvent("hideInfoModal");
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
