@@ -490,7 +490,9 @@
       <Version>13.0.3</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Images\redX.png" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Player.png" />
   </ItemGroup>
@@ -515,10 +517,10 @@
     <EmbeddedResource Include="Images\lmao.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Images\BedroomPartyLeaderboard_logo.png" />
+    <EmbeddedResource Include="Images\pp.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Images\pp.png" />
+    <EmbeddedResource Include="Images\BedroomPartyLeaderboard_logo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

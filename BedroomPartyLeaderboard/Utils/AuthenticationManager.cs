@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -33,7 +32,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                 if (_localPlayerInfo.authKey == null)
                 {
-                    Plugin.Log.Info("AUTH KEY NULL");
+                    Plugin.Log.Error("AUTH KEY NULL");
                     _isAuthed = false;
                     return false;
                 }
@@ -56,7 +55,7 @@ namespace BedroomPartyLeaderboard.Utils
                         string responseContent = await response.Content.ReadAsStringAsync();
 
                         PlayerResponse playerResponse = JsonConvert.DeserializeObject<PlayerResponse>(responseContent);
-                        if(playerResponse != null)
+                        if (playerResponse != null)
                         {
                             _localPlayerInfo.tempKey = playerResponse.sessionKey;
                             _localPlayerInfo.username = playerResponse.username;

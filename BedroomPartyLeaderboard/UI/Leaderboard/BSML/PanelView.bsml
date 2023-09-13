@@ -22,7 +22,7 @@
 							<clickable-text id="seasonText" font-size="4.5" text="Season 1" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
 						</stack>
 						<horizontal ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-16" preferred-width="70" spacing="0.5" child-align="MiddleRight">
-							<text id="pointsText" font-size="4.5" text="1" rich-text="true" align="Right" word-wrapping="false"/>
+							<text id="pointsText" font-size="4.5" text="10" rich-text="true" align="Right" word-wrapping="false"/>
 							<image id="pointsImage" src="BedroomPartyLeaderboard.Images.pp.png" min-width="4" min-height="4" preserve-aspect="true"/>
 						</horizontal>
 						<stack ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="20">

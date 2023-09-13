@@ -13,17 +13,24 @@ namespace BedroomPartyLeaderboard.Utils
 
         internal class LeaderboardEntry
         {
-            [JsonProperty("rank")] public int rank;
-            [JsonProperty("id")] public string userID;
-            [JsonProperty("username")] public string userName;
-            [JsonProperty("timeSet")] public long timestamp;
-            [JsonProperty("misses")] public int missCount;
-            [JsonProperty("badCuts")] public int badCutCount;
-            [JsonProperty("accuracy")] public float acc;
-            [JsonProperty("fullCombo")] public bool fullCombo;
-            [JsonProperty("modifiedScore")] public int modifiedScore;
-            [JsonProperty("multipliedScore")] public int multipliedScore;
-            [JsonProperty("modifiers")] public string mods;
+            [JsonProperty("rank")] public int? rank = null;
+            [JsonProperty("id")] public string? userID = null;
+            [JsonProperty("username")] public string? userName = null;
+            [JsonProperty("timeSet")] public long? timestamp = null;
+            [JsonProperty("misses")] public int? missCount = null;
+            [JsonProperty("badCuts")] public int? badCutCount = null;
+            [JsonProperty("accuracy")] public float? acc = null;
+            [JsonProperty("fullCombo")] public bool? fullCombo = null;
+            [JsonProperty("modifiedScore")] public int? modifiedScore = null;
+            [JsonProperty("multipliedScore")] public int? multipliedScore = null;
+            [JsonProperty("modifiers")] public string? mods = null;
+            [JsonProperty("pauses")] public int? pauses = null;
+            [JsonProperty("maxCombo")] public int? maxCombo = null;
+            [JsonProperty("avgHandTDRight")] public float? avgHandTDRight = null;
+            [JsonProperty("avgHandTDLeft")] public float? avgHandTDLeft = null;
+            [JsonProperty("avgHandAccRight")] public float? avgHandAccRight = null;
+            [JsonProperty("avgHandAccLeft")] public float? avgHandAccLeft = null;
+            [JsonProperty("perfectStreak")] public int? perfectStreak = null;
         }
     }
 }

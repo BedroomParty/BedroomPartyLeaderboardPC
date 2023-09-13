@@ -8,33 +8,27 @@ namespace BedroomPartyLeaderboard.Utils
 {
     public class Constants
     {
-        public const string AUTH_END_POINT = "https://dev.thebedroom.party/user/login";
+        public const string BASE_API_URL = "https://dev.thebedroom.party";
+        public const string BASE_WEB_URL = "https://thebedroom.party";
 
+
+        public const string AUTH_END_POINT = BASE_API_URL + "/user/login";
         public const string API_KEY_PATH = "./UserData/BPLB/scary/DO_NOT_SHARE.SCARY";
-
-        public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash)
-        {
-            return $"https://dev.thebedroom.party/leaderboard/{hash}";
-        }
-
-        public static string LEADERBOARD_UPLOAD_END_POINT(string hash)
-        {
-            return $"https://dev.thebedroom.party/leaderboard/{hash}/upload";
-        }
-
-        public const string USER_URL = "https://dev.thebedroom.party/user";
         public const string PLAYLIST_PATH = "./Playlists/";
-
-        public const string PLAYLIST_URL_RANKED = "https://dev.thebedroom.party/playlist/ranked";
-        public const string USER_PROFILE_LINK = "https://thebedroom.party/user/";
-
+        public const string PLAYLIST_URL_RANKED = BASE_API_URL + "/playlist/ranked";
         public const string STEAM_API_PATH = "./Beat Saber_Data/Plugins/x86_64/steam_api64.dll";
+
+        public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash) => $"{BASE_API_URL}/leaderboard/{hash}";
+        public static string LEADERBOARD_UPLOAD_END_POINT(string hash) => $"{BASE_API_URL}/leaderboard/{hash}/upload";
+        public static string USER_URL_WEB(string userID) => $"{BASE_WEB_URL}/user/{userID}";
+        public static string USER_URL_API(string userID) => $"{BASE_API_URL}/user/{userID}";
+
 
         public static Color BP_COLOR = new(0.674509804f, 0.760784314f, 0.850980392f);
         public static Color BP_COLOR2 = new(0.839215686f, 0.705882353f, 0.988235294f);
 
         public static string[] staffIDs = null;
-        public const string BUG_REPORT_LINK = "https://thebedroom.party/?bugreports";
+        public const string BUG_REPORT_LINK = BASE_WEB_URL + "/bug-report";
 
         public static async Task<bool> isStaff(string staffString)
         {
@@ -42,7 +36,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 if (staffIDs == null)
                 {
-                    string a = await httpClient.GetStringAsync("https://dev.thebedroom.party/staff");
+                    string a = await httpClient.GetStringAsync($"{BASE_API_URL}/staff");
                     staffIDs = a.Split(',');
                 }
             }

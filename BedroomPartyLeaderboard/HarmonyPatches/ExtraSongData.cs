@@ -14,7 +14,6 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
         {
             private static void Postfix()
             {
-                Plugin.Log.Info("StandardLevelScenesTransitionSetupDataSOInit");
                 ExtraSongDataHolder.reset();
                 currentPerfectHits = 0;
                 highestPerfectStreak = 0;
@@ -27,7 +26,6 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
         {
             public static void Postfix(ref CutScoreBuffer ____cutScoreBuffer)
             {
-                Plugin.Log.Info("HandleCutScoreBufferDidFinish");
                 if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
                 {
                     ExtraSongDataHolder.avgHandAccLeft.Add(____cutScoreBuffer.cutScore);
@@ -67,7 +65,6 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
         {
             public static void Postfix()
             {
-                Plugin.Log.Info("Pause");
                 ExtraSongDataHolder.pauses++;
             }
         }

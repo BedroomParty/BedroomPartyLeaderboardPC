@@ -1,7 +1,6 @@
 ﻿using BedroomPartyLeaderboard.UI.Leaderboard;
 using IPA.Utilities.Async;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -40,7 +39,6 @@ namespace BedroomPartyLeaderboard.Utils
                 }
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                Plugin.Log.Info(jsonResponse);
                 LeaderboardData.BPLeaderboard leaderboardData = JsonConvert.DeserializeObject<LeaderboardData.BPLeaderboard>(jsonResponse);
                 scorecount = leaderboardData.scoreCount;
                 totalPages = Mathf.CeilToInt((float)scorecount / 10);
@@ -64,18 +62,18 @@ namespace BedroomPartyLeaderboard.Utils
 
         public void GetBeatMapData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
-            UnityMainThreadTaskScheduler.Factory.StartNew(() =>  GetLeaderboardData(balls, page, callback));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
 
-        public void SetBeatMapData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, int multipliedScore, int modifiedScore, Action<bool> callback)
+        public void SetBeatMapData(string uploadJson, Action<bool> callback)
         {
             _leaderboardView.hasClickedOffResultsScreen = false;
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback, multipliedScore, modifiedScore));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(uploadJson, callback));
         }
 
 
         internal bool isUploading = false;
-        private async Task UploadLeaderboardData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback, int multipliedScore, int modifiedScore)
+        private async Task UploadLeaderboardData(string balls, Action<bool> callback)
         {
 
             if (DateTime.Now.Millisecond > _authenticationManager._localPlayerInfo.sessionExpiry) return;
@@ -87,15 +85,12 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 try
                 {
-                    Plugin.Log.Info($"Attempt {x}");
-
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _authenticationManager._localPlayerInfo.tempKey);
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-                    string requestBody = getLBUploadJSON(balls, userID, badCuts, misses, fullCOmbo, acc, mods, modifiedScore, multipliedScore);
 
-                    HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+                    HttpContent content = new StringContent(balls, Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(balls.Item1), content);
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(balls), content);
 
                     if (response.StatusCode == HttpStatusCode.Conflict)
                     {
@@ -126,22 +121,6 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-        private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int modifiedScore, int multipliedScore)
-        {
-            JObject Data = new()
-            {
-                { "difficulty", balls.Item2 },
-                { "characteristic", balls.Item3 },
-                { "id", userID },
-                { "badCuts", badCuts },
-                { "misses", misses },
-                { "fullCombo", fullCOmbo },
-                { "accuracy", acc },
-                { "modifiedScore", modifiedScore },
-                { "multipliedScore", multipliedScore },
-                { "modifiers", mods },
-            };
-            return Data.ToString();
-        }
+
     }
 }

@@ -4,15 +4,23 @@ using BeatSaberMarkupLanguage.Components;
 using BedroomPartyLeaderboard.UI.Leaderboard;
 using HMUI;
 using IPA.Utilities;
+using IPA.Utilities.Async;
+using Oculus.Platform;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
+using System.Threading;
+using System.Threading.Tasks;
 using TMPro;
 using Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
+using static BeatSaberMarkupLanguage.BeatSaberUI;
 
 namespace BedroomPartyLeaderboard.Utils
 {
@@ -62,7 +70,7 @@ namespace BedroomPartyLeaderboard.Utils
                     return;
                 }
                 _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
-                _leaderboardView._ImageHolders[i].setProfileImage($"https://dev.thebedroom.party/user/{leaderboard[i].userID}/avatar");
+                _leaderboardView._ImageHolders[i].setProfileImage($"http://dev.thebedroom.party/user/{leaderboard[i].userID}/avatar");
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)
@@ -71,6 +79,38 @@ namespace BedroomPartyLeaderboard.Utils
                 _leaderboardView._ImageHolders[i].profileImage.sprite = null;
             }
         }
+
+        internal static IEnumerator GetSpriteAvatar(string url, Action<Sprite> onSuccess, Action<string> onFailure, CancellationToken cancellationToken)
+        {
+            var handler = new DownloadHandlerTexture();
+            var www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
+            www.downloadHandler = handler;
+            yield return www.SendWebRequest();
+
+            while (!www.isDone)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    onFailure?.Invoke("Cancelled");
+                    yield break;
+                }
+
+                yield return null;
+            }
+            if (www.isHttpError || www.isNetworkError)
+            {
+                onFailure?.Invoke(www.error);
+                yield break;
+            }
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                onFailure?.Invoke(www.error);
+                yield break;
+            }
+            Sprite sprite = Sprite.Create(handler.texture, new Rect(0, 0, handler.texture.width, handler.texture.height), Vector2.one * 0.5f);
+            onSuccess?.Invoke(sprite);
+        }
+
 
         public void GetCoolMaterialAndApply()
         {
@@ -223,6 +263,9 @@ namespace BedroomPartyLeaderboard.Utils
 
             public bool isLoading;
 
+            private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+
             public ImageHolder(int index)
             {
                 this.index = index;
@@ -236,11 +279,56 @@ namespace BedroomPartyLeaderboard.Utils
 
             public void setProfileImage(string url)
             {
-                isLoading = true;
-                profileloading.SetActive(true);
-                profileImage.SetImage(url);
-                profileloading.SetActive(false);
+                profileloading.gameObject.SetActive(true);
+                try
+                {
+                    if (isLoading)
+                    {
+                        CancelDownload();
+                    }
+
+                    isLoading = true;
+                    profileloading.SetActive(true);
+
+                    cancellationTokenSource = new CancellationTokenSource();
+
+                    Task.Run(() => ThisFuckingSucks(url));
+                }
+                catch
+                {
+                    isLoading = false;
+                }
+            }
+
+            private async Task ThisFuckingSucks(string url)
+            {
+                await Constants.WaitUntil(() => profileImage.IsActive());
+                UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                {
+                    profileImage.StartCoroutine(GetSpriteAvatar(url, OnAvatarYay, OnAvatarNay, cancellationTokenSource.Token));
+                });
+            }
+
+            private void OnAvatarYay(Sprite a)
+            {
+                profileImage.sprite = a;
+                profileloading.gameObject.SetActive(false);
                 isLoading = false;
+            }
+
+            private void OnAvatarNay(string a)
+            {
+                profileImage.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png");
+                profileloading.gameObject.SetActive(false);
+                isLoading = false;
+            }
+
+            private void CancelDownload()
+            {
+                if (cancellationTokenSource != null && !cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    cancellationTokenSource.Cancel();
+                }
             }
         }
 

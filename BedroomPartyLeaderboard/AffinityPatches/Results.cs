@@ -1,8 +1,8 @@
 ﻿using BedroomPartyLeaderboard.UI.Leaderboard;
 using BedroomPartyLeaderboard.Utils;
 using IPA.Utilities.Async;
+using Newtonsoft.Json.Linq;
 using SiraUtil.Affinity;
-using System.Threading.Tasks;
 using Zenject;
 
 namespace BedroomPartyLeaderboard.AffinityPatches
@@ -115,17 +115,46 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             string mapType = playerLevelStats.beatmapCharacteristic.serializedName;
             (string, int, string) balls = (mapId, difficulty, mapType);
             string mods = GetModifiersString(levelCompletionResults);
+
             int pauses = ExtraSongDataHolder.pauses;
             int maxCombo = levelCompletionResults.maxCombo;
             float avgHandAccRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccRight);
             float avgHandAccLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccLeft);
             int perfectStreak = ExtraSongDataHolder.perfectStreak;
 
+            float avgHandTDRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDRight);
+            float avgHandTDLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDLeft);
+
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _leaderboardView.HandleLBUpload());
-            _requestUtils.SetBeatMapData(balls, _authenticationManager._localPlayerInfo.userID, _authenticationManager._localPlayerInfo.username, badCut, misses, fc, acc, score, mods, multipliedScore, modifiedScore, result =>
+            string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft);
+            _requestUtils.SetBeatMapData(json, result =>
             {
-                Plugin.Log.Info("_requestUtils.SetBeatMapData");
             });
+        }
+
+        private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int multipliedScore, int modifiedScore, int pauses, int maxCombo, float avgAccRight, float avgAccLeft, int perfectStreak, float avgHandTDRight, float avgHandTDLeft)
+        {
+            JObject Data = new()
+            {
+                { "difficulty", balls.Item2 },
+                { "characteristic", balls.Item3 },
+                { "id", userID },
+                { "badCuts", badCuts },
+                { "misses", misses },
+                { "fullCombo", fullCOmbo },
+                { "accuracy", acc },
+                { "modifiedScore", modifiedScore },
+                { "multipliedScore", multipliedScore },
+                { "modifiers", mods },
+                { "pauses", pauses },
+                { "maxCombo", maxCombo },
+                { "avgHandTDRight", avgHandTDLeft },
+                { "avgHandTDLeft", avgHandTDRight },
+                { "avgHandAccRight", avgAccRight },
+                { "avgHandAccLeft", avgAccLeft},
+                { "perfectStreak", perfectStreak }
+            };
+            return Data.ToString();
         }
     }
 }

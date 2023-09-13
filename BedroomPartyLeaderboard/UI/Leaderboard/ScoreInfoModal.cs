@@ -2,6 +2,7 @@
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using BedroomPartyLeaderboard.Utils;
 using HMUI;
 using IPA.Utilities.Async;
@@ -10,12 +11,16 @@ using System;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using Zenject;
 using static BedroomPartyLeaderboard.Utils.UIUtils;
 
 namespace BedroomPartyLeaderboard.UI
 {
     internal class ScoreInfoModal
     {
+
+        [Inject] private readonly LeaderboardView _leaderboardView;
+
         [UIComponent("scoreInfo")]
         public ModalView infoModal;
 
@@ -55,7 +60,7 @@ namespace BedroomPartyLeaderboard.UI
         [UIAction("usernameScoreTextCLICK")]
         public void usernameScoreTextCLICK()
         {
-            Application.OpenURL(Constants.USER_PROFILE_LINK + currentEntry.userID);
+            Application.OpenURL(Constants.USER_URL_WEB(currentEntry.userID));
         }
 
         private LeaderboardData.LeaderboardEntry currentEntry;
@@ -88,16 +93,13 @@ namespace BedroomPartyLeaderboard.UI
                 modifiersScoreText.gameObject.SetActive(true);
             }
 
-            fcScoreText.text = entry.fullCombo
+            fcScoreText.text = (bool)entry.fullCombo
                 ? "<size=4><color=green>Full Combo!</color></size>"
                 : string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
             parserParams.EmitEvent("showScoreInfo");
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-                profileImageModal.SetImage($"https://dev.thebedroom.party/user/{entry.userID}/avatar");
-                profileImageModalLOADING.SetActive(false);
-
                 if (Task.Run(() => Constants.isStaff(entry.userID)).Result)
                 {
                     RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
@@ -122,6 +124,19 @@ namespace BedroomPartyLeaderboard.UI
                 textHoverEffect.daStyle = FontStyles.Underline;
                 textHoverEffect.origStyle = FontStyles.Normal;
 
+                Task.Run(() =>
+                {
+                    while (_leaderboardView._ImageHolders[(int)currentEntry.rank - 1].isLoading)
+                    {
+
+                    }
+
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                    {
+                        profileImageModal.sprite = _leaderboardView._ImageHolders[(int)currentEntry.rank - 1].profileImage.sprite;
+                        profileImageModalLOADING.SetActive(false);
+                    });
+                });
             });
         }
     }

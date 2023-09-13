@@ -102,7 +102,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         private void SetSeasonList(int _currentSeason)
         {
             currentSeason = _currentSeason;
-            Plugin.Log.Notice("SetSeasonButtons");
             List<SeasonListItem> seasonButtons = Enumerable.Range(0, _currentSeason)
                 .Select(i =>
                 {
@@ -115,8 +114,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             seasonList.data = seasonButtons.Cast<object>().ToList();
             seasonList.tableView.ReloadData();
         }
-
-
 
         internal int page = 0;
         internal int totalPages;
@@ -226,9 +223,14 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             parserParams.EmitEvent("showInfoModal");
         }
 
+        [UIAction("hideDaModalBruh")]
+        internal void hideDaModalBruh()
+        {
+            parserParams.EmitEvent("hideSeasonSelectModal");
+        }
+
         internal void showSeasonSelectModal()
         {
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(12));
             parserParams.EmitEvent("showSeasonSelectModal");
         }
 
@@ -280,6 +282,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 {
                     await Constants.WaitUntil(() => _authenticationManager.IsAuthed, timeout: 60000);
                 }
+
                 catch (TimeoutException)
                 {
                     SetErrorState(true, "Failed to Auth");
@@ -289,9 +292,10 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             _panelView.prompt_loader.SetActive(false);
             _panelView.promptText.text = $"<color=green>Successfully signed in!</color>";
             _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
-            _panelView.playerAvatar.SetImage($"https://dev.thebedroom.party/user/{_authenticationManager._localPlayerInfo.userID}/avatar");
+            _panelView.playerAvatar.StartCoroutine(GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a) => _panelView.playerAvatar.sprite = a, (string a) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
             _panelView.playerAvatarLoading.gameObject.SetActive(false);
-            Task.Run(() => assignStaff());
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(1));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => Task.Run(() => assignStaff()));
             await Constants.WaitUntil(() => currentDifficultyBeatmap != null);
             OnLeaderboardSet(currentDifficultyBeatmap);
             _panelView.seasonText.richText = true;
@@ -429,84 +433,94 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 return;
             }
 
-
-            SetErrorState(false, "");
-            leaderboardTableView.SetScores(null, -1);
-            loadingLB.gameObject.SetActive(true);
-            FuckOffButtons();
-            ByeImages();
-
-            await Task.Delay(200);
-
-            SetErrorState(false, "");
-            leaderboardTableView.SetScores(null, -1);
-            loadingLB.gameObject.SetActive(true);
-            FuckOffButtons();
-            ByeImages();
-
-            Plugin.Log.Notice(difficultyBeatmap.level.levelID);
-            string mapId = difficultyBeatmap.level.levelID.Substring(13);
-            mapId = mapId.Split('_')[0];
-            Plugin.Log.Notice(mapId);
-            int difficulty = difficultyBeatmap.difficultyRank;
-            string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
-            string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
-            currentSongLinkLBWebView = $"https://thebedroom.party/leaderboard/{balls}";
-
-            await Task.Delay(50);
-
-            if (cancellationToken.IsCancellationRequested)
+            try
             {
+
+
                 SetErrorState(false, "");
-                loadingLB.gameObject.SetActive(true);
-                ByeIMGLoader();
                 leaderboardTableView.SetScores(null, -1);
-                FadeOut(leaderboardTableView);
-                return;
-            }
+                loadingLB.gameObject.SetActive(true);
+                FuckOffButtons();
+                ByeImages();
 
-            await Task.Delay(50);
-            _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
-            {
-                totalPages = result.Item3;
-                HelloIMGLoader();
-                UpdatePageButtons();
-                if (result.Item2 != null)
+                await Task.Delay(200);
+
+                SetErrorState(false, "");
+                leaderboardTableView.SetScores(null, -1);
+                loadingLB.gameObject.SetActive(true);
+                FuckOffButtons();
+                ByeImages();
+
+                string mapId = difficultyBeatmap.level.levelID.Substring(13);
+                mapId = mapId.Split('_')[0];
+                int difficulty = difficultyBeatmap.difficultyRank;
+                string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
+                string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
+                currentSongLinkLBWebView = $"https://thebedroom.party/leaderboard/{mapId}";
+
+                await Task.Delay(50);
+
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    if (result.Item2.Count == 0)
+                    SetErrorState(false, "");
+                    loadingLB.gameObject.SetActive(true);
+                    ByeIMGLoader();
+                    leaderboardTableView.SetScores(null, -1);
+                    FadeOut(leaderboardTableView);
+                    return;
+                }
+
+                await Task.Delay(50);
+                _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
+                {
+                    totalPages = result.Item3;
+                    HelloIMGLoader();
+                    UpdatePageButtons();
+                    if (result.Item2 != null)
                     {
-                        SetErrorState(false, "No Scores Found");
-                        HandleNoLeaderboardEntries();
-                        loadingLB.gameObject.SetActive(false);
-                        ByeIMGLoader();
+                        if (result.Item2.Count == 0)
+                        {
+                            SetErrorState(false, "No Scores Found");
+                            HandleNoLeaderboardEntries();
+                            loadingLB.gameObject.SetActive(false);
+                            ByeIMGLoader();
+                        }
+                        else
+                        {
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                SetErrorState(false, "");
+                                loadingLB.gameObject.SetActive(true);
+                                ByeIMGLoader();
+                                leaderboardTableView.SetScores(null, -1);
+                                return;
+                            }
+                            loadingLB.gameObject.SetActive(false);
+                            leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
+                            _uiUtils.RichMyText(leaderboardTableView);
+                            _uiUtils.SetProfiles(result.Item2);
+                        }
                     }
                     else
                     {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            SetErrorState(false, "");
-                            loadingLB.gameObject.SetActive(true);
-                            ByeIMGLoader();
-                            leaderboardTableView.SetScores(null, -1);
-                            return;
-                        }
+                        SetErrorState(false, "Error");
+                        HandleNoLeaderboardEntries();
                         loadingLB.gameObject.SetActive(false);
-                        leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
-                        _uiUtils.RichMyText(leaderboardTableView);
-                        _uiUtils.SetProfiles(result.Item2);
+                        ByeIMGLoader();
+                        Plugin.Log.Error("Error");
                     }
-                }
-                else
-                {
-                    SetErrorState(false, "Error");
-                    HandleNoLeaderboardEntries();
-                    loadingLB.gameObject.SetActive(false);
-                    ByeIMGLoader();
-                    Plugin.Log.Error("Error");
-                }
-            });
+                });
 
-            if (cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    SetErrorState(false, "");
+                    loadingLB.gameObject.SetActive(true);
+                    ByeIMGLoader();
+                    leaderboardTableView.SetScores(null, -1);
+                    return;
+                }
+            }
+            catch (OperationCanceledException)
             {
                 SetErrorState(false, "");
                 loadingLB.gameObject.SetActive(true);
@@ -537,9 +551,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             List<ScoreData> tableData = new();
             for (int i = 0; i < leaderboard.Count; i++)
             {
-                int score = leaderboard[i].modifiedScore;
+                int score = (int)leaderboard[i].modifiedScore;
                 int rank = (((page + 1) * 10) - (10 - i)) + 1;
-                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], score, rank));
+                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], (int)score, (int)rank));
                 buttonEntryArray[i] = leaderboard[i];
                 Buttonholders[i].infoButton.gameObject.SetActive(false);
             }
@@ -549,7 +563,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int score, int rankFUCK)
         {
             string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
-            string formattedCombo = entry.fullCombo
+            string formattedCombo = (bool)entry.fullCombo
                 ? " -<color=green> FC </color>"
                 : string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
             string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
@@ -557,7 +571,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             string result;
             if (entry.userID == "76561199077754911")
             {
-                entry.userName = $"<color=blue>{entry.userName}</color>";
+                entry.userName = $"<color=#6488ea>{entry.userName}</color>";
             }
 
             result = "<size=90%>" + entry.userName.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";

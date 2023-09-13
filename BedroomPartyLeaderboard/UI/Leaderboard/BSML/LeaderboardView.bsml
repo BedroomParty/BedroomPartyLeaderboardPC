@@ -96,25 +96,28 @@
 					</horizontal>
 				</vertical>
 			</modal>
-			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='63.75' size-delta-y='63.75' clickerino-offerino-closerino='true' move-to-center='true'>
+			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='65' size-delta-y='60' clickerino-offerino-closerino='false' move-to-center='true'>
 				<vertical pad='2' spacing='11.25'>
-					<custom-list id="seasonList" show-scrollbar="true" stick-scrolling="true" size-delta-y="50" contents="seasonsContents" clickable-cells="false" cell-size="11" list-width="52">
+					<stack ignore-layout="true" anchor-pos-x="26" anchor-pos-y="26">
+						<button-with-icon id="closeButton" on-click="hideDaModalBruh" icon="BedroomPartyLeaderboard.Images.redX.png" preferred-height="8" preferred-width="8"/>
+					</stack>
+					<custom-list ignore-layout="true" anchor-pos-x="-4"  id="seasonList" show-scrollbar="false" stick-scrolling="true" size-delta-y="60" contents="seasonsContents" clickable-cells="false" cell-size="11" list-width="57">
 						<horizontal id="backgroundImage" bg="panel-top" preferred-height="11" vertical-fit="PreferredSize" preferred-width="50" horizontal-fit="PreferredSize">
-							<stack pref-width="8.8125" preferred-height="8.8125" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-21">
+							<stack pref-width="10.5" preferred-height="10.5" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-21">
 								<image id="seasonImage" src="BedroomPartyLeaderboard.Images.blank.png" preserve-aspect="true"/>
 							</stack>
-							<vertical preferred-width="22.5" preferred-height="7.5" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-4">
+							<vertical preferred-width="22.5" preferred-height="7.5" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="-3.25">
 								<text text="~seasonNumber" font-size="3.5"/>
 								<text text="~seasonDescription" font-size="2.25"/>
 							</vertical>
 
-							<vertical preferred-width="22.5" preferred-height="7.5" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="10">
+							<vertical spacing="1.3" preferred-width="22.5" preferred-height="6.9" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="10">
 								<text text="~rank" font-size="3"/>
 								<text text="~pp" font-size="2.5"/>
 							</vertical>
 
-							<vertical preferred-width="22.5" preferred-height="7.5" spacing="2" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="18">
-								<button word-wrapping="false" preferred-height="6.75" size-delta-x="8.25" font-size="2.0625" size-delta-y="4.5" text="Playlist" preferred-width="11.25" on-click="seasonPlaylistClicked"/>
+							<vertical preferred-width="22.5" preferred-height="7.5" spacing="2" horizontal-fit="PreferredSize" vertical-fit="PreferredSize" ignore-layout="true" anchor-pos-x="18.25">
+								<button word-wrapping="false" preferred-height="6.75" size-delta-x="8.25" font-size="2.5" size-delta-y="4.5" text="Playlist" preferred-width="11.25" on-click="seasonPlaylistClicked"/>
 								<button word-wrapping="false" size-delta-x="9.75" pref-height="6.75" font-size="2.0625" size-delta-y="4.5" text="Leaderboard" preferred-width="11.25" on-click="seasonLeaderboardClicked"/>
 							</vertical>
 						</horizontal>
