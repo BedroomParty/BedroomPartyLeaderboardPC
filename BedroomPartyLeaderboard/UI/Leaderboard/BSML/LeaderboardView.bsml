@@ -135,7 +135,7 @@
 
 							<horizontal spacing="-2">
 								<clickable-text rich-text="true" id="usernameScoreText" font-size="~font-size" text="USERNAME" align="Center" on-click="usernameScoreTextCLICK"/>
-								<vertical anchor-pos-y="25" pref-width="12" pref-height="12">
+								<vertical spacing="4" anchor-pos-y="25" pref-width="12" pref-height="12">
 									<stack>
 										<image id="profileImageModal" src="BedroomPartyLeaderboard.Images.blank.png"  preserve-aspect="true"/>
 										<loading-indicator id="profileImageModalLOADING" preserve-aspect="true" />
