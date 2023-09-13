@@ -12,6 +12,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         [Inject] private readonly RequestUtils _requestUtils;
         [Inject] private readonly AuthenticationManager _authenticationManager;
         [Inject] private readonly LeaderboardView _leaderboardView;
+        [Inject] private readonly UIUtils _uiUtils;
+        [Inject] private readonly PlayerUtils _playerUtils;
 
         public static string GetModifiersString(LevelCompletionResults levelCompletionResults)
         {
@@ -125,7 +127,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             float avgHandTDRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDRight);
             float avgHandTDLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDLeft);
 
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => _leaderboardView.HandleLBUpload());
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
             string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft);
             _requestUtils.SetBeatMapData(json, result =>
             {

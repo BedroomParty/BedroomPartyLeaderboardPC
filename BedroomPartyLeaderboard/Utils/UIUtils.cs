@@ -5,12 +5,10 @@ using BedroomPartyLeaderboard.UI.Leaderboard;
 using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
-using Oculus.Platform;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
@@ -20,7 +18,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
-using static BeatSaberMarkupLanguage.BeatSaberUI;
 
 namespace BedroomPartyLeaderboard.Utils
 {
@@ -29,6 +26,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly PanelView _panelView;
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly TweeningService _tweeningService;
+        [Inject] private readonly AuthenticationManager _authenticationManager;
         public class RainbowAnimation : MonoBehaviour
         {
             public float speed = 1f; // Speed of the color change
@@ -57,6 +55,21 @@ namespace BedroomPartyLeaderboard.Utils
                 Color rainbowColor = Color.HSVToRGB(hue, 1f, 1f);
                 clickableText.color = rainbowColor;
             }
+        }
+
+        internal void ByeImages()
+        {
+            _leaderboardView._ImageHolders.ForEach(holder => holder.profileImage.sprite = null);
+        }
+
+        internal void HelloIMGLoader()
+        {
+            _leaderboardView._ImageHolders.ForEach(holder => holder.profileloading.SetActive(true));
+        }
+
+        internal void ByeIMGLoader()
+        {
+            _leaderboardView._ImageHolders.ForEach(holder => holder.profileloading.SetActive(false));
         }
 
         public void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard)
@@ -111,6 +124,50 @@ namespace BedroomPartyLeaderboard.Utils
             onSuccess?.Invoke(sprite);
         }
 
+        public async Task SetToast(string Text, bool FullyActive, bool LoadingActive, int delay)
+        {
+            if (!FullyActive)
+            {
+                _panelView.prompt_loader.SetActive(false);
+                _panelView.promptText.gameObject.SetActive(false);
+                return;
+            }
+
+            if (LoadingActive)
+            {
+                _panelView.prompt_loader.SetActive(true);
+            }
+
+            _panelView.promptText.text = Text;
+
+            if (delay == 0)
+            {
+                return;
+            }
+
+            await Task.Delay(delay);
+            _panelView.prompt_loader.SetActive(false);
+            _panelView.promptText.gameObject.SetActive(false);
+        }
+
+
+        public async Task assignStaff()
+        {
+            if (await Task.Run(() => Constants.isStaff(_authenticationManager._localPlayerInfo.userID).Result))
+            {
+                RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
+                rainbowAnimation.speed = 0.35f;
+            }
+            else
+            {
+                RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.GetComponent<RainbowAnimation>();
+                if (rainbowAnimation != null)
+                {
+                    UnityEngine.Object.Destroy(rainbowAnimation);
+                }
+                _panelView.playerUsername.color = Color.white;
+            }
+        }
 
         public void GetCoolMaterialAndApply()
         {

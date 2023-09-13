@@ -1,4 +1,5 @@
-﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+﻿using BeatSaberMarkupLanguage;
+using BedroomPartyLeaderboard.UI.Leaderboard;
 using IPA.Utilities.Async;
 using Newtonsoft.Json;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -17,6 +19,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly LeaderboardData _leaderboardData;
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly PanelView _panelView;
+        [Inject] private readonly UIUtils _uiUtils;
         [Inject] private readonly AuthenticationManager _authenticationManager;
 
         public async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
@@ -120,6 +123,66 @@ namespace BedroomPartyLeaderboard.Utils
                 await Task.Delay(3000);
             }
         }
+
+        internal async Task HandleLBAuth()
+        {
+            if (!_authenticationManager.IsAuthed)
+            {
+
+                UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Authenticating...", true, true, 0));
+                try
+                {
+                    await Constants.WaitUntil(() => _authenticationManager.IsAuthed, timeout: 60000);
+                }
+
+                catch (TimeoutException)
+                {
+                    _leaderboardView.SetErrorState(true, "Failed to Auth");
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("", false, false, 0));
+                }
+            }
+
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully signed in!</color>", true, false, 4000));
+            _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
+
+            _panelView.playerAvatar.StartCoroutine(UIUtils.GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a) => _panelView.playerAvatar.sprite = a, (string a) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
+            _panelView.playerAvatarLoading.gameObject.SetActive(false);
+
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => _leaderboardView.SetSeasonList(1));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => Task.Run(() => _uiUtils.assignStaff()));
+
+            await Constants.WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
+            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+            _panelView.seasonText.richText = true;
+            await Task.Delay(3000);
+            _panelView.prompt_loader.SetActive(false);
+            _panelView.promptText.gameObject.SetActive(false);
+            return;
+        }
+
+
+        internal async Task HandleLBUpload()
+        {
+            if (isUploading)
+            {
+                UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Uploading Score...", true, true, 0));
+                try
+                {
+                    await Constants.WaitUntil(() => !isUploading, timeout: 60000);
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully uploaded score!</color>", true, false, 4000));
+                }
+                catch (TimeoutException)
+                {
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=red>Failed to upload...</color>", true, false, 4000));
+                }
+            }
+            await Constants.WaitUntil(() => _leaderboardView.hasClickedOffResultsScreen);
+            await Task.Delay(100);
+            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+            return;
+        }
+
+
 
 
     }

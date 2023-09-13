@@ -17,7 +17,6 @@ using TMPro;
 using UnityEngine;
 using Zenject;
 using static BedroomPartyLeaderboard.Utils.UIUtils;
-using static LeaderboardTableView;
 using Button = UnityEngine.UI.Button;
 
 namespace BedroomPartyLeaderboard.UI.Leaderboard
@@ -99,7 +98,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIValue("seasonsContents")]
         private List<object> seasonsContents => new List<object>();
 
-        private void SetSeasonList(int _currentSeason)
+        internal void SetSeasonList(int _currentSeason)
         {
             currentSeason = _currentSeason;
             List<SeasonListItem> seasonButtons = Enumerable.Range(0, _currentSeason)
@@ -247,23 +246,15 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-            if (!base.isActiveAndEnabled)
-            {
-                return;
-            }
-
-            if (!_plvc)
-            {
-                return;
-            }
+            if (!base.isActiveAndEnabled) return;
+            if (!_plvc) return;
 
             Transform header = _plvc.transform.Find("HeaderPanel");
             if (firstActivation)
             {
-
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
-                    Task.Run(() => HandleLBAuth());
+                    Task.Run(() => _requestUtils.HandleLBAuth());
                     _uiUtils.GetCoolMaterialAndApply();
                 });
                 TextHoverEffect textHoverEffect = _panelView.playerUsername.gameObject.AddComponent<UIUtils.TextHoverEffect>();
@@ -274,105 +265,12 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
 
-        private async Task HandleLBAuth()
-        {
-            if (!_authenticationManager.IsAuthed)
-            {
-                _panelView.prompt_loader.SetActive(true);
-                _panelView.promptText.gameObject.SetActive(true);
-                _panelView.promptText.text = "Authenticating...";
-
-                try
-                {
-                    await Constants.WaitUntil(() => _authenticationManager.IsAuthed, timeout: 60000);
-                }
-
-                catch (TimeoutException)
-                {
-                    SetErrorState(true, "Failed to Auth");
-                }
-            }
-
-            _panelView.prompt_loader.SetActive(false);
-            _panelView.promptText.text = $"<color=green>Successfully signed in!</color>";
-            _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
-            _panelView.playerAvatar.StartCoroutine(GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a) => _panelView.playerAvatar.sprite = a, (string a) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
-            _panelView.playerAvatarLoading.gameObject.SetActive(false);
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => SetSeasonList(1));
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => Task.Run(() => assignStaff()));
-            await Constants.WaitUntil(() => currentDifficultyBeatmap != null);
-            OnLeaderboardSet(currentDifficultyBeatmap);
-            _panelView.seasonText.richText = true;
-            await Task.Delay(3000);
-            _panelView.prompt_loader.SetActive(false);
-            _panelView.promptText.gameObject.SetActive(false);
-            return;
-        }
-
-
-        internal async Task HandleLBUpload()
-        {
-            if (_requestUtils.isUploading)
-            {
-                _panelView.prompt_loader.SetActive(true);
-                _panelView.promptText.gameObject.SetActive(true);
-                _panelView.promptText.text = "Uploading Score...";
-
-                try
-                {
-                    await Constants.WaitUntil(() => !_requestUtils.isUploading, timeout: 60000);
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.gameObject.SetActive(true);
-                    _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
-                }
-                catch (TimeoutException)
-                {
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.gameObject.SetActive(true);
-                    _panelView.promptText.text = "<color=red>Failed to upload...</color>";
-                    await Task.Delay(3000);
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.gameObject.SetActive(false);
-                }
-            }
-            await Constants.WaitUntil(() => hasClickedOffResultsScreen);
-            await Task.Delay(100);
-            OnLeaderboardSet(currentDifficultyBeatmap);
-            return;
-        }
-
-
-        internal async Task assignStaff()
-        {
-            if (await Task.Run(() => Constants.isStaff(_authenticationManager._localPlayerInfo.userID).Result))
-            {
-                RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.AddComponent<RainbowAnimation>();
-                rainbowAnimation.speed = 0.35f;
-            }
-            else
-            {
-                RainbowAnimation rainbowAnimation = _panelView.playerUsername.gameObject.GetComponent<RainbowAnimation>();
-                if (rainbowAnimation != null)
-                {
-                    UnityEngine.Object.Destroy(rainbowAnimation);
-                }
-                _panelView.playerUsername.color = Color.white;
-            }
-        }
-
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            if (!_plvc)
-            {
-                return;
-            }
+            if (!_plvc) return;
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
-
-            if (!_plvc.isActivated)
-            {
-                return;
-            }
+            if (!_plvc.isActivated) return;
             page = 0;
             parserParams.EmitEvent("hideInfoModal");
             parserParams.EmitEvent("hideSeasonSelectModal");
@@ -412,17 +310,13 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             }
             cancellationTokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-
             UnityMainThreadTaskScheduler.Factory.StartNew(() => realLeaderboardSet(difficultyBeatmap, cancellationToken));
         }
 
 
         private async Task realLeaderboardSet(IDifficultyBeatmap difficultyBeatmap, CancellationToken cancellationToken)
         {
-            if (!_plvc || !_plvc.isActiveAndEnabled)
-            {
-                return;
-            }
+            if (!_plvc || !_plvc.isActiveAndEnabled) return;
 
             if (cancellationTokenSource != null)
             {
@@ -432,21 +326,15 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             cancellationTokenSource = new CancellationTokenSource();
             cancellationToken = cancellationTokenSource.Token;
 
-
-            if (!_authenticationManager.IsAuthed)
-            {
-                return;
-            }
+            if (!_authenticationManager.IsAuthed) return;
 
             try
             {
-
-
                 SetErrorState(false, "");
                 leaderboardTableView.SetScores(null, -1);
                 loadingLB.gameObject.SetActive(true);
                 FuckOffButtons();
-                ByeImages();
+                _uiUtils.ByeImages();
 
                 await Task.Delay(200);
 
@@ -454,7 +342,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 leaderboardTableView.SetScores(null, -1);
                 loadingLB.gameObject.SetActive(true);
                 FuckOffButtons();
-                ByeImages();
+                _uiUtils.ByeImages();
 
                 string mapId = difficultyBeatmap.level.levelID.Substring(13);
                 mapId = mapId.Split('_')[0];
@@ -469,7 +357,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 {
                     SetErrorState(false, "");
                     loadingLB.gameObject.SetActive(true);
-                    ByeIMGLoader();
+                    _uiUtils.ByeIMGLoader();
                     leaderboardTableView.SetScores(null, -1);
                     FadeOut(leaderboardTableView);
                     return;
@@ -479,7 +367,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
                 {
                     totalPages = result.Item3;
-                    HelloIMGLoader();
+                    _uiUtils.HelloIMGLoader();
                     UpdatePageButtons();
                     if (result.Item2 != null)
                     {
@@ -488,7 +376,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                             SetErrorState(false, "No Scores Found");
                             HandleNoLeaderboardEntries();
                             loadingLB.gameObject.SetActive(false);
-                            ByeIMGLoader();
+                            _uiUtils.ByeIMGLoader();
                         }
                         else
                         {
@@ -496,12 +384,12 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                             {
                                 SetErrorState(false, "");
                                 loadingLB.gameObject.SetActive(true);
-                                ByeIMGLoader();
+                                _uiUtils.ByeIMGLoader();
                                 leaderboardTableView.SetScores(null, -1);
                                 return;
                             }
                             loadingLB.gameObject.SetActive(false);
-                            leaderboardTableView.SetScores(CreateLeaderboardData(result.Item2, page), -1);
+                            leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, Buttonholders), -1);
                             _uiUtils.RichMyText(leaderboardTableView);
                             _uiUtils.SetProfiles(result.Item2);
                         }
@@ -511,7 +399,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                         SetErrorState(false, "Error");
                         HandleNoLeaderboardEntries();
                         loadingLB.gameObject.SetActive(false);
-                        ByeIMGLoader();
+                        _uiUtils.ByeIMGLoader();
                         Plugin.Log.Error("Error");
                     }
                 });
@@ -520,7 +408,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 {
                     SetErrorState(false, "");
                     loadingLB.gameObject.SetActive(true);
-                    ByeIMGLoader();
+                    _uiUtils.ByeIMGLoader();
                     leaderboardTableView.SetScores(null, -1);
                     return;
                 }
@@ -529,61 +417,11 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             {
                 SetErrorState(false, "");
                 loadingLB.gameObject.SetActive(true);
-                ByeIMGLoader();
+                _uiUtils.ByeIMGLoader();
                 leaderboardTableView.SetScores(null, -1);
                 return;
             }
         }
-
-
-        private void ByeImages()
-        {
-            _ImageHolders.ForEach(holder => holder.profileImage.sprite = null);
-        }
-
-        private void HelloIMGLoader()
-        {
-            _ImageHolders.ForEach(holder => holder.profileloading.SetActive(true));
-        }
-
-        private void ByeIMGLoader()
-        {
-            _ImageHolders.ForEach(holder => holder.profileloading.SetActive(false));
-        }
-
-        internal List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page)
-        {
-            List<ScoreData> tableData = new();
-            for (int i = 0; i < leaderboard.Count; i++)
-            {
-                int score = (int)leaderboard[i].modifiedScore;
-                int rank = (((page + 1) * 10) - (10 - i)) + 1;
-                tableData.Add(CreateLeaderboardEntryData(leaderboard[i], (int)score, (int)rank));
-                buttonEntryArray[i] = leaderboard[i];
-                Buttonholders[i].infoButton.gameObject.SetActive(false);
-            }
-            return tableData;
-        }
-
-        internal ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int score, int rankFUCK)
-        {
-            string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
-            string formattedCombo = (bool)entry.fullCombo
-                ? " -<color=green> FC </color>"
-                : string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
-            string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
-
-            string result;
-            if (entry.userID == "76561199077754911")
-            {
-                entry.userName = $"<color=#6488ea>{entry.userName}</color>";
-            }
-
-            result = "<size=90%>" + entry.userName.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";
-            entry.rank = rankFUCK;
-            return new ScoreData(score, result, rankFUCK, false);
-        }
-
 
         internal bool hasClickedOffResultsScreen = false;
 

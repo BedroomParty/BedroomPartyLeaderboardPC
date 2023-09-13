@@ -29,21 +29,14 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
                 if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
                 {
                     ExtraSongDataHolder.avgHandAccLeft.Add(____cutScoreBuffer.cutScore);
-                }
-                else if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorB)
-                {
-                    ExtraSongDataHolder.avgHandAccLeft.Add(____cutScoreBuffer.cutScore);
-                }
-
-                if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
-                {
                     ExtraSongDataHolder.avgHandTDLeft.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
+
                 }
                 else if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorB)
                 {
+                    ExtraSongDataHolder.avgHandAccRight.Add(____cutScoreBuffer.cutScore);
                     ExtraSongDataHolder.avgHandTDRight.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
                 }
-
 
                 if (____cutScoreBuffer.cutScore == 115)
                 {
