@@ -108,9 +108,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 {
                     if (_currentSeason - i == _currentSeason)
                     {
-                        return new SeasonListItem(_currentSeason, $"Season {_currentSeason}", "Speed Tech", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
+                        return new SeasonListItem(_currentSeason, $"Season {_currentSeason}", "Speed Tech", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"), "Rank: 1", "PP: 10234");
                     }
-                    return new SeasonListItem(_currentSeason - i, $"Season {_currentSeason - i}", "No Pauses", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"));
+                    return new SeasonListItem(_currentSeason - i, $"Season {_currentSeason - i}", "No Pauses", Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.BedroomPartyLeaderboard_logo.png"), "Rank: 53", "PP: 123");
                 }).ToList();
             seasonList.data = seasonButtons.Cast<object>().ToList();
             seasonList.tableView.ReloadData();
@@ -451,7 +451,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             int difficulty = difficultyBeatmap.difficultyRank;
             string mapType = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName;
             string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
-            currentSongLinkLBWebView = $"https://thebedroom.party/?board={balls}";
+            currentSongLinkLBWebView = $"https://thebedroom.party/leaderboard/{balls}";
 
             await Task.Delay(50);
 

@@ -12,16 +12,23 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         [UIValue("seasonNumber")] public string seasonNumber;
         [UIValue("seasonDescription")] public string seasonDescription;
+
+        [UIValue("rank")] public string rankText;
+        [UIValue("pp")] public string ppText;
+
+
         [UIComponent("seasonImage")] public ImageView seasonImage;
         private Sprite seasonImageSprite;
 
 
-        public SeasonListItem(int index, string seasonNumber, string seasonDescription, Sprite seasonImageSprite)
+        public SeasonListItem(int index, string seasonNumber, string seasonDescription, Sprite seasonImageSprite, string Rank, string PP)
         {
             this.index = index;
             this.seasonNumber = seasonNumber;
             this.seasonDescription = seasonDescription;
             this.seasonImageSprite = seasonImageSprite;
+            this.rankText = Rank;
+            this.ppText = PP;
         }
 
         [UIAction("#post-parse")]

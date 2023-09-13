@@ -62,6 +62,7 @@ namespace BedroomPartyLeaderboard.Utils
                             _localPlayerInfo.username = playerResponse.username;
                             _localPlayerInfo.userID = playerResponse.gameID;
                             _localPlayerInfo.discordID = playerResponse.discordID;
+                            _localPlayerInfo.sessionExpiry = playerResponse.sessionKeyExpires;
                         }
                         else
                         {

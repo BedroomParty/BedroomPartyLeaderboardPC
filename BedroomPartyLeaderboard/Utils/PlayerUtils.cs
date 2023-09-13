@@ -24,17 +24,17 @@ namespace BedroomPartyLeaderboard.Utils
             }
             else
             {
-                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", ""));
+                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", "", 0));
                 return taskCompletionSource.Task;
             }
 
             if (playerId == "" || authKey == "")
             {
-                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", ""));
+                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", "", 0));
                 return taskCompletionSource.Task;
             }
 
-            taskCompletionSource.SetResult(new PlayerInfo("", playerId, authKey, "", ""));
+            taskCompletionSource.SetResult(new PlayerInfo("", playerId, authKey, "", "", 0));
             return taskCompletionSource.Task;
         }
 
@@ -65,14 +65,16 @@ namespace BedroomPartyLeaderboard.Utils
             internal readonly string authKey;
             internal string tempKey;
             internal string discordID;
+            internal long sessionExpiry;
 
-            public PlayerInfo(string username, string userID, string authKey, string tempKey, string discordID)
+            public PlayerInfo(string username, string userID, string authKey, string tempKey, string discordID, long sessionExpiry)
             {
                 this.authKey = authKey;
                 this.username = username;
                 this.userID = userID;
                 this.tempKey = tempKey;
                 this.discordID = discordID;
+                this.sessionExpiry = sessionExpiry;
             }
 
             public PlayerInfoAwaiter GetAwaiter()

@@ -26,7 +26,7 @@ namespace BedroomPartyLeaderboard.Utils
         public const string PLAYLIST_PATH = "./Playlists/";
 
         public const string PLAYLIST_URL_RANKED = "https://dev.thebedroom.party/playlist/ranked";
-        public const string USER_PROFILE_LINK = "https://thebedroom.party?user=";
+        public const string USER_PROFILE_LINK = "https://thebedroom.party/user/";
 
         public const string STEAM_API_PATH = "./Beat Saber_Data/Plugins/x86_64/steam_api64.dll";
 

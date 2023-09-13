@@ -77,6 +77,8 @@ namespace BedroomPartyLeaderboard.Utils
         internal bool isUploading = false;
         private async Task UploadLeaderboardData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback, int multipliedScore, int modifiedScore)
         {
+
+            if (DateTime.Now.Millisecond > _authenticationManager._localPlayerInfo.sessionExpiry) return;
             _leaderboardView.hasClickedOffResultsScreen = false;
             using HttpClient httpClient = new();
             int x = 0;
