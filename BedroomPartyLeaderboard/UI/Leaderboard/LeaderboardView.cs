@@ -318,6 +318,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         {
             if (!_plvc || !_plvc.isActiveAndEnabled) return;
 
+            leaderboardTableView.SetScores(null, -1);
             if (cancellationTokenSource != null)
             {
                 cancellationTokenSource.Cancel();
