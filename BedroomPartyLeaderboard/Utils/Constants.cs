@@ -8,24 +8,24 @@ namespace BedroomPartyLeaderboard.Utils
 {
     public class Constants
     {
-        public const string AUTH_END_POINT = "https://api.thebedroom.party/user/login";
+        public const string AUTH_END_POINT = "https://dev.thebedroom.party/user/login";
 
         public const string API_KEY_PATH = "./UserData/BPLB/scary/DO_NOT_SHARE.SCARY";
 
         public static string LEADERBOARD_DOWNLOAD_END_POINT(string hash)
         {
-            return $"https://api.thebedroom.party/leaderboard/{hash}";
+            return $"https://dev.thebedroom.party/leaderboard/{hash}";
         }
 
         public static string LEADERBOARD_UPLOAD_END_POINT(string hash)
         {
-            return $"https://api.thebedroom.party/leaderboard/{hash}/upload";
+            return $"https://dev.thebedroom.party/leaderboard/{hash}/upload";
         }
 
-        public const string USER_URL = "https://api.thebedroom.party/user";
+        public const string USER_URL = "https://dev.thebedroom.party/user";
         public const string PLAYLIST_PATH = "./Playlists/";
 
-        public const string PLAYLIST_URL_RANKED = "https://api.thebedroom.party/playlist/ranked";
+        public const string PLAYLIST_URL_RANKED = "https://dev.thebedroom.party/playlist/ranked";
         public const string USER_PROFILE_LINK = "https://thebedroom.party?user=";
 
         public const string STEAM_API_PATH = "./Beat Saber_Data/Plugins/x86_64/steam_api64.dll";
@@ -42,7 +42,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 if (staffIDs == null)
                 {
-                    string a = await httpClient.GetStringAsync("https://api.thebedroom.party/staff");
+                    string a = await httpClient.GetStringAsync("https://dev.thebedroom.party/staff");
                     staffIDs = a.Split(',');
                 }
             }

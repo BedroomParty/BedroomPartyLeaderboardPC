@@ -289,7 +289,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             _panelView.prompt_loader.SetActive(false);
             _panelView.promptText.text = $"<color=green>Successfully signed in!</color>";
             _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
-            _panelView.playerAvatar.SetImage($"https://api.thebedroom.party/user/{_authenticationManager._localPlayerInfo.userID}/avatar");
+            _panelView.playerAvatar.SetImage($"https://dev.thebedroom.party/user/{_authenticationManager._localPlayerInfo.userID}/avatar");
             _panelView.playerAvatarLoading.gameObject.SetActive(false);
             Task.Run(() => assignStaff());
             await Constants.WaitUntil(() => currentDifficultyBeatmap != null);
@@ -298,6 +298,38 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             await Task.Delay(3000);
             _panelView.prompt_loader.SetActive(false);
             _panelView.promptText.gameObject.SetActive(false);
+            return;
+        }
+
+
+        internal async Task HandleLBUpload()
+        {
+            if (_requestUtils.isUploading)
+            {
+                _panelView.prompt_loader.SetActive(true);
+                _panelView.promptText.gameObject.SetActive(true);
+                _panelView.promptText.text = "Uploading Score...";
+
+                try
+                {
+                    await Constants.WaitUntil(() => !_requestUtils.isUploading, timeout: 60000);
+                    _panelView.prompt_loader.SetActive(false);
+                    _panelView.promptText.gameObject.SetActive(true);
+                    _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
+                }
+                catch (TimeoutException)
+                {
+                    _panelView.prompt_loader.SetActive(false);
+                    _panelView.promptText.gameObject.SetActive(true);
+                    _panelView.promptText.text = "<color=red>Failed to upload...</color>";
+                    await Task.Delay(3000);
+                    _panelView.prompt_loader.SetActive(false);
+                    _panelView.promptText.gameObject.SetActive(false);
+                }
+            }
+            await Constants.WaitUntil(() => hasClickedOffResultsScreen);
+            await Task.Delay(100);
+            OnLeaderboardSet(currentDifficultyBeatmap);
             return;
         }
 
@@ -533,6 +565,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             return new ScoreData(score, result, rankFUCK, false);
         }
 
+
+        internal bool hasClickedOffResultsScreen = false;
+
         public void Initialize()
         {
             _resultsViewController.continueButtonPressedEvent += FUCKOFFIHATETHISIWANTTODIE;
@@ -540,7 +575,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         internal void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController)
         {
-            OnLeaderboardSet(currentDifficultyBeatmap);
+            hasClickedOffResultsScreen = true;
         }
     }
 }

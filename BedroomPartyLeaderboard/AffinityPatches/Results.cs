@@ -1,5 +1,8 @@
-﻿using BedroomPartyLeaderboard.Utils;
+﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+using BedroomPartyLeaderboard.Utils;
+using IPA.Utilities.Async;
 using SiraUtil.Affinity;
+using System.Threading.Tasks;
 using Zenject;
 
 namespace BedroomPartyLeaderboard.AffinityPatches
@@ -8,6 +11,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
     {
         [Inject] private readonly RequestUtils _requestUtils;
         [Inject] private readonly AuthenticationManager _authenticationManager;
+        [Inject] private readonly LeaderboardView _leaderboardView;
 
         public static string GetModifiersString(LevelCompletionResults levelCompletionResults)
         {
@@ -116,6 +120,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             float avgHandAccRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccRight);
             float avgHandAccLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccLeft);
             int perfectStreak = ExtraSongDataHolder.perfectStreak;
+
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => _leaderboardView.HandleLBUpload());
             _requestUtils.SetBeatMapData(balls, _authenticationManager._localPlayerInfo.userID, _authenticationManager._localPlayerInfo.username, badCut, misses, fc, acc, score, mods, multipliedScore, modifiedScore, result =>
             {
                 Plugin.Log.Info("_requestUtils.SetBeatMapData");

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -18,22 +19,22 @@ namespace BedroomPartyLeaderboard.Utils
             if (NullCheckFilePath(Constants.API_KEY_PATH))
             {
                 string[] sillyvar = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
-                playerId = sillyvar[1];
                 authKey = sillyvar[0];
+                playerId = sillyvar[1];
             }
             else
             {
-                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
+                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", ""));
                 return taskCompletionSource.Task;
             }
 
             if (playerId == "" || authKey == "")
             {
-                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, ""));
+                taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", ""));
                 return taskCompletionSource.Task;
             }
 
-            taskCompletionSource.SetResult(new PlayerInfo("", playerId, authKey, ""));
+            taskCompletionSource.SetResult(new PlayerInfo("", playerId, authKey, "", ""));
             return taskCompletionSource.Task;
         }
 
@@ -59,17 +60,19 @@ namespace BedroomPartyLeaderboard.Utils
 
         public struct PlayerInfo
         {
-            public string username;
-            public string userID;
-            public readonly string authKey;
+            internal string username;
+            internal string userID;
+            internal readonly string authKey;
             internal string tempKey;
+            internal string discordID;
 
-            public PlayerInfo(string username, string userID, string authKey, string tempKey)
+            public PlayerInfo(string username, string userID, string authKey, string tempKey, string discordID)
             {
                 this.authKey = authKey;
                 this.username = username;
                 this.userID = userID;
                 this.tempKey = tempKey;
+                this.discordID = discordID;
             }
 
             public PlayerInfoAwaiter GetAwaiter()
@@ -99,5 +102,15 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             }
         }
+    }
+
+    public class PlayerResponse
+    {
+        [JsonProperty("game_id")] public string gameID;
+        [JsonProperty("discord_id")] public string discordID;
+        [JsonProperty("username")] public string username;
+        [JsonProperty("avatar")] public string avatarLink;
+        [JsonProperty("sessionKey")] public string sessionKey;
+        [JsonProperty("sessionKeyExpires")] public long sessionKeyExpires;
     }
 }

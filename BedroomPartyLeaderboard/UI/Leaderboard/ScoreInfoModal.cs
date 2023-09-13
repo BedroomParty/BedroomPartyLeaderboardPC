@@ -95,7 +95,7 @@ namespace BedroomPartyLeaderboard.UI
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-                profileImageModal.SetImage($"https://api.thebedroom.party/user/{entry.userID}/avatar");
+                profileImageModal.SetImage($"https://dev.thebedroom.party/user/{entry.userID}/avatar");
                 profileImageModalLOADING.SetActive(false);
 
                 if (Task.Run(() => Constants.isStaff(entry.userID)).Result)

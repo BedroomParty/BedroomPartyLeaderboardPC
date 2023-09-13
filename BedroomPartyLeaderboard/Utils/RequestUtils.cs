@@ -64,21 +64,23 @@ namespace BedroomPartyLeaderboard.Utils
 
         public void GetBeatMapData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() =>  GetLeaderboardData(balls, page, callback));
         }
 
         public void SetBeatMapData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, int multipliedScore, int modifiedScore, Action<bool> callback)
         {
+            _leaderboardView.hasClickedOffResultsScreen = false;
             UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(balls, userID, username, badCuts, misses, fullCOmbo, acc, score, mods, callback, multipliedScore, modifiedScore));
         }
 
+
+        internal bool isUploading = false;
         private async Task UploadLeaderboardData((string, int, string) balls, string userID, string username, int badCuts, int misses, bool fullCOmbo, float acc, int score, string mods, Action<bool> callback, int multipliedScore, int modifiedScore)
         {
+            _leaderboardView.hasClickedOffResultsScreen = false;
             using HttpClient httpClient = new();
             int x = 0;
-            _panelView.prompt_loader.SetActive(true);
-            _panelView.promptText.gameObject.SetActive(true);
-            _panelView.promptText.text = "Uploading Score...";
+            isUploading = true;
             while (x < 3)
             {
                 try
@@ -96,11 +98,7 @@ namespace BedroomPartyLeaderboard.Utils
                     if (response.StatusCode == HttpStatusCode.Conflict)
                     {
                         callback(response.IsSuccessStatusCode);
-                        _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=red>Better score already exists.</color>";
-                        await Task.Delay(3000);
-                        _panelView.promptText.gameObject.SetActive(false);
-                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+                        isUploading = false;
                         break;
                     }
 
@@ -108,38 +106,21 @@ namespace BedroomPartyLeaderboard.Utils
                     {
                         string jsonResponse = await response.Content.ReadAsStringAsync();
                         callback(response.IsSuccessStatusCode);
-                        _panelView.prompt_loader.SetActive(false);
-                        _panelView.promptText.text = "<color=green>Successfully uploaded score!</color>";
-                        _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
-                        await Task.Delay(3000);
-                        _panelView.promptText.gameObject.SetActive(false);
+                        isUploading = false;
                         break;
                     }
-
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = "<color=red>Failed to upload score... Retrying!</color>";
-                    await Task.Delay(5000);
-                    _panelView.promptText.gameObject.SetActive(false);
-                    _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
                 }
                 catch (HttpRequestException e)
                 {
                     Plugin.Log.Error("EXCEPTION: " + e.ToString());
                     callback(false);
-                    _panelView.prompt_loader.SetActive(false);
-                    _panelView.promptText.text = "<color=red>EXCEPTION ERROR</color>";
-                    await Task.Delay(3000);
-                    _panelView.promptText.gameObject.SetActive(false);
                 }
                 x++;
             }
             if (x == 2)
             {
                 callback(false);
-                _panelView.promptText.text = "<color=red>Failed to upload score... Retrying!</color>";
                 await Task.Delay(3000);
-                _panelView.promptText.gameObject.SetActive(false);
-                _panelView.prompt_loader.SetActive(false);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -53,26 +54,19 @@ namespace BedroomPartyLeaderboard.Utils
                         _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                         string responseContent = await response.Content.ReadAsStringAsync();
-                        JObject jsonResponse = JObject.Parse(responseContent);
 
-                        if (jsonResponse.TryGetValue("sessionKey", out JToken silly))
+                        PlayerResponse playerResponse = JsonConvert.DeserializeObject<PlayerResponse>(responseContent);
+                        if(playerResponse != null)
                         {
-                            _localPlayerInfo.tempKey = silly.Value<string>();
+                            _localPlayerInfo.tempKey = playerResponse.sessionKey;
+                            _localPlayerInfo.username = playerResponse.username;
+                            _localPlayerInfo.userID = playerResponse.gameID;
+                            _localPlayerInfo.discordID = playerResponse.discordID;
                         }
                         else
                         {
                             throw new Exception("Error Authenticating, RESTART GAME.");
                         }
-
-                        if (jsonResponse.TryGetValue("username", out JToken fortnite))
-                        {
-                            _localPlayerInfo.username = fortnite.Value<string>();
-                        }
-                        else
-                        {
-                            throw new Exception("Error Authenticating, RESTART GAME.");
-                        }
-
                         if (_isAuthed)
                         {
                             _currentlyAuthing = false;

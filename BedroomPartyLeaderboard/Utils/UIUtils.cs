@@ -62,7 +62,7 @@ namespace BedroomPartyLeaderboard.Utils
                     return;
                 }
                 _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
-                _leaderboardView._ImageHolders[i].setProfileImage($"https://api.thebedroom.party/user/{leaderboard[i].userID}/avatar");
+                _leaderboardView._ImageHolders[i].setProfileImage($"https://dev.thebedroom.party/user/{leaderboard[i].userID}/avatar");
             }
 
             for (int i = leaderboard.Count; i <= 10; i++)
