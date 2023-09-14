@@ -93,7 +93,7 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-        internal static IEnumerator GetSpriteAvatar(string url, Action<Sprite> onSuccess, Action<string> onFailure, CancellationToken cancellationToken)
+        internal static IEnumerator GetSpriteAvatar(string url, Action<Sprite, string> onSuccess, Action<string, string> onFailure, CancellationToken cancellationToken)
         {
             var handler = new DownloadHandlerTexture();
             var www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
@@ -104,7 +104,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    onFailure?.Invoke("Cancelled");
+                    onFailure?.Invoke("Cancelled", url);
                     yield break;
                 }
 
@@ -112,16 +112,16 @@ namespace BedroomPartyLeaderboard.Utils
             }
             if (www.isHttpError || www.isNetworkError)
             {
-                onFailure?.Invoke(www.error);
+                onFailure?.Invoke(www.error, url);
                 yield break;
             }
             if (!string.IsNullOrEmpty(www.error))
             {
-                onFailure?.Invoke(www.error);
+                onFailure?.Invoke(www.error, url);
                 yield break;
             }
             Sprite sprite = Sprite.Create(handler.texture, new Rect(0, 0, handler.texture.width, handler.texture.height), Vector2.one * 0.5f);
-            onSuccess?.Invoke(sprite);
+            onSuccess?.Invoke(sprite, url);
         }
 
         public async Task SetToast(string Text, bool FullyActive, bool LoadingActive, int delay)
@@ -322,7 +322,6 @@ namespace BedroomPartyLeaderboard.Utils
 
             private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-
             public ImageHolder(int index)
             {
                 this.index = index;
@@ -337,6 +336,13 @@ namespace BedroomPartyLeaderboard.Utils
             public void setProfileImage(string url)
             {
                 profileloading.gameObject.SetActive(true);
+                if(SpriteCache.TryGetSprite(url, out Sprite sprite))
+                {
+                    profileImage.sprite = sprite;
+                    profileloading.gameObject.SetActive(false);
+                    isLoading = false;
+                    return;
+                }
                 try
                 {
                     if (isLoading)
@@ -366,14 +372,15 @@ namespace BedroomPartyLeaderboard.Utils
                 });
             }
 
-            private void OnAvatarYay(Sprite a)
+            private void OnAvatarYay(Sprite a, string url)
             {
                 profileImage.sprite = a;
                 profileloading.gameObject.SetActive(false);
                 isLoading = false;
+                SpriteCache.AddSprite(url, a);
             }
 
-            private void OnAvatarNay(string a)
+            private void OnAvatarNay(string a, string url)
             {
                 profileImage.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png");
                 profileloading.gameObject.SetActive(false);
@@ -463,6 +470,33 @@ namespace BedroomPartyLeaderboard.Utils
                 };
                 text.gameObject.SetActive(true);
                 _tweeningManager.AddTween(tween, text);
+            }
+        }
+
+        public static class SpriteCache
+        {
+            private static Dictionary<string, Sprite> spriteDictionary = new();
+            private static Sprite[] sprites;
+
+            public static void AddSprite(string spriteName, Sprite sprite)
+            {
+                if (!spriteDictionary.ContainsKey(spriteName))
+                {
+                    spriteDictionary[spriteName] = sprite;
+                }
+            }
+
+            public static bool TryGetSprite(string spriteName, out Sprite sprite)
+            {
+                if (spriteDictionary.TryGetValue(spriteName, out sprite))
+                {
+                    return true;
+                }
+                else
+                {
+                    sprite = null;
+                    return false;
+                }
             }
         }
     }

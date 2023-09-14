@@ -39,7 +39,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal IDifficultyBeatmapSet currentDifficultyBeatmapSet;
         private CancellationTokenSource cancellationTokenSource;
 
-
         private string currentSongLinkLBWebView = string.Empty;
         internal static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
         internal string sortMethod = "top";
