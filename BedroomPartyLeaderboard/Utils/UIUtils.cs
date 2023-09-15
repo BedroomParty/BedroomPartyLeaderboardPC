@@ -230,9 +230,9 @@ namespace BedroomPartyLeaderboard.Utils
                 clicky.seperator = seperator;
                 if (cell.gameObject.activeSelf && _leaderboardView.leaderboardTransform.gameObject.activeSelf)
                 {
-                    _tweeningService.FadeText(nameText, true, 0.3f);
-                    _tweeningService.FadeText(rankText, true, 0.3f);
-                    _tweeningService.FadeText(scoreText, true, 0.3f);
+                    _tweeningService.FadeText(nameText, true, 0.2f);
+                    _tweeningService.FadeText(rankText, true, 0.2f);
+                    _tweeningService.FadeText(scoreText, true, 0.2f);
                 }
                 /*
                 if (cell.idx == 9)
