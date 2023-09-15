@@ -124,31 +124,39 @@ namespace BedroomPartyLeaderboard.Utils
             onSuccess?.Invoke(sprite, url);
         }
 
-        public async Task SetToast(string Text, bool FullyActive, bool LoadingActive, int delay)
+        public async Task SetToast(string text, bool fullyActive, bool loadingActive, int delayMilliseconds)
         {
-            if (!FullyActive)
+            await Constants.WaitUntil(() => _panelView.promptText != null && _panelView.prompt_loader != null);
+
+            if (!fullyActive)
             {
                 _panelView.prompt_loader.SetActive(false);
                 _panelView.promptText.gameObject.SetActive(false);
                 return;
             }
 
-            if (LoadingActive)
+            if (loadingActive)
             {
                 _panelView.prompt_loader.SetActive(true);
             }
-
-            _panelView.promptText.text = Text;
-
-            if (delay == 0)
+            else
             {
-                return;
+                _panelView.prompt_loader.SetActive(false);
             }
 
-            await Task.Delay(delay);
-            _panelView.prompt_loader.SetActive(false);
-            _panelView.promptText.gameObject.SetActive(false);
+            _panelView.promptText.gameObject.SetActive(true);
+            _tweeningService.FadeText(_panelView.promptText, true, 0.20f);
+
+            _panelView.promptText.text = text;
+
+            if (delayMilliseconds > 0)
+            {
+                await Task.Delay(delayMilliseconds);
+                _panelView.prompt_loader.SetActive(false);
+                _tweeningService.FadeText(_panelView.promptText, false, 0.15f);
+            }
         }
+
 
 
         public async Task assignStaff()

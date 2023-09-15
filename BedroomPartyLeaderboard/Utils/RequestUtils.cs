@@ -134,7 +134,6 @@ namespace BedroomPartyLeaderboard.Utils
                 {
                     await Constants.WaitUntil(() => _authenticationManager.IsAuthed, timeout: 60000);
                 }
-
                 catch (TimeoutException)
                 {
                     _leaderboardView.SetErrorState(true, "Failed to Auth");
@@ -142,7 +141,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             }
 
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully signed in!</color>", true, false, 4000));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully signed in!</color>", true, false, 10000));
             _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
 
             _panelView.playerAvatar.StartCoroutine(UIUtils.GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a, string b) => _panelView.playerAvatar.sprite = a, (string a, string b) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
@@ -153,10 +152,6 @@ namespace BedroomPartyLeaderboard.Utils
 
             await Constants.WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
-            _panelView.seasonText.richText = true;
-            await Task.Delay(3000);
-            _panelView.prompt_loader.SetActive(false);
-            _panelView.promptText.gameObject.SetActive(false);
             return;
         }
 
@@ -169,11 +164,11 @@ namespace BedroomPartyLeaderboard.Utils
                 try
                 {
                     await Constants.WaitUntil(() => !isUploading, timeout: 60000);
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully uploaded score!</color>", true, false, 4000));
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully uploaded score!</color>", true, false, 5500));
                 }
                 catch (TimeoutException)
                 {
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=red>Failed to upload...</color>", true, false, 4000));
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=red>Failed to upload...</color>", true, false, 7500));
                 }
             }
             await Constants.WaitUntil(() => _leaderboardView.hasClickedOffResultsScreen);
@@ -181,9 +176,5 @@ namespace BedroomPartyLeaderboard.Utils
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
             return;
         }
-
-
-
-
     }
 }

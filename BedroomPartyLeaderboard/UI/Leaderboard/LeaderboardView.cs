@@ -251,6 +251,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             Transform header = _plvc.transform.Find("HeaderPanel");
             if (firstActivation)
             {
+                _panelView.seasonText.richText = true;
                 UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                 {
                     Task.Run(() => _requestUtils.HandleLBAuth());
@@ -353,7 +354,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
                 await Task.Delay(50);
 
-                if (cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)  
                 {
                     SetErrorState(false, "");
                     loadingLB.gameObject.SetActive(true);
