@@ -59,9 +59,9 @@
 	</vertical>
 	<!-- Leaderboard table -->
 	<vertical pref-width='76'
-			  pref-height='60'
+			  pref-height='60.5'
 			  anchor-pos-x="7"
-			  anchor-pos-y="5.5"
+			  anchor-pos-y="5.2"
 			  horizontal-fit='PreferredSize'
 			  vertical-fit='PreferredSize'>
 		<leaderboard id='leaderboardTableView'

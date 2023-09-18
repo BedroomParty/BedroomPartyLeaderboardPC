@@ -234,17 +234,6 @@ namespace BedroomPartyLeaderboard.Utils
                     _tweeningService.FadeText(rankText, true, 0.2f);
                     _tweeningService.FadeText(scoreText, true, 0.2f);
                 }
-                /*
-                if (cell.idx == 9)
-                {
-                    ImageView silly = GameObject.Instantiate<Image>(seperator, _leaderboardView.leaderboardTransform) as ImageView;
-                    silly.transform.position = seperator.transform.position;
-                    silly.transform.localPosition = seperator.transform.localPosition;
-                    silly.transform.localPosition += new Vector3(0, -0.1f, 0);
-
-                    return;
-                }
-                */
             }
         }
 
