@@ -8,7 +8,7 @@ namespace BedroomPartyLeaderboard.Utils
 {
     public class Constants
     {
-        public const string BASE_API_URL = "https://dev.thebedroom.party";
+        public const string BASE_API_URL = "https://api.thebedroom.party";
         public const string BASE_WEB_URL = "https://thebedroom.party";
 
 
