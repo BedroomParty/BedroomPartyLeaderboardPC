@@ -28,6 +28,10 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 sum += f;
             }
+            if(list.Count == 0)
+            {
+                return 0;
+            }
             return sum / list.Count;
         }
     }
