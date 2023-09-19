@@ -28,7 +28,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 sum += f;
             }
-            if(list.Count == 0)
+            if (list.Count == 0)
             {
                 return 0;
             }

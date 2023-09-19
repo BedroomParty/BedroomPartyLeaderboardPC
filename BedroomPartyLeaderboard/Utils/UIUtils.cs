@@ -333,7 +333,7 @@ namespace BedroomPartyLeaderboard.Utils
             public void setProfileImage(string url)
             {
                 profileloading.gameObject.SetActive(true);
-                if(SpriteCache.TryGetSprite(url, out Sprite sprite))
+                if (SpriteCache.TryGetSprite(url, out Sprite sprite))
                 {
                     profileImage.sprite = sprite;
                     profileloading.gameObject.SetActive(false);

@@ -354,7 +354,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
                 await Task.Delay(50);
 
-                if (cancellationToken.IsCancellationRequested)  
+                if (cancellationToken.IsCancellationRequested)
                 {
                     SetErrorState(false, "");
                     loadingLB.gameObject.SetActive(true);
