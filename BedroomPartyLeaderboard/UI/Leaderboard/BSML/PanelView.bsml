@@ -18,20 +18,20 @@
 						<clickable-text id="playerUsername" font-size="6" text="Loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
 					</horizontal>
 					<horizontal pref-height="4" pad="1" spacing="2" horizontal-fit="PreferredSize">
-						<stack ignore-layout="true" anchor-pos-y="1.5" horizontal-fit="PreferredSize">
-							<clickable-text id="seasonText" font-size="4.5" text="Season 1" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
+						<stack active="true" ignore-layout="true" anchor-pos-y="1.5" horizontal-fit="PreferredSize">
+							<clickable-text id="seasonText" font-size="4.5" text="(Beta Testing)" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
 						</stack>
-						<horizontal ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-16" preferred-width="70" spacing="0.5" child-align="MiddleRight">
+						<horizontal active="false" ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-16" preferred-width="70" spacing="0.5" child-align="MiddleRight">
 							<text id="pointsText" font-size="4.5" text="10" rich-text="true" align="Right" word-wrapping="false"/>
 							<image id="pointsImage" src="BedroomPartyLeaderboard.Images.pp.png" min-width="4" min-height="4" preserve-aspect="true"/>
 						</horizontal>
-						<stack ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="20">
+						<stack active="false" ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="20">
 							<text id="rankText" font-size="4.5" text="#2" rich-text="true" align="Center" word-wrapping="false"/>
 						</stack>
-						<stack ignore-layout="true" anchor-pos-y="1.75" anchor-pos-x="15" size-delta-x="5">
+						<stack active="false" ignore-layout="true" anchor-pos-y="1.75" anchor-pos-x="15" size-delta-x="5">
 							<image id="rankImage" src="BedroomPartyLeaderboard.Images.Globe.png" preferred-height="5" preferred-width="5" preserve-aspect="true"/>
 						</stack>
-						<stack ignore-layout="true" anchor-pos-y="-3.5">
+						<stack active="false" ignore-layout="true" anchor-pos-y="-3.5">
 							<text id="seasonDescription" font-size="3.5" text="Season Description" rich-text="true" align="Center"  word-wrapping="false"/>
 						</stack>
 					</horizontal>

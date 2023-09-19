@@ -150,8 +150,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
                 { "modifiers", mods },
                 { "pauses", pauses },
                 { "maxCombo", maxCombo },
-                { "avgHandTDRight", avgHandTDLeft },
-                { "avgHandTDLeft", avgHandTDRight },
+                { "avgHandTDRight", avgHandTDRight },
+                { "avgHandTDLeft", avgHandTDLeft },
                 { "avgHandAccRight", avgAccRight },
                 { "avgHandAccLeft", avgAccLeft},
                 { "perfectStreak", perfectStreak }
