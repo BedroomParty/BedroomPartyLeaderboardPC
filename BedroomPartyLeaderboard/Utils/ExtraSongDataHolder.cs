@@ -33,6 +33,7 @@ namespace BedroomPartyLeaderboard.Utils
                 return 0;
             }
             return sum / list.Count;
+            // it sure does
         }
     }
 }
