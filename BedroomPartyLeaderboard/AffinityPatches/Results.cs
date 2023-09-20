@@ -108,7 +108,6 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             if (modifiedScore == 0 || maxScore == 0) return;
             if (levelCompletionResults.levelEndStateType == LevelCompletionResults.LevelEndStateType.Failed) return;
             float acc = modifiedScore / maxScore * 100;
-            int score = levelCompletionResults.modifiedScore;
             int badCut = levelCompletionResults.badCutsCount;
             int misses = levelCompletionResults.missedCount;
             bool fc = levelCompletionResults.fullCombo;
@@ -129,7 +128,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
             string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft);
-            _requestUtils.SetBeatMapData(json, result =>
+            _requestUtils.SetBeatMapData(mapId, json, result =>
             {
             });
         }

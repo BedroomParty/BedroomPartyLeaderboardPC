@@ -68,15 +68,15 @@ namespace BedroomPartyLeaderboard.Utils
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
 
-        public void SetBeatMapData(string uploadJson, Action<bool> callback)
+        public void SetBeatMapData(string mapId, string uploadJson, Action<bool> callback)
         {
             _leaderboardView.hasClickedOffResultsScreen = false;
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(uploadJson, callback));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(mapId, uploadJson, callback));
         }
 
 
         internal bool isUploading = false;
-        private async Task UploadLeaderboardData(string balls, Action<bool> callback)
+        private async Task UploadLeaderboardData(string mapId, string balls, Action<bool> callback)
         {
 
             if (DateTime.Now.Millisecond > _authenticationManager._localPlayerInfo.sessionExpiry) return;
@@ -93,8 +93,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                     HttpContent content = new StringContent(balls, Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(balls), content);
-
+                    HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(mapId), content);
                     if (response.StatusCode == HttpStatusCode.Conflict)
                     {
                         callback(response.IsSuccessStatusCode);
