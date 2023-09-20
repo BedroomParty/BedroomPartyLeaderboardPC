@@ -21,6 +21,25 @@ namespace BedroomPartyLeaderboard.Utils
             return tableData;
         }
 
+        internal static int GetUserScorePos(List<LeaderboardData.LeaderboardEntry> leaderboard, string userID)
+        {
+            for (int i = 0; i < leaderboard.Count; i++)
+            {
+                if (leaderboard[i].userID == userID)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        internal static string ReverseString(string s)
+        {
+            char[] charArray = s.ToCharArray();
+            System.Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
         internal static ScoreData CreateLeaderboardEntryData(LeaderboardData.LeaderboardEntry entry, int score, int rankFUCK)
         {
             try
@@ -34,7 +53,7 @@ namespace BedroomPartyLeaderboard.Utils
                 string result;
                 if (entry.userID == "76561199077754911")
                 {
-                    entry.userName = $"<color=#6488ea>{entry.userName}</color>";
+                    entry.userName = $"<color=#6488ea><rotate=180>{ReverseString(entry.userName)}</rotate></color>";
                 }
 
                 result = "<size=90%>" + entry.userName.TrimEnd() + formattedAcc + formattedCombo + formattedMods + "</size>";

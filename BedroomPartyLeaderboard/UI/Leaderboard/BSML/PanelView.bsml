@@ -19,7 +19,7 @@
 					</horizontal>
 					<horizontal pref-height="4" pad="1" spacing="2" horizontal-fit="PreferredSize">
 						<stack active="true" ignore-layout="true" anchor-pos-y="1.5" horizontal-fit="PreferredSize">
-							<clickable-text id="seasonText" font-size="4.5" text="(Beta Testing)" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
+							<text id="seasonText" font-size="4.5" text="(Beta Testing)" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
 						</stack>
 						<horizontal active="false" ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-16" preferred-width="70" spacing="0.5" child-align="MiddleRight">
 							<text id="pointsText" font-size="4.5" text="10" rich-text="true" align="Right" word-wrapping="false"/>
