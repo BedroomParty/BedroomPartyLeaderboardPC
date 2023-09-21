@@ -68,22 +68,26 @@ namespace BedroomPartyLeaderboard.Utils
             UnityMainThreadTaskScheduler.Factory.StartNew(() => GetLeaderboardData(balls, page, callback));
         }
 
-        public void SetBeatMapData(string mapId, string uploadJson, Action<bool> callback)
+        public void SetBeatMapData(string mapId, string uploadJson)
         {
             _leaderboardView.hasClickedOffResultsScreen = false;
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(mapId, uploadJson, callback));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(mapId, uploadJson));
         }
 
 
         internal bool isUploading = false;
-        private async Task UploadLeaderboardData(string mapId, string balls, Action<bool> callback)
-        {
 
+        public event Action<bool, string> UploadCompleted;
+        public event Action UploadFailed;
+
+        private async Task UploadLeaderboardData(string mapId, string json)
+        {
             if (DateTime.Now.Millisecond > _authenticationManager._localPlayerInfo.sessionExpiry) return;
             _leaderboardView.hasClickedOffResultsScreen = false;
             using HttpClient httpClient = new();
             int x = 0;
             isUploading = true;
+
             while (x < 3)
             {
                 try
@@ -91,12 +95,13 @@ namespace BedroomPartyLeaderboard.Utils
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _authenticationManager._localPlayerInfo.tempKey);
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                    HttpContent content = new StringContent(balls, Encoding.UTF8, "application/json");
+                    HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
                     HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(mapId), content);
+
                     if (response.StatusCode == HttpStatusCode.Conflict)
                     {
-                        callback(response.IsSuccessStatusCode);
+                        UploadCompleted?.Invoke(response.IsSuccessStatusCode, $"<color={Constants.badToast}>Failed to upload...</color>");
                         isUploading = false;
                         break;
                     }
@@ -104,7 +109,7 @@ namespace BedroomPartyLeaderboard.Utils
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
                         string jsonResponse = await response.Content.ReadAsStringAsync();
-                        callback(response.IsSuccessStatusCode);
+                        UploadCompleted?.Invoke(response.IsSuccessStatusCode, $"<color={Constants.goodToast}>Successfully uploaded score!</color>");
                         isUploading = false;
                         break;
                     }
@@ -112,16 +117,56 @@ namespace BedroomPartyLeaderboard.Utils
                 catch (HttpRequestException e)
                 {
                     Plugin.Log.Error("EXCEPTION: " + e.ToString());
-                    callback(false);
+                    UploadFailed?.Invoke();
                 }
                 x++;
             }
+
             if (x == 2)
             {
-                callback(false);
+                UploadFailed?.Invoke();
                 await Task.Delay(3000);
             }
         }
+
+        internal async Task HandleLBUpload()
+        {
+            Action<bool, string> uploadCompletedCallback = (isSuccessful, message) =>
+            {
+                if (isSuccessful)
+                {
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast(message, true, false, 5500));
+                }
+                else
+                {
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast(message, true, false, 7500));
+                }
+            };
+
+            UploadCompleted += uploadCompletedCallback;
+
+            if (isUploading)
+            {
+                UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Uploading Score...", true, true, 0));
+                try
+                {
+                    await Constants.WaitUntil(() => !isUploading, timeout: 60000);
+                }
+                catch (TimeoutException)
+                {
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.badToast}>Failed to upload...</color>", true, false, 7500));
+                }
+                finally
+                {
+                    UploadCompleted -= uploadCompletedCallback;
+                }
+            }
+
+            await Constants.WaitUntil(() => _leaderboardView.hasClickedOffResultsScreen);
+            await Task.Delay(100);
+            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+        }
+
 
         internal async Task HandleLBAuth()
         {
@@ -140,7 +185,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             }
 
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully signed in!</color>", true, false, 10000));
+            UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.goodToast}>Successfully signed in!</color>", true, false, 10000));
             _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
 
             SharedCoroutineStarter.instance.StartCoroutine(UIUtils.GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a, string b) => _panelView.playerAvatar.sprite = a, (string a, string b) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
@@ -155,25 +200,5 @@ namespace BedroomPartyLeaderboard.Utils
         }
 
 
-        internal async Task HandleLBUpload()
-        {
-            if (isUploading)
-            {
-                UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Uploading Score...", true, true, 0));
-                try
-                {
-                    await Constants.WaitUntil(() => !isUploading, timeout: 60000);
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=green>Successfully uploaded score!</color>", true, false, 5500));
-                }
-                catch (TimeoutException)
-                {
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("<color=red>Failed to upload...</color>", true, false, 7500));
-                }
-            }
-            await Constants.WaitUntil(() => _leaderboardView.hasClickedOffResultsScreen);
-            await Task.Delay(100);
-            _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
-            return;
-        }
     }
 }

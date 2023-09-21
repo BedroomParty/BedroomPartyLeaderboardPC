@@ -23,6 +23,9 @@ namespace BedroomPartyLeaderboard.Utils
         public static string USER_URL_WEB(string userID) => $"{BASE_WEB_URL}/user/{userID}";
         public static string USER_URL_API(string userID) => $"{BASE_API_URL}/user/{userID}";
 
+        public const string goodToast = "#43e03a";
+        public const string badToast = "#f0584a";
+
 
         public static Color BP_COLOR = new(0.674509804f, 0.760784314f, 0.850980392f);
         public static Color BP_COLOR2 = new(0.839215686f, 0.705882353f, 0.988235294f);

@@ -128,9 +128,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
             string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft);
-            _requestUtils.SetBeatMapData(mapId, json, result =>
-            {
-            });
+            _requestUtils.SetBeatMapData(mapId, json);
         }
 
         private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int multipliedScore, int modifiedScore, int pauses, int maxCombo, float avgAccRight, float avgAccLeft, int perfectStreak, float avgHandTDRight, float avgHandTDLeft)

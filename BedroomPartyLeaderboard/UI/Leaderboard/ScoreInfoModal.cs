@@ -93,8 +93,8 @@ namespace BedroomPartyLeaderboard.UI
             }
 
             fcScoreText.text = (bool)entry.fullCombo
-                ? "<size=4><color=green>Full Combo!</color></size>"
-                : string.Format("Mistakes: <size=4><color=red>{0}</color></size>", entry.badCutCount + entry.missCount);
+                ? $"<size=4><color={Constants.goodToast}>Full Combo!</color></size>"
+                : $"<size=4><color={Constants.badToast}>Mistakes: {entry.badCutCount + entry.missCount}</color></size>";
             parserParams.EmitEvent("showScoreInfo");
             parserParams.EmitEvent("hideSeasonSelectModal");
             parserParams.EmitEvent("hideInfoModal");

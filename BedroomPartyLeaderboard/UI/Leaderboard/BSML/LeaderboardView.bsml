@@ -72,7 +72,7 @@
 				  anchor-pos-x="-5"
 				  align="Center"
 				  italics="true"
-				  color="red"
+				  color="#f0584a"
 				  active="false"/>
 			
 				<loading anchor-pos-x="-5" align="Center" active="false" id="loadingLB" pref-width='20' pref-height='20' preserve-aspect='true'/>

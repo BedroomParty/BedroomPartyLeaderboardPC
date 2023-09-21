@@ -44,11 +44,11 @@ namespace BedroomPartyLeaderboard.Utils
         {
             try
             {
-                string formattedAcc = string.Format(" - (<color=#ffd42a>{0:0.00}%</color>)", entry.acc);
+                string formattedAcc = $" - (<color=#ffd42a>{entry.acc:0.00}%</color>)";
                 string formattedCombo = (bool)entry.fullCombo
-                    ? " -<color=green> FC </color>"
-                    : string.Format(" - <color=red>x{0} </color>", entry.badCutCount + entry.missCount);
-                string formattedMods = string.Format("  <size=60%>{0}</size>", entry.mods);
+                    ? $" - <color={Constants.goodToast}> FC </color>"
+                    : $" - <color={Constants.badToast}>x{entry.badCutCount + entry.missCount} </color>";
+                string formattedMods = $"  <size=60%>{entry.mods}</size>";
 
                 string result;
                 if (entry.userID == "76561199077754911")
@@ -62,7 +62,7 @@ namespace BedroomPartyLeaderboard.Utils
             }
             catch
             {
-                return new ScoreData(0, "<color=red>Error</color>", rankFUCK, false);
+                return new ScoreData(0, $"<color={Constants.badToast}>Error</color>", rankFUCK, false);
             }
         }
     }
