@@ -132,35 +132,56 @@
 
 							<!-- Style -->
 							<macro.define name="font-size" value="3.1"/>
+							<vertical id="normalModalInfo">
+								<horizontal spacing="2">
+									<clickable-text rich-text="true" id="usernameScoreText" font-size="6" text="USERNAME" align="Center" on-click="usernameScoreTextCLICK"/>
+									<vertical spacing="4" anchor-pos-y="25" pref-width="12" pref-height="12">
+										<stack>
+											<image id="profileImageModal" src="BedroomPartyLeaderboard.Images.blank.png"  preserve-aspect="true"/>
+											<loading-indicator id="profileImageModalLOADING" preserve-aspect="true" />
+										</stack>
+									</vertical>
+								</horizontal>
 
-							<horizontal spacing="-2">
-								<clickable-text rich-text="true" id="usernameScoreText" font-size="~font-size" text="USERNAME" align="Center" on-click="usernameScoreTextCLICK"/>
-								<vertical spacing="4" anchor-pos-y="25" pref-width="12" pref-height="12">
-									<stack>
-										<image id="profileImageModal" src="BedroomPartyLeaderboard.Images.blank.png"  preserve-aspect="true"/>
-										<loading-indicator id="profileImageModalLOADING" preserve-aspect="true" />
-									</stack>
+								<vertical spacing="1">
+									<text rich-text="true" id="dateScoreText" font-size="~font-size" text="DATE" align="Center"/>
+									<text rich-text="true" id="ppScoreText" font-size="~font-size" text="PP" align="Center"/>
 								</vertical>
-							</horizontal>
 
-							<vertical spacing="1">
-								<text rich-text="true" id="dateScoreText" font-size="~font-size" text="DATE" align="Center"/>
-								<text rich-text="true" id="ppScoreText" font-size="~font-size" text="PP" align="Center"/>
+								<horizontal spacing="3">
+									<text rich-text="true" id="accScoreText" font-size="~font-size" text="ACC" align="Left"/>
+									<text rich-text="true" id="scoreScoreText" font-size="~font-size" text="SCORE" align="Right"/>
+								</horizontal>
+
+								<horizontal spacing="1">
+									<text rich-text="true" id="modifiersScoreText" font-size="~font-size" text="MODS" align="Center"/>
+								</horizontal>
+
+								<horizontal spacing="1">
+									<text rich-text="true" id="fcScoreText" font-size="~font-size" text="FC" align="Center"/>
+								</horizontal>
 							</vertical>
 
-							<horizontal spacing="3">
-								<text rich-text="true" id="accScoreText" font-size="~font-size" text="ACC" align="Left"/>
-								<text rich-text="true" id="scoreScoreText" font-size="~font-size" text="SCORE" align="Right"/>
-							</horizontal>
+							<vertical id="moreModalInfo" active="false">
+								<horizontal spacing="3">
+									<text rich-text="true" id="avgHandAccLeft" font-size="~font-size" text="avgHandAccLeft" align="Center"/>
+									<text rich-text="true" id="avgHandAccRight" font-size="~font-size" text="avgHandAccRight" align="Center"/>
+								</horizontal>
+
+								<horizontal spacing="3">
+									<text rich-text="true" id="avgHandTDLeft" font-size="~font-size" text="avgHandTDLeft" align="Left"/>
+									<text rich-text="true" id="avgHandTDRight" font-size="~font-size" text="avgHandTDRight" align="Right"/>
+								</horizontal>
+
+								<horizontal spacing="1">
+									<text rich-text="true" id="perfectStreak" font-size="~font-size" text="perfectStreak" align="Center"/>
+									<text rich-text="true" id="pauses" font-size="~font-size" text="perfectStreak" align="Center"/>
+								</horizontal>
+							</vertical>
 
 							<horizontal spacing="1">
-								<text rich-text="true" id="modifiersScoreText" font-size="~font-size" text="MODS" align="Center"/>
+								<button rich-text="true" id="moreInfoButton" font-size="~font-size" text="More Info" align="Bottom" on-click="moreInfoButtonCLICK"/>
 							</horizontal>
-
-							<horizontal spacing="1">
-								<text rich-text="true" id="fcScoreText" font-size="~font-size" text="FC" align="Center"/>
-							</horizontal>
-
 						</vertical>
 					</stack>
 				</modal>

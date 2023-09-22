@@ -328,9 +328,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             cancellationToken = cancellationTokenSource.Token;
 
             if (!_authenticationManager.IsAuthed) return;
-
             try
             {
+                scoreInfoModal.hidethefucker();
                 SetErrorState(false, "");
                 leaderboardTableView.SetScores(null, -1);
                 loadingLB.gameObject.SetActive(true);
@@ -434,6 +434,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController)
         {
             hasClickedOffResultsScreen = true;
+            OnLeaderboardSet(currentDifficultyBeatmap);
         }
     }
 }
