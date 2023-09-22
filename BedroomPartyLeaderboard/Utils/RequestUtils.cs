@@ -101,7 +101,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                     if (response.StatusCode == HttpStatusCode.Conflict)
                     {
-                        UploadCompleted?.Invoke(response.IsSuccessStatusCode, $"<color={Constants.badToast}>Failed to upload...</color>");
+                        UploadCompleted?.Invoke(response.IsSuccessStatusCode, $"<color={Constants.badToast}>You have a better score already...</color>");
                         isUploading = false;
                         break;
                     }
@@ -154,7 +154,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 catch (TimeoutException)
                 {
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.badToast}>Failed to upload...</color>", true, false, 7500));
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.badToast}>Failed to upload... (TIMEOUT)</color>", true, false, 7500));
                 }
                 finally
                 {
