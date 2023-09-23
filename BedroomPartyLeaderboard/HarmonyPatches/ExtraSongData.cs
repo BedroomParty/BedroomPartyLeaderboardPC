@@ -9,8 +9,19 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
         public static int currentPerfectHits = 0;
         public static int highestPerfectStreak = 0;
 
-        [HarmonyPatch(typeof(StandardLevelScenesTransitionSetupDataSO), "Init")]
-        internal class StandardLevelScenesTransitionSetupDataSOInit
+        [HarmonyPatch(typeof(AudioTimeSyncController), "Start")]
+        internal class AudioTimeSyncControllerStart
+        {
+            private static void Postfix()
+            {
+                ExtraSongDataHolder.reset();
+                currentPerfectHits = 0;
+                highestPerfectStreak = 0;
+            }
+        }
+
+        [HarmonyPatch(typeof(PauseMenuManager), "RestartButtonPressed")]
+        internal class PauseMenuManagerRestartButtonPressed
         {
             private static void Postfix()
             {
@@ -44,6 +55,7 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
                     if (currentPerfectHits > highestPerfectStreak)
                     {
                         highestPerfectStreak = currentPerfectHits;
+                        ExtraSongDataHolder.perfectStreak = highestPerfectStreak;
                     }
                 }
                 else
