@@ -39,6 +39,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIComponent("pointsText")]
         public TextMeshProUGUI ppText;
 
+        [UIComponent("notiImage")]
+        public ImageView notiImage;
+
         [UIAction("FunnyModalMoment")]
         public void FunnyModalMoment()
         {

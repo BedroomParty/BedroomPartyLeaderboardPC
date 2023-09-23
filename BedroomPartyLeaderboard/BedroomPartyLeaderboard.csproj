@@ -523,5 +523,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Images\BedroomPartyLeaderboard_logo.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\noti.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
