@@ -434,7 +434,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal void FUCKOFFIHATETHISIWANTTODIE(ResultsViewController resultsViewController)
         {
             hasClickedOffResultsScreen = true;
-            OnLeaderboardSet(currentDifficultyBeatmap);
         }
     }
 }

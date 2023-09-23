@@ -122,6 +122,7 @@ namespace BedroomPartyLeaderboard.Utils
                 x++;
             }
 
+
             if (x == 2)
             {
                 UploadFailed?.Invoke();
@@ -143,7 +144,10 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             };
 
+
             UploadCompleted += uploadCompletedCallback;
+
+            await Constants.WaitUntil(() => _leaderboardView.hasClickedOffResultsScreen);
 
             if (isUploading)
             {
@@ -161,10 +165,9 @@ namespace BedroomPartyLeaderboard.Utils
                     UploadCompleted -= uploadCompletedCallback;
                 }
             }
-
-            await Constants.WaitUntil(() => _leaderboardView.hasClickedOffResultsScreen);
-            await Task.Delay(100);
+            await Constants.WaitUntil(() => _leaderboardView.isActivated);
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+            UploadCompleted -= uploadCompletedCallback;
         }
 
 
