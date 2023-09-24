@@ -126,7 +126,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             float avgHandTDRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDRight);
             float avgHandTDLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDLeft);
 
-            float fcAcc = (float)ExtraSongDataHolder.GetTotalFromList(ExtraSongDataHolder.hitScores) / ExtraSongDataHolder.amountOfNotesHit * 100;
+            float fcAcc = (float)ExtraSongDataHolder.GetTotalFromList(ExtraSongDataHolder.avgHandAccLeft) + (float)ExtraSongDataHolder.GetTotalFromList(ExtraSongDataHolder.avgHandAccLeft) / (ExtraSongDataHolder.avgHandAccLeft.Count + ExtraSongDataHolder.avgHandAccRight.Count) * 100;
 
             Plugin.Log.Notice(fcAcc.ToString());
 

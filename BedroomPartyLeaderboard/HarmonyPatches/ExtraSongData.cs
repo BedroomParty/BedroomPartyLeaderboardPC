@@ -63,11 +63,6 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
                 {
                     currentPerfectHits = 0;
                 }
-                if (____cutScoreBuffer.noteCutInfo.allIsOK)
-                {
-                    ExtraSongDataHolder.amountOfNotesHit++;
-                    ExtraSongDataHolder.hitScores.Add(____cutScoreBuffer.cutScore);
-                }
             }
         }
 
