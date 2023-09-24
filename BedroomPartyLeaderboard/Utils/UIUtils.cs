@@ -289,13 +289,20 @@ namespace BedroomPartyLeaderboard.Utils
         {
             public TextMeshProUGUI daComponent;
             private bool isScaled;
-            public FontStyles daStyle;
-            public FontStyles origStyle;
+            public bool shouldChangeText = false;
+            public string oldText = "";
+            public string newText = "";
+            public FontStyles daStyle = FontStyles.Normal;
+            public FontStyles origStyle = FontStyles.Normal;
 
             public void OnPointerEnter(PointerEventData eventData)
             {
                 if (!isScaled)
                 {
+                    if (shouldChangeText)
+                    {
+                        daComponent.text = newText;
+                    }
                     daComponent.fontStyle = daStyle;
                     isScaled = true;
                 }
@@ -305,6 +312,10 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 if (isScaled)
                 {
+                    if (shouldChangeText)
+                    {
+                        daComponent.text = oldText;
+                    }
                     daComponent.fontStyle = origStyle;
                     isScaled = false;
                 }

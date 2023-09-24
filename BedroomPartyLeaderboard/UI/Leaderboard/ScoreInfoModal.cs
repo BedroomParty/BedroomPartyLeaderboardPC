@@ -57,6 +57,9 @@ namespace BedroomPartyLeaderboard.UI
         [UIComponent("moreInfoButton")]
         private readonly Button moreInfoButton;
 
+        [UIComponent("backInfoButton")]
+        private readonly Button backInfoButton;
+
         [UIComponent("profileImageModal")]
         public ImageView profileImageModal;
 
@@ -103,13 +106,15 @@ namespace BedroomPartyLeaderboard.UI
             isMoreInfo = !isMoreInfo;
             if (isMoreInfo)
             {
-                moreInfoButton.GetComponentInChildren<TextMeshProUGUI>().text = "Back";
+                backInfoButton.gameObject.SetActive(true);
+                moreInfoButton.gameObject.SetActive(false);
                 moreModalInfo.SetActive(true);
                 normalModalInfo.SetActive(false);
             }
             else
             {
-                moreInfoButton.GetComponentInChildren<TextMeshProUGUI>().text = "More Info";
+                backInfoButton.gameObject.SetActive(false);
+                moreInfoButton.gameObject.SetActive(true);
                 moreModalInfo.SetActive(false);
                 normalModalInfo.SetActive(true);
             }
@@ -130,14 +135,20 @@ namespace BedroomPartyLeaderboard.UI
             usernameScoreText.richText = true;
 
             isMoreInfo = false;
-            moreInfoButton.GetComponentInChildren<TextMeshProUGUI>().text = "More Info";
+            backInfoButton.gameObject.SetActive(false);
+            moreInfoButton.gameObject.SetActive(true);
             moreModalInfo.SetActive(false);
             normalModalInfo.SetActive(true);
 
-            accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc:F2}%</color></size>";
-            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.modifiedScore:N0}</size>";
-            scoreScoreText.text.Replace(",", " ");
+            accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc:0.##}%</color></size>";
+            scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.modifiedScore:0,0}</size>";
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
+            avgHandAccLeft.text = entry.avgHandAccLeft.HasValue ? $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.avgHandAccLeft:0.##}</color></size>" : "";
+            avgHandAccRight.text = entry.avgHandAccRight.HasValue ? $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.avgHandAccRight:0.##}</color></size>" : "";
+            avgHandTDLeft.text = entry.avgHandTDLeft.HasValue ? $"Left Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.avgHandTDLeft:0.##}</color></size>" : "";
+            avgHandTDRight.text = entry.avgHandTDRight.HasValue ? $"Right Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.avgHandTDRight:0.##}</color></size>" : "";
+            pauses.text = entry.pauses.HasValue ? $"Pauses: <size={infoFontSize}><color=#ffd42a>{entry.pauses}</color></size>" : "";
+            perfectStreak.text = entry.perfectStreak.HasValue ? $"Perfect Streak: <size={infoFontSize}><color=#ffd42a>{entry.perfectStreak}</color></size>" : "";
 
             ppScoreText.gameObject.SetActive(false);
 
@@ -154,12 +165,16 @@ namespace BedroomPartyLeaderboard.UI
                 ? $"<size=4><color={Constants.goodToast}>Full Combo!</color></size>"
                 : $"<size=4><color={Constants.badToast}>Mistakes: {entry.badCutCount + entry.missCount}</color></size>";
 
-            avgHandAccLeft.text = entry.avgHandAccLeft.HasValue ? $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.avgHandAccLeft:F2}</color></size>" : "";
-            avgHandAccRight.text = entry.avgHandAccRight.HasValue ? $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.avgHandAccRight:F2}</color></size>" : "";
-            avgHandTDLeft.text = entry.avgHandTDLeft.HasValue ? $"Left Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.avgHandTDLeft:F2}</color></size>" : "";
-            avgHandTDRight.text = entry.avgHandTDRight.HasValue ? $"Right Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.avgHandTDRight:F2}</color></size>" : "";
-            pauses.text = entry.pauses.HasValue ? $"Pauses: <size={infoFontSize}><color=#ffd42a>{entry.pauses}</color></size>" : "";
-            perfectStreak.text = entry.perfectStreak.HasValue ? $"Perfect Streak: <size={infoFontSize}><color=#ffd42a>{entry.perfectStreak}</color></size>" : "";
+            if (accScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
+            {
+                UnityEngine.Object.Destroy(accScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>());
+            }
+
+            TextHoverEffect comp = accScoreText.gameObject.AddComponent<UIUtils.TextHoverEffect>();
+            comp.daComponent = accScoreText;
+            comp.shouldChangeText = true;
+            comp.oldText = accScoreText.text;
+            comp.newText = $"Accuracy: <size={infoFontSize}><color=#ffd42a>FC ACC%</color></size>";
 
             parserParams.EmitEvent("showScoreInfo");
             parserParams.EmitEvent("hideSeasonSelectModal");

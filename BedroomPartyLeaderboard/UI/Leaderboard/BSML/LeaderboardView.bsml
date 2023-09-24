@@ -126,64 +126,62 @@
 			</modal>
 
 			<macro.as-host host="scoreInfoModal">
-				<modal id="scoreInfo" show-event="showScoreInfo" hide-event="hideScoreInfo" size-delta-x="60" size-delta-y="42" clickerino-offerino-closerino="true" move-to-center="true">
-					<stack>
-						<vertical spacing="1" child-expand-height="true" child-expand-width="true" pad="3">
-
-							<!-- Style -->
-							<macro.define name="font-size" value="3.1"/>
-							<vertical id="normalModalInfo">
-								<horizontal spacing="2">
-									<clickable-text rich-text="true" id="usernameScoreText" font-size="6" text="USERNAME" align="Center" on-click="usernameScoreTextCLICK"/>
-									<vertical spacing="4" anchor-pos-y="25" pref-width="12" pref-height="12">
-										<stack>
-											<image id="profileImageModal" src="BedroomPartyLeaderboard.Images.blank.png"  preserve-aspect="true"/>
-											<loading-indicator id="profileImageModalLOADING" preserve-aspect="true" />
-										</stack>
-									</vertical>
-								</horizontal>
-
-								<vertical spacing="1">
-									<text rich-text="true" id="dateScoreText" font-size="~font-size" text="DATE" align="Center"/>
-									<text rich-text="true" id="ppScoreText" font-size="~font-size" text="PP" align="Center"/>
-								</vertical>
-
-								<horizontal spacing="3">
-									<text rich-text="true" id="accScoreText" font-size="~font-size" text="ACC" align="Left"/>
-									<text rich-text="true" id="scoreScoreText" font-size="~font-size" text="SCORE" align="Right"/>
-								</horizontal>
-
-								<horizontal spacing="1">
-									<text rich-text="true" id="modifiersScoreText" font-size="~font-size" text="MODS" align="Center"/>
-								</horizontal>
-
-								<horizontal spacing="1">
-									<text rich-text="true" id="fcScoreText" font-size="~font-size" text="FC" align="Center"/>
+				<modal id="scoreInfo" size-delta-x="60" size-delta-y="42" show-event="showScoreInfo" hide-event="hideScoreInfo" clickerino-offerino-closerino="true" move-to-center="true">
+					<macro.define name="font-size" value="3.1"/>
+					<vertical spacing="0.5">
+						<vertical id="normalModalInfo" spacing="1.5" child-expand-height="true" child-expand-width="false" child-control-width="false" pad="3" child-align="MiddleCenter" pref-width="60">
+							<vertical min-height="12" min-width="60">
+								<horizontal ignore-layout="true" spacing="3" child-align="MiddleRight" min-width="60" anchor-pos-x="-3">
+									<horizontal>
+										<clickable-text rich-text="true" id="usernameScoreText" font-size="7" text="hilariouslylongnameforthefuckingsakeofit" align="Right" on-click="OnUserNameTextClick"/>
+									</horizontal>
+									<stack pref-width="12" pref-height="12">
+										<image id="profileImageModal" preserve-aspect="true" min-height="12" min-width="12"/>
+										<loading-indicator id="profileImageModalLOADING" preserve-aspect="true" min-height="12" min-width="12"/>
+									</stack>
 								</horizontal>
 							</vertical>
-
-							<vertical id="moreModalInfo" active="false">
-								<horizontal spacing="3">
-									<text rich-text="true" id="avgHandAccLeft" font-size="~font-size" text="avgHandAccLeft" align="Center"/>
-									<text rich-text="true" id="avgHandAccRight" font-size="~font-size" text="avgHandAccRight" align="Center"/>
-								</horizontal>
-
-								<horizontal spacing="3">
-									<text rich-text="true" id="avgHandTDLeft" font-size="~font-size" text="avgHandTDLeft" align="Left"/>
-									<text rich-text="true" id="avgHandTDRight" font-size="~font-size" text="avgHandTDRight" align="Right"/>
-								</horizontal>
-
-								<horizontal spacing="1">
-									<text rich-text="true" id="perfectStreak" font-size="~font-size" text="perfectStreak" align="Center"/>
-									<text rich-text="true" id="pauses" font-size="~font-size" text="perfectStreak" align="Center"/>
-								</horizontal>
+							<vertical spacing="1">
+								<text rich-text="true" id="dateScoreText" font-size="~font-size" text="DATE" align="Center"/>
+								<text rich-text="true" id="ppScoreText" font-size="~font-size" text="PP" align="Center"/>
 							</vertical>
-
-							<horizontal spacing="1">
-								<button rich-text="true" id="moreInfoButton" font-size="~font-size" text="More Info" align="Bottom" on-click="moreInfoButtonCLICK"/>
+							<horizontal spacing="4" child-align="MiddleCenter" child-control-width="true" horizontal-fit="PreferredSize">
+								<text rich-text="true" id="accScoreText" font-size="~font-size" text="ACC"/>
+								<text rich-text="true" id="scoreScoreText" font-size="~font-size" text="SCORE"/>
+							</horizontal>
+							<horizontal>
+								<text rich-text="true" id="modifiersScoreText" font-size="~font-size" text="MODS" align="Center"/>
+							</horizontal>
+							<horizontal>
+								<text rich-text="true" id="fcScoreText" font-size="~font-size" text="FC" align="Center"/>
 							</horizontal>
 						</vertical>
-					</stack>
+
+						<vertical id="moreModalInfo" active="false">
+							<horizontal spacing="3">
+								<text rich-text="true" id="avgHandAccLeft" font-size="~font-size" text="avgHandAccLeft" align="Center"/>
+								<text rich-text="true" id="avgHandAccRight" font-size="~font-size" text="avgHandAccRight" align="Center"/>
+							</horizontal>
+
+							<horizontal spacing="3">
+								<text rich-text="true" id="avgHandTDLeft" font-size="~font-size" text="avgHandTDLeft" align="Left"/>
+								<text rich-text="true" id="avgHandTDRight" font-size="~font-size" text="avgHandTDRight" align="Right"/>
+							</horizontal>
+
+							<horizontal spacing="1">
+								<text rich-text="true" id="perfectStreak" font-size="~font-size" text="perfectStreak" align="Center"/>
+								<text rich-text="true" id="pauses" font-size="~font-size" text="perfectStreak" align="Center"/>
+							</horizontal>
+						</vertical>
+						<vertical min-height="8"/>
+						
+						<horizontal ignore-layout="true" anchor-pos-y="-15">
+							<action-button preferred-height="8" preferred-width="20" rich-text="true" id="moreInfoButton" font-size="4" text="More Info" align="Bottom" on-click="moreInfoButtonCLICK" />
+						</horizontal>
+						<horizontal ignore-layout="true" anchor-pos-y="-15">
+							<button active="false" preferred-height="8" preferred-width="20" rich-text="true" id="backInfoButton" font-size="4" text="Back" align="Bottom" on-click="moreInfoButtonCLICK" />
+						</horizontal>
+					</vertical>
 				</modal>
 			</macro.as-host>
 			<button id="retryButton" text="Retry" on-click="Retry" active="false" anchor-pos-x="-5" align="Center"/>
