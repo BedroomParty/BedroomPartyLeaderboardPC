@@ -2,7 +2,6 @@
 using BedroomPartyLeaderboard.UI;
 using BedroomPartyLeaderboard.UI.Leaderboard;
 using BedroomPartyLeaderboard.Utils;
-using SiraUtil.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using Zenject;

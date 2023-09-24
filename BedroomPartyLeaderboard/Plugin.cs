@@ -1,9 +1,6 @@
 ﻿using BedroomPartyLeaderboard.Installers;
-using HarmonyLib;
 using IPA;
-using SiraUtil.Logging;
 using SiraUtil.Zenject;
-using System.Reflection;
 using IPALogger = IPA.Logging.Logger;
 
 namespace BedroomPartyLeaderboard

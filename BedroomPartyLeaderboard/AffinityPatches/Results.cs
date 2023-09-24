@@ -10,6 +10,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 {
     internal class Results : IAffinity
     {
+#pragma warning disable IDE0060
+#pragma warning disable IDE1006 // Naming Styles
         [Inject] private readonly RequestUtils _requestUtils;
         [Inject] private readonly AuthenticationManager _authenticationManager;
         [Inject] private readonly LeaderboardView _leaderboardView;

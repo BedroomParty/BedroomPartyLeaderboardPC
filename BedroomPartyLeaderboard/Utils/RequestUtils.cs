@@ -17,6 +17,7 @@ namespace BedroomPartyLeaderboard.Utils
 {
     internal class RequestUtils
     {
+#pragma warning disable CS4014
         [Inject] private readonly LeaderboardData _leaderboardData;
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly PanelView _panelView;
@@ -101,7 +102,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                     HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    _log.Info("Posting..." );
+                    _log.Info("Posting...");
                     HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(mapId), content);
                     _log.Info("Posted");
                     if (response.StatusCode == HttpStatusCode.Conflict)
