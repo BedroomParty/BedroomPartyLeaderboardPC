@@ -8,13 +8,13 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 {
     internal class ExtraSongData : IAffinity
     {
-        [Inject] private  readonly SiraLog _log;
-        internal  int currentPerfectHits = 0;
-        internal  int highestPerfectStreak = 0;
+        [Inject] private readonly SiraLog _log;
+        internal int currentPerfectHits = 0;
+        internal int highestPerfectStreak = 0;
 
         [AffinityPostfix]
         [AffinityPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Start))]
-        public  void Postfixaaa()
+        public void Postfixaaa()
         {
             _log.Info("Resetting ExtraSongData");
             ExtraSongDataHolder.reset();
@@ -24,7 +24,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
         [AffinityPostfix]
         [AffinityPatch(typeof(PauseMenuManager), nameof(PauseMenuManager.RestartButtonPressed))]
-        public  void Postfixsdasda()
+        public void Postfixsdasda()
         {
             _log.Info("Resetting ExtraSongData");
             ExtraSongDataHolder.reset();
@@ -34,7 +34,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
         [AffinityPostfix]
         [AffinityPatch(typeof(FlyingScoreEffect), nameof(FlyingScoreEffect.HandleCutScoreBufferDidFinish))]
-        public  void Postfixfgasg(ref CutScoreBuffer ____cutScoreBuffer)
+        public void Postfixfgasg(ref CutScoreBuffer ____cutScoreBuffer)
         {
             if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
             {
@@ -65,7 +65,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
         [AffinityPostfix]
         [AffinityPatch(typeof(PauseController), nameof(PauseController.Pause))]
-        public  void Postfixasgasg()
+        public void Postfixasgasg()
         {
             ExtraSongDataHolder.pauses++;
             _log.Info("Pause Detected: " + ExtraSongDataHolder.pauses.ToString());
