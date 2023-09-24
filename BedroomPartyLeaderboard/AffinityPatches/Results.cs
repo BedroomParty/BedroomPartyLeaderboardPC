@@ -18,82 +18,22 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         public static string GetModifiersString(LevelCompletionResults levelCompletionResults)
         {
             string mods = "";
-
-            if (levelCompletionResults.gameplayModifiers.noFailOn0Energy && levelCompletionResults.energy == 0)
-            {
-                mods += "NF";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.Faster)
-            {
-                mods += "FS ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.SuperFast)
-            {
-                mods += "SF ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.energyType == GameplayModifiers.EnergyType.Battery)
-            {
-                mods += "BE ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.proMode)
-            {
-                mods += "PM ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.instaFail)
-            {
-                mods += "IF ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.failOnSaberClash)
-            {
-                mods += "SC ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.enabledObstacleType == GameplayModifiers.EnabledObstacleType.NoObstacles)
-            {
-                mods += "NO ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.noBombs)
-            {
-                mods += "NB ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.strictAngles)
-            {
-                mods += "SA ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.disappearingArrows)
-            {
-                mods += "DA ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.ghostNotes)
-            {
-                mods += "GN ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.Slower)
-            {
-                mods += "SS ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.smallCubes)
-            {
-                mods += "SC ";
-            }
-
-            if (levelCompletionResults.gameplayModifiers.noArrows)
-            {
-                mods += "NA ";
-            }
-
+            GameplayModifiers gameplayModifiers = levelCompletionResults.gameplayModifiers;
+            if (gameplayModifiers.noFailOn0Energy && levelCompletionResults.energy == 0) mods += "NF";
+            if (gameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.Faster) mods += "FS ";
+            if (gameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.SuperFast) mods += "SF ";
+            if (gameplayModifiers.energyType == GameplayModifiers.EnergyType.Battery) mods += "BE ";
+            if (gameplayModifiers.proMode) mods += "PM ";
+            if (gameplayModifiers.instaFail) mods += "IF ";
+            if (gameplayModifiers.failOnSaberClash) mods += "SC ";
+            if (gameplayModifiers.enabledObstacleType == GameplayModifiers.EnabledObstacleType.NoObstacles) mods += "NO ";
+            if (gameplayModifiers.noBombs) mods += "NB ";
+            if (gameplayModifiers.strictAngles) mods += "SA ";
+            if (gameplayModifiers.disappearingArrows) mods += "DA ";
+            if (gameplayModifiers.ghostNotes) mods += "GN ";
+            if (gameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.Slower) mods += "SS ";
+            if (gameplayModifiers.smallCubes) mods += "SC ";
+            if (gameplayModifiers.noArrows) mods += "NA ";
             return mods.TrimEnd();
         }
 

@@ -1,7 +1,6 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Parser;
-using BeatSaberMarkupLanguage.Tags;
 using BedroomPartyLeaderboard.UI.Leaderboard;
 using BedroomPartyLeaderboard.Utils;
 using HMUI;
@@ -104,20 +103,10 @@ namespace BedroomPartyLeaderboard.UI
         public void moreInfoButtonCLICK()
         {
             isMoreInfo = !isMoreInfo;
-            if (isMoreInfo)
-            {
-                backInfoButton.gameObject.SetActive(true);
-                moreInfoButton.gameObject.SetActive(false);
-                moreModalInfo.SetActive(true);
-                normalModalInfo.SetActive(false);
-            }
-            else
-            {
-                backInfoButton.gameObject.SetActive(false);
-                moreInfoButton.gameObject.SetActive(true);
-                moreModalInfo.SetActive(false);
-                normalModalInfo.SetActive(true);
-            }
+            moreInfoButton.gameObject.SetActive(!isMoreInfo);
+            backInfoButton.gameObject.SetActive(isMoreInfo);
+            moreModalInfo.SetActive(isMoreInfo);
+            normalModalInfo.SetActive(!isMoreInfo);
         }
 
         private LeaderboardData.LeaderboardEntry currentEntry;
@@ -129,7 +118,7 @@ namespace BedroomPartyLeaderboard.UI
             currentEntry = entry;
             profileImageModalLOADING.SetActive(true);
             TimeSpan relativeTime = TimeUtils.GetRelativeTime(entry.timestamp.ToString());
-            dateScoreText.text = string.Format("<size=4.8><color=white>{0}</color></size>", TimeUtils.GetRelativeTimeString(relativeTime));
+            dateScoreText.text = string.Format("<size=4><color=white>{0}</color></size>", TimeUtils.GetRelativeTimeString(relativeTime));
 
             usernameScoreText.text = $"{entry.userName}";
             usernameScoreText.richText = true;
@@ -165,6 +154,9 @@ namespace BedroomPartyLeaderboard.UI
                 ? $"<size=4><color={Constants.goodToast}>Full Combo!</color></size>"
                 : $"<size=4><color={Constants.badToast}>Mistakes: {entry.badCutCount + entry.missCount}</color></size>";
 
+
+            // acc score hover effect
+
             if (accScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
             {
                 UnityEngine.Object.Destroy(accScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>());
@@ -174,7 +166,35 @@ namespace BedroomPartyLeaderboard.UI
             comp.daComponent = accScoreText;
             comp.shouldChangeText = true;
             comp.oldText = accScoreText.text;
-            comp.newText = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.fcAcc}%</color></size>";
+            comp.newText = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.fcAcc ?? 100}%</color></size>";
+
+            // avgHandAcc left hover effect
+
+            if (avgHandAccLeft.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
+            {
+                UnityEngine.Object.Destroy(avgHandAccLeft.gameObject.GetComponent<UIUtils.TextHoverEffect>());
+            }
+
+            TextHoverEffect comp2 = avgHandAccLeft.gameObject.AddComponent<UIUtils.TextHoverEffect>();
+            comp2.daComponent = avgHandAccLeft;
+            comp2.shouldChangeText = true;
+            comp2.oldText = avgHandAccLeft.text;
+            string fo = LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccLeft ?? 0.0f);
+            comp2.newText = $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{fo}</color></size>";
+
+            // avgHandAcc right hover effect
+
+            if (avgHandAccRight.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
+            {
+                UnityEngine.Object.Destroy(avgHandAccRight.gameObject.GetComponent<UIUtils.TextHoverEffect>());
+            }
+
+            TextHoverEffect comp3 = avgHandAccRight.gameObject.AddComponent<UIUtils.TextHoverEffect>();
+            comp3.daComponent = avgHandAccRight;
+            comp3.shouldChangeText = true;
+            comp3.oldText = avgHandAccRight.text;
+            string fo2 = LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccRight ?? 0.0f);
+            comp3.newText = $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{fo2}</color></size>";
 
             parserParams.EmitEvent("showScoreInfo");
             parserParams.EmitEvent("hideSeasonSelectModal");

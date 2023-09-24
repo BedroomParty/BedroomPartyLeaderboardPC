@@ -63,7 +63,7 @@ namespace BedroomPartyLeaderboard.Utils
         internal static float GetFcAcc()
         {
             int blocksHit = avgHandAccLeft.Count + avgHandAccRight.Count;
-            if(blocksHit == 0) return 0.0f;
+            if (blocksHit == 0) return 0.0f;
             float averagehitscore = ((float)GetTotalFromList(avgHandAccLeft) + (float)GetTotalFromList(avgHandAccRight)) / (float)blocksHit;
             float fcAcc = averagehitscore / 115 * 100;
             return fcAcc;

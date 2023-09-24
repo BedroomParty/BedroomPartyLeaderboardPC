@@ -156,21 +156,19 @@
 								<text rich-text="true" id="fcScoreText" font-size="~font-size" text="FC" align="Center"/>
 							</horizontal>
 						</vertical>
-
-						<vertical id="moreModalInfo" active="false">
-							<horizontal spacing="3">
-								<text rich-text="true" id="avgHandAccLeft" font-size="~font-size" text="avgHandAccLeft" align="Center"/>
-								<text rich-text="true" id="avgHandAccRight" font-size="~font-size" text="avgHandAccRight" align="Center"/>
+						<macro.define name="sillysize" value="3.3" />
+						<vertical id="moreModalInfo" active="false" spacing="1" child-expand-height="true" child-expand-width="false" child-control-width="false" pad="3" child-align="MiddleCenter" pref-width="60">
+							<horizontal spacing="3" child-align="MiddleCenter" child-control-width="true" horizontal-fit="PreferredSize">
+								<text font-size="~sillysize" rich-text="true" id="avgHandAccLeft" text="avgHandAccLeft" align="Center"/>
+								<text font-size="~sillysize" rich-text="true" id="avgHandAccRight" text="avgHandAccRight" align="Center"/>
 							</horizontal>
-
-							<horizontal spacing="3">
-								<text rich-text="true" id="avgHandTDLeft" font-size="~font-size" text="avgHandTDLeft" align="Left"/>
-								<text rich-text="true" id="avgHandTDRight" font-size="~font-size" text="avgHandTDRight" align="Right"/>
+							<horizontal spacing="3" child-align="MiddleCenter" child-control-width="true" horizontal-fit="PreferredSize">
+								<text font-size="~sillysize" rich-text="true" id="avgHandTDLeft" text="avgHandTDLeft" align="Center"/>
+								<text font-size="~sillysize" rich-text="true" id="avgHandTDRight" text="avgHandTDRight" align="Center"/>
 							</horizontal>
-
-							<horizontal spacing="1">
-								<text rich-text="true" id="perfectStreak" font-size="~font-size" text="perfectStreak" align="Center"/>
-								<text rich-text="true" id="pauses" font-size="~font-size" text="perfectStreak" align="Center"/>
+							<horizontal spacing="3" child-align="MiddleCenter" child-control-width="true" horizontal-fit="PreferredSize">
+								<text font-size="~sillysize" rich-text="true" id="perfectStreak" text="perfectStreak" align="Center"/>
+								<text font-size="~sillysize" rich-text="true" id="pauses" text="perfectStreak" align="Center"/>
 							</horizontal>
 						</vertical>
 						<vertical min-height="8"/>

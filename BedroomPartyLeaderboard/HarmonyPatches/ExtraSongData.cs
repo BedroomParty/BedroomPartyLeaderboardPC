@@ -1,7 +1,6 @@
 ﻿using BedroomPartyLeaderboard.Utils;
 using HarmonyLib;
 using System;
-using System.Collections.Generic;
 
 namespace BedroomPartyLeaderboard.HarmonyPatches
 {

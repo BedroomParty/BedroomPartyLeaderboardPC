@@ -25,7 +25,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     [ViewDefinition("BedroomPartyLeaderboard.UI.Leaderboard.BSML.LeaderboardView.bsml")]
     internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet, IInitializable
     {
-        #pragma warning disable 0649
+#pragma warning disable 0649
         [Inject] private readonly PlatformLeaderboardViewController _plvc;
         [Inject] private readonly PlayerUtils _playerUtils;
         [Inject] private readonly PanelView _panelView;
@@ -391,7 +391,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                                 return;
                             }
                             loadingLB.gameObject.SetActive(false);
-                            leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, Buttonholders), LeaderboardDataUtils.GetUserScorePos(result.Item2,_authenticationManager._localPlayerInfo.userID));
+                            leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, Buttonholders), LeaderboardDataUtils.GetUserScorePos(result.Item2, _authenticationManager._localPlayerInfo.userID));
                             _uiUtils.RichMyText(leaderboardTableView);
                             _uiUtils.SetProfiles(result.Item2);
                         }

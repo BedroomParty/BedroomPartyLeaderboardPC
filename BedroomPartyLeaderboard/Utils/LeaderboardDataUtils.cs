@@ -21,6 +21,34 @@ namespace BedroomPartyLeaderboard.Utils
             return tableData;
         }
 
+        internal static string GetFormattedScore(int score)
+        {
+            string result = "";
+            if (score >= 1000000)
+            {
+                result = $"{score / 1000000}M";
+            }
+            else if (score >= 1000)
+            {
+                result = $"{score / 1000}K";
+            }
+            else
+            {
+                result = $"{score}";
+            }
+            return result;
+        }
+
+        internal static string GetAccPercentFromHand(float handAcc)
+        {
+            return GetAccPercentFromHandFloat(handAcc).ToString("0.00") + "%";
+        }
+
+        internal static float GetAccPercentFromHandFloat(float handAcc)
+        {
+            return (handAcc / 115) * 100;
+        }
+
         internal static int GetUserScorePos(List<LeaderboardData.LeaderboardEntry> leaderboard, string userID)
         {
             for (int i = 0; i < leaderboard.Count; i++)
