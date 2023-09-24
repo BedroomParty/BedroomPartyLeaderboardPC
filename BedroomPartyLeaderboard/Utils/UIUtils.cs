@@ -18,7 +18,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
-using static BedroomPartyLeaderboard.Utils.UIUtils;
 
 namespace BedroomPartyLeaderboard.Utils
 {
@@ -337,7 +336,7 @@ namespace BedroomPartyLeaderboard.Utils
         }
 
 
-    public class ImageHolder
+        public class ImageHolder
         {
             private readonly int index;
 
