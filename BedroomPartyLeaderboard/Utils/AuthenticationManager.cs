@@ -21,6 +21,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         public async Task<bool> AuthenticateAsync()
         {
+            _log.Info("Authenticating");
             if (_currentlyAuthing)
             {
                 return false;
@@ -49,7 +50,6 @@ namespace BedroomPartyLeaderboard.Utils
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                         string requestBody = _playerUtils.GetLoginString(_localPlayerInfo.userID);
-                        _log.Notice(requestBody);
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
                         HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
@@ -80,6 +80,7 @@ namespace BedroomPartyLeaderboard.Utils
                     }
                     catch (HttpRequestException)
                     {
+                        _log.Error("Error Authenticating, retrying...");
                         attempt++;
                         await Task.Delay(5000);
                     }
@@ -87,9 +88,8 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 if (attempt < 2)
                 {
-                    throw new Exception("Error Authenticating.");
+                    _log.Error("Error Authenticating");
                 }
-
                 _currentlyAuthing = false;
                 return false;
             }

@@ -10,6 +10,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         internal static int currentPerfectHits = 0;
         internal static int highestPerfectStreak = 0;
 
+        [AffinityPostfix]
         [AffinityPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Start))]
         internal class AudioTimeSyncControllerStart
         {
@@ -21,6 +22,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             }
         }
 
+        [AffinityPostfix]
         [AffinityPatch(typeof(PauseMenuManager), nameof(PauseMenuManager.RestartButtonPressed))]
         internal class PauseMenuManagerRestartButtonPressed
         {
@@ -32,7 +34,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             }
         }
 
-
+        [AffinityPostfix]
         [AffinityPatch(typeof(FlyingScoreEffect), nameof(FlyingScoreEffect.HandleCutScoreBufferDidFinish))]
         internal class FlyingScoreEffectHandleCutScoreBufferDidFinish
         {
@@ -66,6 +68,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             }
         }
 
+        [AffinityPostfix]
         [AffinityPatch(typeof(PauseController), nameof(PauseController.Pause))]
         internal class PauseControllerPause
         {

@@ -54,8 +54,8 @@ namespace BedroomPartyLeaderboard.Utils
             JObject user = new()
             {
                 { "id", userID },
-                { "gameVersion", IPA.Utilities.UnityGame.GameVersion.StringValue.Split('_')[0] },
-                { "pluginVersion", PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion.ToString() }
+                { "gameVersion", "v" + IPA.Utilities.UnityGame.GameVersion.StringValue.Split('_')[0] },
+                { "pluginVersion", "PC v" + PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion.ToString() }
             };
             return user.ToString();
         }

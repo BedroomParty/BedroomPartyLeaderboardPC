@@ -333,14 +333,13 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             if (!_authenticationManager.IsAuthed) return;
             try
             {
+                _log.Info("Setting leaderboard");
                 scoreInfoModal.hidethefucker();
                 SetErrorState(false, "");
                 leaderboardTableView.SetScores(null, -1);
                 loadingLB.gameObject.SetActive(true);
                 FuckOffButtons();
                 _uiUtils.ByeImages();
-
-                await Task.Delay(200);
 
                 SetErrorState(false, "");
                 leaderboardTableView.SetScores(null, -1);
@@ -368,6 +367,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 }
 
                 await Task.Delay(50);
+                _log.Info("Getting leaderboard data");
                 _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
                 {
                     totalPages = result.Item3;
@@ -377,6 +377,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     {
                         if (result.Item2.Count == 0)
                         {
+                            _log.Info("No Scores Found");
                             SetErrorState(false, "No Scores Found");
                             HandleNoLeaderboardEntries();
                             loadingLB.gameObject.SetActive(false);
@@ -396,18 +397,18 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                             leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, Buttonholders), LeaderboardDataUtils.GetUserScorePos(result.Item2, _authenticationManager._localPlayerInfo.userID));
                             _uiUtils.RichMyText(leaderboardTableView);
                             _uiUtils.SetProfiles(result.Item2);
+                            _log.Info("Finished setting leaderboard");
                         }
                     }
                     else
                     {
+                        _log.Error("Error getting leaderboard");
                         SetErrorState(false, "Error");
                         HandleNoLeaderboardEntries();
                         loadingLB.gameObject.SetActive(false);
                         _uiUtils.ByeIMGLoader();
-                        _log.Error("Error");
                     }
                 });
-
                 if (cancellationToken.IsCancellationRequested)
                 {
                     SetErrorState(false, "");
@@ -419,6 +420,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             }
             catch (OperationCanceledException)
             {
+                _log.Info("Operation Cancelled");
                 SetErrorState(false, "");
                 loadingLB.gameObject.SetActive(true);
                 _uiUtils.ByeIMGLoader();

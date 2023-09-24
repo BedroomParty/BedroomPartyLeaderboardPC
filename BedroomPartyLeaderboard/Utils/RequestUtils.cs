@@ -31,6 +31,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 string requestString = getLBDownloadJSON(balls, page, _leaderboardView.sortMethod);
 
+                _log.Info("Getting Leaderboard Data");
                 HttpResponseMessage response = await httpClient.GetAsync(requestString);
 
                 int scorecount = 0;
@@ -39,10 +40,11 @@ namespace BedroomPartyLeaderboard.Utils
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    _log.Error("Failed to get leaderboard data");
                     callback((false, data, 0));
                     return;
                 }
-
+                _log.Info("Got Leaderboard Data");
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 LeaderboardData.BPLeaderboard leaderboardData = JsonConvert.DeserializeObject<LeaderboardData.BPLeaderboard>(jsonResponse);
                 scorecount = leaderboardData.scoreCount;
@@ -76,7 +78,6 @@ namespace BedroomPartyLeaderboard.Utils
             UnityMainThreadTaskScheduler.Factory.StartNew(() => UploadLeaderboardData(mapId, uploadJson));
         }
 
-
         internal bool isUploading = false;
 
         public event Action<bool, string> UploadCompleted;
@@ -84,14 +85,15 @@ namespace BedroomPartyLeaderboard.Utils
 
         private async Task UploadLeaderboardData(string mapId, string json)
         {
+            _log.Info("Uploading Score");
             if (DateTime.Now.Millisecond > _authenticationManager._localPlayerInfo.sessionExpiry) return;
             _leaderboardView.hasClickedOffResultsScreen = false;
             using HttpClient httpClient = new();
             int x = 0;
             isUploading = true;
-
             while (x < 3)
             {
+                _log.Info("Uploading Score Attempt: " + x);
                 try
                 {
                     httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _authenticationManager._localPlayerInfo.tempKey);
@@ -99,10 +101,12 @@ namespace BedroomPartyLeaderboard.Utils
 
                     HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
+                    _log.Info("Posting..." );
                     HttpResponseMessage response = await httpClient.PostAsync(Constants.LEADERBOARD_UPLOAD_END_POINT(mapId), content);
-
+                    _log.Info("Posted");
                     if (response.StatusCode == HttpStatusCode.Conflict)
                     {
+                        _log.Info("Score already exists");
                         UploadCompleted?.Invoke(response.IsSuccessStatusCode, $"<color={Constants.badToast}>You have a better score already...</color>");
                         isUploading = false;
                         break;
@@ -110,6 +114,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
+                        _log.Info("Score uploaded");
                         string jsonResponse = await response.Content.ReadAsStringAsync();
                         UploadCompleted?.Invoke(response.IsSuccessStatusCode, $"<color={Constants.goodToast}>Successfully uploaded score!</color>");
                         isUploading = false;
@@ -134,6 +139,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         internal async Task HandleLBUpload()
         {
+            _log.Info("Handling Upload UI");
             Action<bool, string> uploadCompletedCallback = (isSuccessful, message) =>
             {
                 if (isSuccessful)
@@ -160,6 +166,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 catch (TimeoutException)
                 {
+                    _log.Error("Failed to upload score (TIMEOUT)");
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.badToast}>Failed to upload... (TIMEOUT)</color>", true, false, 7500));
                 }
                 finally
@@ -170,11 +177,13 @@ namespace BedroomPartyLeaderboard.Utils
             await Constants.WaitUntil(() => _leaderboardView.isActivated);
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
             UploadCompleted -= uploadCompletedCallback;
+            _log.Info("Successfully handled upload UI");
         }
 
 
         internal async Task HandleLBAuth()
         {
+            _log.Info("Handling Auth UI");
             if (!_authenticationManager.IsAuthed)
             {
 
@@ -185,6 +194,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 catch (TimeoutException)
                 {
+                    _log.Error("Failed to auth (TIMEOUT)");
                     _leaderboardView.SetErrorState(true, "Failed to Auth");
                     UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("", false, false, 0));
                 }
@@ -201,6 +211,7 @@ namespace BedroomPartyLeaderboard.Utils
 
             await Constants.WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+            _log.Info("Successfully handled auth UI");
             return;
         }
 

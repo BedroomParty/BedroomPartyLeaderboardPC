@@ -3,6 +3,7 @@ using BedroomPartyLeaderboard.Utils;
 using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
 using SiraUtil.Affinity;
+using SiraUtil.Logging;
 using Zenject;
 
 namespace BedroomPartyLeaderboard.AffinityPatches
@@ -14,6 +15,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly UIUtils _uiUtils;
         [Inject] private readonly PlayerUtils _playerUtils;
+        [Inject] private readonly SiraLog _log;
 
         public static string GetModifiersString(LevelCompletionResults levelCompletionResults)
         {
@@ -41,6 +43,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         [AffinityPatch(typeof(LevelCompletionResultsHelper), nameof(LevelCompletionResultsHelper.ProcessScore))]
         private void Postfix(ref PlayerData playerData, ref PlayerLevelStatsData playerLevelStats, ref LevelCompletionResults levelCompletionResults, ref IReadonlyBeatmapData transformedBeatmapData, ref IDifficultyBeatmap difficultyBeatmap, ref PlatformLeaderboardsModel platformLeaderboardsModel)
         {
+            _log.Info("Begin Score Postfix");
             if (BS_Utils.Gameplay.ScoreSubmission.Disabled) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             int modifiedScore = levelCompletionResults.modifiedScore;
@@ -71,6 +74,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
             string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft, fcAcc);
             _requestUtils.SetBeatMapData(mapId, json);
+            _log.Info("End Score Postfix");
         }
 
         private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int multipliedScore, int modifiedScore, int pauses, int maxCombo, float avgAccRight, float avgAccLeft, int perfectStreak, float avgHandTDRight, float avgHandTDLeft, float fcAcc)
