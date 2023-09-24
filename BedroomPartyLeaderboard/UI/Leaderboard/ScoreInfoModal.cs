@@ -154,47 +154,9 @@ namespace BedroomPartyLeaderboard.UI
                 ? $"<size=4><color={Constants.goodToast}>Full Combo!</color></size>"
                 : $"<size=4><color={Constants.badToast}>Mistakes: {entry.badCutCount + entry.missCount}</color></size>";
 
-
-            // acc score hover effect
-
-            if (accScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
-            {
-                UnityEngine.Object.Destroy(accScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>());
-            }
-
-            TextHoverEffect comp = accScoreText.gameObject.AddComponent<UIUtils.TextHoverEffect>();
-            comp.daComponent = accScoreText;
-            comp.shouldChangeText = true;
-            comp.oldText = accScoreText.text;
-            comp.newText = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.fcAcc ?? 100}%</color></size>";
-
-            // avgHandAcc left hover effect
-
-            if (avgHandAccLeft.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
-            {
-                UnityEngine.Object.Destroy(avgHandAccLeft.gameObject.GetComponent<UIUtils.TextHoverEffect>());
-            }
-
-            TextHoverEffect comp2 = avgHandAccLeft.gameObject.AddComponent<UIUtils.TextHoverEffect>();
-            comp2.daComponent = avgHandAccLeft;
-            comp2.shouldChangeText = true;
-            comp2.oldText = avgHandAccLeft.text;
-            string fo = LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccLeft ?? 0.0f);
-            comp2.newText = $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{fo}</color></size>";
-
-            // avgHandAcc right hover effect
-
-            if (avgHandAccRight.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
-            {
-                UnityEngine.Object.Destroy(avgHandAccRight.gameObject.GetComponent<UIUtils.TextHoverEffect>());
-            }
-
-            TextHoverEffect comp3 = avgHandAccRight.gameObject.AddComponent<UIUtils.TextHoverEffect>();
-            comp3.daComponent = avgHandAccRight;
-            comp3.shouldChangeText = true;
-            comp3.oldText = avgHandAccRight.text;
-            string fo2 = LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccRight ?? 0.0f);
-            comp3.newText = $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{fo2}</color></size>";
+            MonoBehaviourAttacher.AttachTextHoverEffect(accScoreText.gameObject, true, accScoreText.text, $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.fcAcc ?? 100}%</color></size>");
+            MonoBehaviourAttacher.AttachTextHoverEffect(avgHandAccLeft.gameObject, true, avgHandAccLeft.text, $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccLeft ?? 0.0f)}</color></size>");
+            MonoBehaviourAttacher.AttachTextHoverEffect(avgHandAccRight.gameObject, true, avgHandAccRight.text, $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccRight ?? 0.0f)}</color></size>");
 
             parserParams.EmitEvent("showScoreInfo");
             parserParams.EmitEvent("hideSeasonSelectModal");
@@ -217,14 +179,7 @@ namespace BedroomPartyLeaderboard.UI
                     usernameScoreText.color = Color.white;
                 }
 
-                if (usernameScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>() != null)
-                {
-                    UnityEngine.Object.Destroy(usernameScoreText.gameObject.GetComponent<UIUtils.TextHoverEffect>());
-                }
-                TextHoverEffect textHoverEffect = usernameScoreText.gameObject.AddComponent<UIUtils.TextHoverEffect>();
-                textHoverEffect.daComponent = usernameScoreText;
-                textHoverEffect.daStyle = FontStyles.Underline;
-                textHoverEffect.origStyle = FontStyles.Normal;
+                MonoBehaviourAttacher.AttachTextHoverEffect(usernameScoreText.gameObject, false, "", "", FontStyles.Underline, FontStyles.Normal);
 
                 Task.Run(() =>
                 {

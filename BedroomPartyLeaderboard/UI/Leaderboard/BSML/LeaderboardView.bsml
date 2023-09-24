@@ -133,7 +133,7 @@
 							<vertical min-height="12" min-width="60">
 								<horizontal ignore-layout="true" spacing="3" child-align="MiddleRight" min-width="60" anchor-pos-x="-3">
 									<horizontal>
-										<clickable-text rich-text="true" id="usernameScoreText" font-size="7" text="hilariouslylongnameforthefuckingsakeofit" align="Right" on-click="OnUserNameTextClick"/>
+										<clickable-text rich-text="true" id="usernameScoreText" font-size="7" text="hilariouslylongnameforthefuckingsakeofit" align="Right" on-click="usernameScoreTextCLICK"/>
 									</horizontal>
 									<stack pref-width="12" pref-height="12">
 										<image id="profileImageModal" preserve-aspect="true" min-height="12" min-width="12"/>

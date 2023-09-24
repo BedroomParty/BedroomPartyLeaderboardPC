@@ -18,6 +18,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
+using static BedroomPartyLeaderboard.Utils.UIUtils;
 
 namespace BedroomPartyLeaderboard.Utils
 {
@@ -156,8 +157,6 @@ namespace BedroomPartyLeaderboard.Utils
                 _tweeningService.FadeText(_panelView.promptText, false, 0.15f);
             }
         }
-
-
 
         public async Task assignStaff()
         {
@@ -322,7 +321,23 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-        public class ImageHolder
+        public static class MonoBehaviourAttacher
+        {
+            public static TextHoverEffect AttachTextHoverEffect(GameObject gameObject, bool shouldChangeText = false, string oldText = "", string newText = "", FontStyles daStyle = FontStyles.Normal, FontStyles origStyle = FontStyles.Normal)
+            {
+                TextHoverEffect textHoverEffect = gameObject.GetComponent<TextHoverEffect>() ?? gameObject.AddComponent<TextHoverEffect>();
+                textHoverEffect.daComponent = gameObject.GetComponent<TextMeshProUGUI>();
+                textHoverEffect.shouldChangeText = shouldChangeText;
+                textHoverEffect.oldText = oldText;
+                textHoverEffect.newText = newText;
+                textHoverEffect.daStyle = daStyle;
+                textHoverEffect.origStyle = origStyle;
+                return textHoverEffect;
+            }
+        }
+
+
+    public class ImageHolder
         {
             private readonly int index;
 
