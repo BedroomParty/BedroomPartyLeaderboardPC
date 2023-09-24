@@ -126,9 +126,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             float avgHandTDRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDRight);
             float avgHandTDLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDLeft);
 
-            float fcAcc = (float)ExtraSongDataHolder.GetTotalFromList(ExtraSongDataHolder.avgHandAccLeft) + (float)ExtraSongDataHolder.GetTotalFromList(ExtraSongDataHolder.avgHandAccLeft) / (ExtraSongDataHolder.avgHandAccLeft.Count + ExtraSongDataHolder.avgHandAccRight.Count) * 100;
-
-            Plugin.Log.Notice(fcAcc.ToString());
+            float fcAcc = ExtraSongDataHolder.GetFcAcc();
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
             string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft, fcAcc);
