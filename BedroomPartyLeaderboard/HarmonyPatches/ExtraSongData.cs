@@ -1,80 +1,74 @@
 ﻿using BedroomPartyLeaderboard.Utils;
 using SiraUtil.Affinity;
+using SiraUtil.Logging;
 using System;
+using Zenject;
 
 namespace BedroomPartyLeaderboard.AffinityPatches
 {
     internal class ExtraSongData : IAffinity
     {
-        internal static int currentPerfectHits = 0;
-        internal static int highestPerfectStreak = 0;
+        [Inject] private  readonly SiraLog _log;
+        internal  int currentPerfectHits = 0;
+        internal  int highestPerfectStreak = 0;
 
         [AffinityPostfix]
         [AffinityPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Start))]
-        internal class AudioTimeSyncControllerStart
+        public  void Postfixaaa()
         {
-            private static void Postfix()
-            {
-                ExtraSongDataHolder.reset();
-                currentPerfectHits = 0;
-                highestPerfectStreak = 0;
-            }
+            _log.Info("Resetting ExtraSongData");
+            ExtraSongDataHolder.reset();
+            currentPerfectHits = 0;
+            highestPerfectStreak = 0;
         }
 
         [AffinityPostfix]
         [AffinityPatch(typeof(PauseMenuManager), nameof(PauseMenuManager.RestartButtonPressed))]
-        internal class PauseMenuManagerRestartButtonPressed
+        public  void Postfixsdasda()
         {
-            private static void Postfix()
-            {
-                ExtraSongDataHolder.reset();
-                currentPerfectHits = 0;
-                highestPerfectStreak = 0;
-            }
+            _log.Info("Resetting ExtraSongData");
+            ExtraSongDataHolder.reset();
+            currentPerfectHits = 0;
+            highestPerfectStreak = 0;
         }
 
         [AffinityPostfix]
         [AffinityPatch(typeof(FlyingScoreEffect), nameof(FlyingScoreEffect.HandleCutScoreBufferDidFinish))]
-        internal class FlyingScoreEffectHandleCutScoreBufferDidFinish
+        public  void Postfixfgasg(ref CutScoreBuffer ____cutScoreBuffer)
         {
-            public static void Postfix(ref CutScoreBuffer ____cutScoreBuffer)
+            if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
             {
-                if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
-                {
-                    ExtraSongDataHolder.avgHandAccLeft.Add(____cutScoreBuffer.cutScore);
-                    ExtraSongDataHolder.avgHandTDLeft.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
+                ExtraSongDataHolder.avgHandAccLeft.Add(____cutScoreBuffer.cutScore);
+                ExtraSongDataHolder.avgHandTDLeft.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
 
-                }
-                else if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorB)
-                {
-                    ExtraSongDataHolder.avgHandAccRight.Add(____cutScoreBuffer.cutScore);
-                    ExtraSongDataHolder.avgHandTDRight.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
-                }
+            }
+            else if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorB)
+            {
+                ExtraSongDataHolder.avgHandAccRight.Add(____cutScoreBuffer.cutScore);
+                ExtraSongDataHolder.avgHandTDRight.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
+            }
 
-                if (____cutScoreBuffer.cutScore == 115)
+            if (____cutScoreBuffer.cutScore == 115)
+            {
+                currentPerfectHits++;
+                if (currentPerfectHits > highestPerfectStreak)
                 {
-                    currentPerfectHits++;
-                    if (currentPerfectHits > highestPerfectStreak)
-                    {
-                        highestPerfectStreak = currentPerfectHits;
-                        ExtraSongDataHolder.perfectStreak = highestPerfectStreak;
-                    }
+                    highestPerfectStreak = currentPerfectHits;
+                    ExtraSongDataHolder.perfectStreak = highestPerfectStreak;
                 }
-                else
-                {
-                    currentPerfectHits = 0;
-                }
+            }
+            else
+            {
+                currentPerfectHits = 0;
             }
         }
 
         [AffinityPostfix]
         [AffinityPatch(typeof(PauseController), nameof(PauseController.Pause))]
-        internal class PauseControllerPause
+        public  void Postfixasgasg()
         {
-            public static void Postfix()
-            {
-                ExtraSongDataHolder.pauses++;
-            }
+            ExtraSongDataHolder.pauses++;
+            _log.Info("Pause Detected: " + ExtraSongDataHolder.pauses.ToString());
         }
     }
 }
