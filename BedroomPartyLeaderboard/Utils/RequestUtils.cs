@@ -2,6 +2,7 @@
 using BedroomPartyLeaderboard.UI.Leaderboard;
 using IPA.Utilities.Async;
 using Newtonsoft.Json;
+using SiraUtil.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -21,6 +22,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly PanelView _panelView;
         [Inject] private readonly UIUtils _uiUtils;
         [Inject] private readonly AuthenticationManager _authenticationManager;
+        [Inject] private readonly SiraLog _log;
 
         public async Task GetLeaderboardData((string, int, string) balls, int page, Action<(bool, List<LeaderboardData.LeaderboardEntry>, int)> callback)
         {
@@ -52,7 +54,7 @@ namespace BedroomPartyLeaderboard.Utils
             }
             catch (HttpRequestException e)
             {
-                Plugin.Log.Error("EXCEPTION: " + e.ToString());
+                _log.Error("EXCEPTION: " + e.ToString());
                 callback((false, null, 0));
             }
         }
@@ -116,7 +118,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 catch (HttpRequestException e)
                 {
-                    Plugin.Log.Error("EXCEPTION: " + e.ToString());
+                    _log.Error("EXCEPTION: " + e.ToString());
                     UploadFailed?.Invoke();
                 }
                 x++;

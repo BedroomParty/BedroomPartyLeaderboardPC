@@ -1,15 +1,16 @@
 ﻿using BedroomPartyLeaderboard.Utils;
 using HarmonyLib;
+using SiraUtil.Affinity;
 using System;
 
-namespace BedroomPartyLeaderboard.HarmonyPatches
+namespace BedroomPartyLeaderboard.AffinityPatches
 {
-    internal class ExtraSongData
+    internal class ExtraSongData : IAffinity
     {
-        public static int currentPerfectHits = 0;
-        public static int highestPerfectStreak = 0;
+        internal static int currentPerfectHits = 0;
+        internal static int highestPerfectStreak = 0;
 
-        [HarmonyPatch(typeof(AudioTimeSyncController), "Start")]
+        [AffinityPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Start))]
         internal class AudioTimeSyncControllerStart
         {
             private static void Postfix()
@@ -20,7 +21,7 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
             }
         }
 
-        [HarmonyPatch(typeof(PauseMenuManager), "RestartButtonPressed")]
+        [AffinityPatch(typeof(PauseMenuManager), nameof(PauseMenuManager.RestartButtonPressed))]
         internal class PauseMenuManagerRestartButtonPressed
         {
             private static void Postfix()
@@ -32,7 +33,7 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
         }
 
 
-        [HarmonyPatch(typeof(FlyingScoreEffect), "HandleCutScoreBufferDidFinish")]
+        [AffinityPatch(typeof(FlyingScoreEffect), nameof(FlyingScoreEffect.HandleCutScoreBufferDidFinish))]
         internal class FlyingScoreEffectHandleCutScoreBufferDidFinish
         {
             public static void Postfix(ref CutScoreBuffer ____cutScoreBuffer)
@@ -65,7 +66,7 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
             }
         }
 
-        [HarmonyPatch(typeof(PauseController), "Pause")]
+        [AffinityPatch(typeof(PauseController), nameof(PauseController.Pause))]
         internal class PauseControllerPause
         {
             public static void Postfix()

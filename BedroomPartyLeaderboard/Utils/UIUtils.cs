@@ -5,6 +5,7 @@ using BedroomPartyLeaderboard.UI.Leaderboard;
 using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
+using SiraUtil.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly TweeningService _tweeningService;
         [Inject] private readonly AuthenticationManager _authenticationManager;
+        [Inject] private readonly SiraLog _log;
         public class RainbowAnimation : MonoBehaviour
         {
             public float speed = 1f; // Speed of the color change
@@ -190,7 +192,7 @@ namespace BedroomPartyLeaderboard.Utils
         {
             Material cool = null;
             cool = Resources.FindObjectsOfTypeAll<Material>().First(x => x.name == "UINoGlowRoundEdge");
-            if (cool == null) Plugin.Log.Error("Material 'UINoGlowRoundEdge' not found.");
+            if (cool == null) _log.Error("Material 'UINoGlowRoundEdge' not found.");
             return cool;
         }
 

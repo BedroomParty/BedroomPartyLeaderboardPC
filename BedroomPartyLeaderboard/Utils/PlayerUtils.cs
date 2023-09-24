@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using IPA.Loader;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
@@ -53,8 +54,9 @@ namespace BedroomPartyLeaderboard.Utils
             JObject user = new()
             {
                 { "id", userID },
+                { "gameVersion", IPA.Utilities.UnityGame.GameVersion.StringValue.Split('_')[0] },
+                { "pluginVersion", PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion.ToString() }
             };
-
             return user.ToString();
         }
 

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SiraUtil.Logging;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -11,6 +12,7 @@ namespace BedroomPartyLeaderboard.Utils
     internal class AuthenticationManager
     {
         [Inject] private readonly PlayerUtils _playerUtils;
+        [Inject] private readonly SiraLog _log;
         internal PlayerUtils.PlayerInfo _localPlayerInfo;
         private bool _isAuthed = false;
         internal bool _currentlyAuthing = false;
@@ -32,7 +34,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                 if (_localPlayerInfo.authKey == null)
                 {
-                    Plugin.Log.Error("AUTH KEY NULL");
+                    _log.Error("AUTH KEY NULL");
                     _isAuthed = false;
                     return false;
                 }
@@ -47,6 +49,7 @@ namespace BedroomPartyLeaderboard.Utils
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                         string requestBody = _playerUtils.GetLoginString(_localPlayerInfo.userID);
+                        _log.Notice(requestBody);
                         HttpContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
                         HttpResponseMessage response = await httpClient.PostAsync(Constants.AUTH_END_POINT, content);
@@ -92,7 +95,7 @@ namespace BedroomPartyLeaderboard.Utils
             }
             catch (Exception e)
             {
-                Plugin.Log.Error(e);
+                _log.Error(e);
                 _currentlyAuthing = false;
                 return false;
             }
@@ -104,16 +107,16 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 if (await AuthenticateAsync())
                 {
-                    Plugin.Log.Info("authed");
+                    _log.Info("authed");
                 }
                 else
                 {
-                    Plugin.Log.Error("Not authenticated!");
+                    _log.Error("Not authenticated!");
                 }
             }
             catch (Exception ex)
             {
-                Plugin.Log.Error("LoginUserAsync failed: " + ex.Message);
+                _log.Error("LoginUserAsync failed: " + ex.Message);
             }
         }
     }

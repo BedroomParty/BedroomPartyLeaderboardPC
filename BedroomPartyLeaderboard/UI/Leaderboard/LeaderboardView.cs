@@ -8,6 +8,7 @@ using HMUI;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
+using SiraUtil.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [Inject] private readonly UIUtils _uiUtils;
         [Inject] private readonly TweeningService _tweeningService;
         [Inject] private readonly AuthenticationManager _authenticationManager;
+        [Inject] private readonly SiraLog _log;
 
         internal IDifficultyBeatmap currentDifficultyBeatmap;
         internal IDifficultyBeatmapSet currentDifficultyBeatmapSet;
@@ -402,7 +404,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                         HandleNoLeaderboardEntries();
                         loadingLB.gameObject.SetActive(false);
                         _uiUtils.ByeIMGLoader();
-                        Plugin.Log.Error("Error");
+                        _log.Error("Error");
                     }
                 });
 
