@@ -64,7 +64,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         }
 
         [AffinityPostfix]
-        [AffinityPatch(typeof(PauseController), nameof(PauseController.Pause))]
+        [AffinityPatch(typeof(GamePause), nameof(GamePause.Pause))]
         public void Postfixasgasg()
         {
             ExtraSongDataHolder.pauses++;
