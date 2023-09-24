@@ -126,12 +126,16 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             float avgHandTDRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDRight);
             float avgHandTDLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDLeft);
 
+            float fcAcc = (float)ExtraSongDataHolder.GetTotalFromList(ExtraSongDataHolder.hitScores) / ExtraSongDataHolder.amountOfNotesHit * 100;
+
+            Plugin.Log.Notice(fcAcc.ToString());
+
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
-            string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft);
+            string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft, fcAcc);
             _requestUtils.SetBeatMapData(mapId, json);
         }
 
-        private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int multipliedScore, int modifiedScore, int pauses, int maxCombo, float avgAccRight, float avgAccLeft, int perfectStreak, float avgHandTDRight, float avgHandTDLeft)
+        private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int multipliedScore, int modifiedScore, int pauses, int maxCombo, float avgAccRight, float avgAccLeft, int perfectStreak, float avgHandTDRight, float avgHandTDLeft, float fcAcc)
         {
             JObject Data = new()
             {
@@ -151,7 +155,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
                 { "avgHandTDLeft", avgHandTDLeft },
                 { "avgHandAccRight", avgAccRight },
                 { "avgHandAccLeft", avgAccLeft},
-                { "perfectStreak", perfectStreak }
+                { "perfectStreak", perfectStreak },
+                { "fcAcc", fcAcc }
             };
             return Data.ToString();
         }

@@ -25,6 +25,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
     [ViewDefinition("BedroomPartyLeaderboard.UI.Leaderboard.BSML.LeaderboardView.bsml")]
     internal class LeaderboardView : BSMLAutomaticViewController, INotifyLeaderboardSet, IInitializable
     {
+        #pragma warning disable 0649
         [Inject] private readonly PlatformLeaderboardViewController _plvc;
         [Inject] private readonly PlayerUtils _playerUtils;
         [Inject] private readonly PanelView _panelView;

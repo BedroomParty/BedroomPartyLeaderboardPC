@@ -31,6 +31,7 @@ namespace BedroomPartyLeaderboard.Utils
             [JsonProperty("avgHandAccRight")] public float? avgHandAccRight = null;
             [JsonProperty("avgHandAccLeft")] public float? avgHandAccLeft = null;
             [JsonProperty("perfectStreak")] public int? perfectStreak = null;
+            [JsonProperty("fcAcc")] public float? fcAcc = null;
         }
     }
 }

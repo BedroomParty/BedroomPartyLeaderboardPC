@@ -9,7 +9,12 @@ namespace BedroomPartyLeaderboard.Utils
         internal static List<float> avgHandAccLeft = new();
         internal static List<float> avgHandTDRight = new();
         internal static List<float> avgHandTDLeft = new();
-        internal static int perfectStreak;
+
+
+        public static List<int> hitScores = new();
+        public static int amountOfNotesHit = 0;
+
+        internal static int perfectStreak = 0;
 
         internal static void reset()
         {
@@ -18,7 +23,9 @@ namespace BedroomPartyLeaderboard.Utils
             avgHandAccLeft.Clear();
             avgHandTDRight.Clear();
             avgHandTDLeft.Clear();
+            hitScores.Clear();
             perfectStreak = 0;
+            amountOfNotesHit = 0;
         }
 
         internal static float GetAverageFromList(List<float> list)
@@ -34,6 +41,16 @@ namespace BedroomPartyLeaderboard.Utils
             }
             return sum / list.Count;
             // it sure does
+        }
+
+        internal static int GetTotalFromList(List<int> list)
+        {
+            int sum = 0;
+            foreach (int i in list)
+            {
+                sum += i;
+            }
+            return sum;
         }
     }
 }

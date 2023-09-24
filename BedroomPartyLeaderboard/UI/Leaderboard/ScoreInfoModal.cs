@@ -174,7 +174,7 @@ namespace BedroomPartyLeaderboard.UI
             comp.daComponent = accScoreText;
             comp.shouldChangeText = true;
             comp.oldText = accScoreText.text;
-            comp.newText = $"Accuracy: <size={infoFontSize}><color=#ffd42a>FC ACC%</color></size>";
+            comp.newText = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.fcAcc}%</color></size>";
 
             parserParams.EmitEvent("showScoreInfo");
             parserParams.EmitEvent("hideSeasonSelectModal");

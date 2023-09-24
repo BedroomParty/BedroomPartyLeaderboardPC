@@ -1,6 +1,7 @@
 ﻿using BedroomPartyLeaderboard.Utils;
 using HarmonyLib;
 using System;
+using System.Collections.Generic;
 
 namespace BedroomPartyLeaderboard.HarmonyPatches
 {
@@ -61,6 +62,11 @@ namespace BedroomPartyLeaderboard.HarmonyPatches
                 else
                 {
                     currentPerfectHits = 0;
+                }
+                if (____cutScoreBuffer.noteCutInfo.allIsOK)
+                {
+                    ExtraSongDataHolder.amountOfNotesHit++;
+                    ExtraSongDataHolder.hitScores.Add(____cutScoreBuffer.cutScore);
                 }
             }
         }
