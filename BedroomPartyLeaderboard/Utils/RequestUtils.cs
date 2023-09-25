@@ -41,7 +41,7 @@ namespace BedroomPartyLeaderboard.Utils
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _log.Error("Failed to get leaderboard data");
+                    _log.Info("No Scores Found (Response code not 200)");
                     callback((false, data, 0));
                     return;
                 }

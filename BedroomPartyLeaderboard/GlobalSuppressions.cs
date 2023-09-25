@@ -9,3 +9,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~F:BedroomPartyLeaderboard.UI.Leaderboard.LeaderboardView._leaderboardData")]
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:BedroomPartyLeaderboard.UI.Leaderboard.LeaderboardView.downloadPlaylistCLICK")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:BedroomPartyLeaderboard.UI.Leaderboard.LeaderboardView.openWebLeaderboardCLICK")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~F:BedroomPartyLeaderboard.UI.Leaderboard.LeaderboardView.versionText")]

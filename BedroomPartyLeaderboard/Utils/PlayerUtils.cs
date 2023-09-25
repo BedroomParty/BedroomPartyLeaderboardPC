@@ -41,9 +41,21 @@ namespace BedroomPartyLeaderboard.Utils
 
         private bool NullCheckFilePath(string path)
         {
+            if (path == null) return false;
+
             if (!File.Exists(path))
             {
                 Directory.CreateDirectory(path.Substring(0, path.LastIndexOf('/')));
+                return false;
+            }
+            return true;
+        }
+
+        private bool NullCheckDirectory(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
                 return false;
             }
             return true;

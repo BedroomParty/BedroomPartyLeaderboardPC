@@ -94,6 +94,9 @@
 					<horizontal>
 						<action-button text="Website" pref-width="25" pref-height="10"  id='websiteButton' on-click='openWebsite'/>
 					</horizontal>
+					<horizontal>
+						<text id='versionText' text='VersionTextHere' font-size='3.4' align='Center'/>
+					</horizontal>
 				</vertical>
 			</modal>
 			<modal child-expand-height="false" id='seasonSelectModal' show-event='showSeasonSelectModal' hide-event='hideSeasonSelectModal' size-delta-x='65' size-delta-y='60' clickerino-offerino-closerino='false' move-to-center='true'>

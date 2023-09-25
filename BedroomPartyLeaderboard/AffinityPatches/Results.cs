@@ -41,7 +41,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             return mods.TrimEnd();
         }
 
-        [AffinityPostfix]
+        [AffinityPriority(int.MaxValue)]
+        [AffinityPrefix]
         [AffinityPatch(typeof(LevelCompletionResultsHelper), nameof(LevelCompletionResultsHelper.ProcessScore))]
         private void Postfix(ref PlayerData playerData, ref PlayerLevelStatsData playerLevelStats, ref LevelCompletionResults levelCompletionResults, ref IReadonlyBeatmapData transformedBeatmapData, ref IDifficultyBeatmap difficultyBeatmap, ref PlatformLeaderboardsModel platformLeaderboardsModel)
         {

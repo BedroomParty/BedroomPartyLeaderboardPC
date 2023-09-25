@@ -381,11 +381,13 @@ namespace BedroomPartyLeaderboard.Utils
 
                     Task.Run(() => ThisFuckingSucks(url));
                 }
-                catch
+                catch(OperationCanceledException)
                 {
                     isLoading = false;
                 }
             }
+            
+
 
             private async Task ThisFuckingSucks(string url)
             {

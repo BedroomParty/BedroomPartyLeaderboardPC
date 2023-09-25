@@ -68,7 +68,6 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         public void Postfixasgasg()
         {
             ExtraSongDataHolder.pauses++;
-            _log.Info("Pause Detected: " + ExtraSongDataHolder.pauses.ToString());
         }
     }
 }

@@ -5,6 +5,7 @@ using BeatSaberMarkupLanguage.Parser;
 using BeatSaberMarkupLanguage.ViewControllers;
 using BedroomPartyLeaderboard.Utils;
 using HMUI;
+using IPA.Loader;
 using IPA.Utilities;
 using IPA.Utilities.Async;
 using LeaderboardCore.Interfaces;
@@ -78,6 +79,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         [UIObject("loadingLB")]
         private readonly GameObject loadingLB;
+
+        [UIComponent("versionText")]
+        private readonly TextMeshProUGUI versionText;
 
         [UIAction("downloadPlaylistCLICK")]
         private void downloadPlaylistCLICK()
@@ -174,7 +178,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             _imgView.color1 = Constants.BP_COLOR;
             ImageSkew(ref _imgView) = 0.18f;
             ImageGradient(ref _imgView) = true;
+            versionText.text = $"You are running BPLB v{PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion} on BS version {UnityGame.GameVersion.ToString().Split('_')[0]}";
         }
+
         private void FuckOffButtons()
         {
             Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
@@ -353,7 +359,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
                 currentSongLinkLBWebView = $"https://thebedroom.party/leaderboard/{mapId}";
 
-                await Task.Delay(50);
+                await Task.Delay(200);
 
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -365,7 +371,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                     return;
                 }
 
-                await Task.Delay(50);
                 _log.Info("Getting leaderboard data");
                 _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
                 {
