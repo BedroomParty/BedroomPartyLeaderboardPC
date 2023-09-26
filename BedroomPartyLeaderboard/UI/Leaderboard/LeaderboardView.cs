@@ -42,6 +42,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         internal IDifficultyBeatmapSet currentDifficultyBeatmapSet;
         private CancellationTokenSource cancellationTokenSource;
 
+        private List<LeaderboardData.LeaderboardEntry> currentEntries;
         private string currentSongLinkLBWebView = string.Empty;
         internal static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
         internal string sortMethod = "top";
@@ -270,6 +271,19 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 textHoverEffect.daStyle = FontStyles.Underline;
                 textHoverEffect.origStyle = FontStyles.Normal;
             }
+            if(currentEntries == null || currentEntries.Count == 0)
+            {
+                leaderboardTableView.SetScores(null, -1);
+                _uiUtils.ByeImages();
+            }
+            else
+            {
+                for (int i = currentEntries.Count; i < 10; i++)
+                {
+                    _ImageHolders[i].profileloading.gameObject.SetActive(false);
+                    _ImageHolders[i].profileImage.sprite = null;
+                }
+            }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
 
@@ -399,6 +413,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                             }
                             loadingLB.gameObject.SetActive(false);
                             leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, Buttonholders), LeaderboardDataUtils.GetUserScorePos(result.Item2, _authenticationManager._localPlayerInfo.userID));
+                            currentEntries = result.Item2;
                             _uiUtils.RichMyText(leaderboardTableView);
                             _uiUtils.SetProfiles(result.Item2);
                             _log.Info("Finished setting leaderboard");

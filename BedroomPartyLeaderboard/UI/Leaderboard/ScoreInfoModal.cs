@@ -7,6 +7,7 @@ using HMUI;
 using IPA.Utilities.Async;
 using ModestTree;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -164,7 +165,24 @@ namespace BedroomPartyLeaderboard.UI
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-                if (Task.Run(() => Constants.isStaff(entry.userID)).Result)
+                if(Constants.staffIDs == null)
+                {
+                    if(Task.Run(() => Constants.isStaff(entry.userID)).Result)
+                    {
+                        RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
+                        rainbowAnimation.speed = 0.4f;
+                    }
+                    else
+                    {
+                        RainbowAnimation rainbowAnimation = usernameScoreText.GetComponent<RainbowAnimation>();
+                        if (rainbowAnimation != null)
+                        {
+                            UnityEngine.Object.Destroy(rainbowAnimation);
+                        }
+                        usernameScoreText.color = Color.white;
+                    }
+                }
+                else if (Constants.staffIDs.Contains(entry.userID))
                 {
                     RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
                     rainbowAnimation.speed = 0.4f;

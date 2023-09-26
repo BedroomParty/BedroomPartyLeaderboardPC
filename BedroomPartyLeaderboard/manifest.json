@@ -3,7 +3,7 @@
   "id": "BedroomPartyLeaderboard",
   "name": "BedroomPartyLeaderboard",
   "author": "Speecil",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A Leaderboard of All Time",
   "gameVersion": "1.29.1",
   "dependsOn": {
