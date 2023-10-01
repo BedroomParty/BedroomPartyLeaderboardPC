@@ -100,7 +100,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
                 { "avgHandAccRight", avgAccRight },
                 { "avgHandAccLeft", avgAccLeft},
                 { "perfectStreak", perfectStreak },
-                { "fcAcc", fcAcc }
+                { "fcAccuracy", fcAcc }
             };
             return Data.ToString();
         }
