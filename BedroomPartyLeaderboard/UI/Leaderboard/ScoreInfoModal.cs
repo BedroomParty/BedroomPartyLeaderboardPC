@@ -66,17 +66,17 @@ namespace BedroomPartyLeaderboard.UI
         [UIObject("profileImageModalLOADING")]
         public GameObject profileImageModalLOADING;
 
-        [UIComponent("avgHandAccLeft")]
-        private readonly TextMeshProUGUI avgHandAccLeft;
+        [UIComponent("leftHandAccuracy")]
+        private readonly TextMeshProUGUI leftHandAccuracy;
 
-        [UIComponent("avgHandAccRight")]
-        private readonly TextMeshProUGUI avgHandAccRight;
+        [UIComponent("rightHandAccuracy")]
+        private readonly TextMeshProUGUI rightHandAccuracy;
 
-        [UIComponent("avgHandTDLeft")]
-        private readonly TextMeshProUGUI avgHandTDLeft;
+        [UIComponent("leftHandTimeDependency")]
+        private readonly TextMeshProUGUI leftHandTimeDependency;
 
-        [UIComponent("avgHandTDRight")]
-        private readonly TextMeshProUGUI avgHandTDRight;
+        [UIComponent("rightHandTimeDependency")]
+        private readonly TextMeshProUGUI rightHandTimeDependency;
 
         [UIComponent("pauses")]
         private readonly TextMeshProUGUI pauses;
@@ -133,10 +133,10 @@ namespace BedroomPartyLeaderboard.UI
             accScoreText.text = $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.acc:0.##}%</color></size>";
             scoreScoreText.text = $"Score: <size={infoFontSize}>{entry.modifiedScore:0,0}</size>";
             modifiersScoreText.text = $"Mods: <size=4.4>{entry.mods}</size>";
-            avgHandAccLeft.text = entry.avgHandAccLeft.HasValue ? $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.avgHandAccLeft:0.##}</color></size>" : "";
-            avgHandAccRight.text = entry.avgHandAccRight.HasValue ? $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.avgHandAccRight:0.##}</color></size>" : "";
-            avgHandTDLeft.text = entry.avgHandTDLeft.HasValue ? $"Left Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.avgHandTDLeft:0.##}</color></size>" : "";
-            avgHandTDRight.text = entry.avgHandTDRight.HasValue ? $"Right Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.avgHandTDRight:0.##}</color></size>" : "";
+            leftHandAccuracy.text = entry.leftHandAccuracy.HasValue ? $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.leftHandAccuracy:0.##}</color></size>" : "";
+            rightHandAccuracy.text = entry.rightHandAccuracy.HasValue ? $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{entry.rightHandAccuracy:0.##}</color></size>" : "";
+            leftHandTimeDependency.text = entry.leftHandTimeDependency.HasValue ? $"Left Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.leftHandTimeDependency:0.##}</color></size>" : "";
+            rightHandTimeDependency.text = entry.rightHandTimeDependency.HasValue ? $"Right Hand TD: <size={infoFontSize}><color=#ffd42a>{entry.rightHandTimeDependency:0.##}</color></size>" : "";
             pauses.text = entry.pauses.HasValue ? $"Pauses: <size={infoFontSize}><color=#ffd42a>{entry.pauses}</color></size>" : "";
             perfectStreak.text = entry.perfectStreak.HasValue ? $"Perfect Streak: <size={infoFontSize}><color=#ffd42a>{entry.perfectStreak}</color></size>" : "";
 
@@ -156,8 +156,8 @@ namespace BedroomPartyLeaderboard.UI
                 : $"<size=4><color={Constants.badToast}>Mistakes: {entry.badCutCount + entry.missCount}</color></size>";
 
             MonoBehaviourAttacher.AttachTextHoverEffect(accScoreText.gameObject, true, accScoreText.text, $"Accuracy: <size={infoFontSize}><color=#ffd42a>{entry.fcAcc ?? 100}%</color></size>");
-            MonoBehaviourAttacher.AttachTextHoverEffect(avgHandAccLeft.gameObject, true, avgHandAccLeft.text, $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccLeft ?? 0.0f)}</color></size>");
-            MonoBehaviourAttacher.AttachTextHoverEffect(avgHandAccRight.gameObject, true, avgHandAccRight.text, $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{LeaderboardDataUtils.GetAccPercentFromHand(entry.avgHandAccRight ?? 0.0f)}</color></size>");
+            MonoBehaviourAttacher.AttachTextHoverEffect(leftHandAccuracy.gameObject, true, leftHandAccuracy.text, $"Left Hand Acc: <size={infoFontSize}><color=#ffd42a>{LeaderboardDataUtils.GetAccPercentFromHand(entry.leftHandAccuracy ?? 0.0f)}</color></size>");
+            MonoBehaviourAttacher.AttachTextHoverEffect(rightHandAccuracy.gameObject, true, rightHandAccuracy.text, $"Right Hand Acc: <size={infoFontSize}><color=#ffd42a>{LeaderboardDataUtils.GetAccPercentFromHand(entry.rightHandAccuracy ?? 0.0f)}</color></size>");
 
             parserParams.EmitEvent("showScoreInfo");
             parserParams.EmitEvent("hideSeasonSelectModal");

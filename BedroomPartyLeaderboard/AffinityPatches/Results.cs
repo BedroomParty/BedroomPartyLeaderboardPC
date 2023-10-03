@@ -64,22 +64,22 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
             int pauses = ExtraSongDataHolder.pauses;
             int maxCombo = levelCompletionResults.maxCombo;
-            float avgHandAccRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccRight);
-            float avgHandAccLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandAccLeft);
+            float rightHandAccuracy = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.rightHandAccuracy);
+            float leftHandAccuracy = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.leftHandAccuracy);
             int perfectStreak = ExtraSongDataHolder.perfectStreak;
 
-            float avgHandTDRight = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDRight);
-            float avgHandTDLeft = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.avgHandTDLeft);
+            float rightHandTimeDependency = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.rightHandTimeDependency);
+            float leftHandTimeDependency = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.leftHandTimeDependency);
 
             float fcAcc = ExtraSongDataHolder.GetFcAcc();
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
-            string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, avgHandAccRight, avgHandAccLeft, perfectStreak, avgHandTDRight, avgHandTDLeft, fcAcc);
+            string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, rightHandAccuracy, leftHandAccuracy, perfectStreak, rightHandTimeDependency, leftHandTimeDependency, fcAcc);
             _requestUtils.SetBeatMapData(mapId, json);
             _log.Info("End Score Postfix");
         }
 
-        private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int multipliedScore, int modifiedScore, int pauses, int maxCombo, float avgAccRight, float avgAccLeft, int perfectStreak, float avgHandTDRight, float avgHandTDLeft, float fcAcc)
+        private string getLBUploadJSON((string, int, string) balls, string userID, int badCuts, int misses, bool fullCOmbo, float acc, string mods, int multipliedScore, int modifiedScore, int pauses, int maxCombo, float avgAccRight, float avgAccLeft, int perfectStreak, float rightHandTimeDependency, float leftHandTimeDependency, float fcAcc)
         {
             JObject Data = new()
             {
@@ -95,10 +95,10 @@ namespace BedroomPartyLeaderboard.AffinityPatches
                 { "modifiers", mods },
                 { "pauses", pauses },
                 { "maxCombo", maxCombo },
-                { "avgHandTDRight", avgHandTDRight },
-                { "avgHandTDLeft", avgHandTDLeft },
-                { "avgHandAccRight", avgAccRight },
-                { "avgHandAccLeft", avgAccLeft},
+                { "rightHandTimeDependency", rightHandTimeDependency },
+                { "leftHandTimeDependency", leftHandTimeDependency },
+                { "rightHandAccuracy", avgAccRight },
+                { "leftHandAccuracy", avgAccLeft},
                 { "perfectStreak", perfectStreak },
                 { "fcAccuracy", fcAcc }
             };

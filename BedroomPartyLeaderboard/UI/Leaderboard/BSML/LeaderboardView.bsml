@@ -162,12 +162,12 @@
 						<macro.define name="sillysize" value="3.3" />
 						<vertical id="moreModalInfo" active="false" spacing="1" child-expand-height="true" child-expand-width="false" child-control-width="false" pad="3" child-align="MiddleCenter" pref-width="60">
 							<horizontal spacing="3" child-align="MiddleCenter" child-control-width="true" horizontal-fit="PreferredSize">
-								<text font-size="~sillysize" rich-text="true" id="avgHandAccLeft" text="avgHandAccLeft" align="Center"/>
-								<text font-size="~sillysize" rich-text="true" id="avgHandAccRight" text="avgHandAccRight" align="Center"/>
+								<text font-size="~sillysize" rich-text="true" id="leftHandAccuracy" text="leftHandAccuracy" align="Center"/>
+								<text font-size="~sillysize" rich-text="true" id="rightHandAccuracy" text="rightHandAccuracy" align="Center"/>
 							</horizontal>
 							<horizontal spacing="3" child-align="MiddleCenter" child-control-width="true" horizontal-fit="PreferredSize">
-								<text font-size="~sillysize" rich-text="true" id="avgHandTDLeft" text="avgHandTDLeft" align="Center"/>
-								<text font-size="~sillysize" rich-text="true" id="avgHandTDRight" text="avgHandTDRight" align="Center"/>
+								<text font-size="~sillysize" rich-text="true" id="leftHandTimeDependency" text="leftHandTimeDependency" align="Center"/>
+								<text font-size="~sillysize" rich-text="true" id="rightHandTimeDependency" text="rightHandTimeDependency" align="Center"/>
 							</horizontal>
 							<horizontal spacing="3" child-align="MiddleCenter" child-control-width="true" horizontal-fit="PreferredSize">
 								<text font-size="~sillysize" rich-text="true" id="perfectStreak" text="perfectStreak" align="Center"/>

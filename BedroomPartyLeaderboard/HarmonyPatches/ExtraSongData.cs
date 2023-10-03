@@ -13,7 +13,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         internal int highestPerfectStreak = 0;
 
         [AffinityPostfix]
-        [AffinityPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Start))]
+        [AffinityPatch(typeof(AudioTimeSyncController), "Start")]
         public void Postfixaaa()
         {
             _log.Info("Resetting ExtraSongData");
@@ -23,7 +23,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         }
 
         [AffinityPostfix]
-        [AffinityPatch(typeof(PauseMenuManager), nameof(PauseMenuManager.RestartButtonPressed))]
+        [AffinityPatch(typeof(PauseMenuManager), "RestartButtonPressed")]
         public void Postfixsdasda()
         {
             _log.Info("Resetting ExtraSongData");
@@ -38,14 +38,14 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         {
             if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
             {
-                ExtraSongDataHolder.avgHandAccLeft.Add(____cutScoreBuffer.cutScore);
-                ExtraSongDataHolder.avgHandTDLeft.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
+                ExtraSongDataHolder.leftHandAccuracy.Add(____cutScoreBuffer.cutScore);
+                ExtraSongDataHolder.leftHandTimeDependency.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
 
             }
             else if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorB)
             {
-                ExtraSongDataHolder.avgHandAccRight.Add(____cutScoreBuffer.cutScore);
-                ExtraSongDataHolder.avgHandTDRight.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
+                ExtraSongDataHolder.rightHandAccuracy.Add(____cutScoreBuffer.cutScore);
+                ExtraSongDataHolder.rightHandTimeDependency.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
             }
 
             if (____cutScoreBuffer.cutScore == 115)

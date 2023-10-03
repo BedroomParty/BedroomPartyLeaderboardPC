@@ -122,8 +122,8 @@ namespace BedroomPartyLeaderboard.Utils
 
     public class PlayerResponse
     {
-        [JsonProperty("game_id")] public string gameID;
-        [JsonProperty("discord_id")] public string discordID;
+        [JsonProperty("gameID")] public string gameID;
+        [JsonProperty("discordID")] public string discordID;
         [JsonProperty("username")] public string username;
         [JsonProperty("avatar")] public string avatarLink;
         [JsonProperty("sessionKey")] public string sessionKey;

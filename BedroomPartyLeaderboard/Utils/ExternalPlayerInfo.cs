@@ -6,8 +6,8 @@ namespace BedroomPartyLeaderboard.Utils
     {
         internal class PlayerInfo
         {
-            [JsonProperty("discord_id")] public long discordID;
-            [JsonProperty("game_id")] public long gameID;
+            [JsonProperty("discordID")] public long discordID;
+            [JsonProperty("gameID")] public long gameID;
             [JsonProperty("username")] public string username;
             [JsonProperty("avatar")] public string avatarLink;
         }

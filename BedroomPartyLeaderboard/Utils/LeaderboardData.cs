@@ -26,10 +26,10 @@ namespace BedroomPartyLeaderboard.Utils
             [JsonProperty("modifiers")] public string? mods = null;
             [JsonProperty("pauses")] public int? pauses = null;
             [JsonProperty("maxCombo")] public int? maxCombo = null;
-            [JsonProperty("avgHandTDRight")] public float? avgHandTDRight = null;
-            [JsonProperty("avgHandTDLeft")] public float? avgHandTDLeft = null;
-            [JsonProperty("avgHandAccRight")] public float? avgHandAccRight = null;
-            [JsonProperty("avgHandAccLeft")] public float? avgHandAccLeft = null;
+            [JsonProperty("rightHandTimeDependency")] public float? rightHandTimeDependency = null;
+            [JsonProperty("leftHandTimeDependency")] public float? leftHandTimeDependency = null;
+            [JsonProperty("rightHandAccuracy")] public float? rightHandAccuracy = null;
+            [JsonProperty("leftHandAccuracy")] public float? leftHandAccuracy = null;
             [JsonProperty("perfectStreak")] public int? perfectStreak = null;
             [JsonProperty("fcAccuracy")] public float? fcAcc = null;
         }
