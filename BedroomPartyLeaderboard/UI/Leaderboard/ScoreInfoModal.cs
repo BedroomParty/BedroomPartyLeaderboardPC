@@ -92,7 +92,6 @@ namespace BedroomPartyLeaderboard.UI
         {
             Application.OpenURL(Constants.USER_URL_WEB(currentEntry.userID));
         }
-
         public void hidethefucker()
         {
             parserParams.EmitEvent("hideScoreInfo");
@@ -163,25 +162,26 @@ namespace BedroomPartyLeaderboard.UI
             parserParams.EmitEvent("hideSeasonSelectModal");
             parserParams.EmitEvent("hideInfoModal");
 
-            UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+            RainbowAnimation rainbowAnimation;
+            if (Constants.staffIDs.Contains(entry.userID))
             {
-                if(Constants.staffIDs.Contains(entry.userID))
+                if (!usernameScoreText.TryGetComponent<RainbowAnimation>(out rainbowAnimation))
                 {
-                    RainbowAnimation rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
+                    rainbowAnimation = usernameScoreText.gameObject.AddComponent<RainbowAnimation>();
                     rainbowAnimation.speed = 0.4f;
                 }
-                else
+            }
+            else
+            {
+                if (usernameScoreText.TryGetComponent<RainbowAnimation>(out rainbowAnimation))
                 {
-                    RainbowAnimation rainbowAnimation = usernameScoreText.GetComponent<RainbowAnimation>();
-                    if (rainbowAnimation != null)
-                    {
-                        UnityEngine.Object.Destroy(rainbowAnimation);
-                    }
-                    usernameScoreText.color = Color.white;
+                    UnityEngine.Object.Destroy(rainbowAnimation);
                 }
-
-                MonoBehaviourAttacher.AttachTextHoverEffect(usernameScoreText.gameObject, false, "", "", FontStyles.Underline, FontStyles.Normal);
-
+                usernameScoreText.color = Color.white;
+            }
+            MonoBehaviourAttacher.AttachTextHoverEffect(usernameScoreText.gameObject, false, "", "", FontStyles.Underline, FontStyles.Normal);
+            UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+            {
                 Task.Run(() =>
                 {
                     while (_leaderboardView._ImageHolders[(int)currentEntry.rank - 1].isLoading)

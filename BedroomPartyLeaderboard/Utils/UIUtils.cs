@@ -29,6 +29,8 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly TweeningService _tweeningService;
         [Inject] private readonly AuthenticationManager _authenticationManager;
         [Inject] private readonly SiraLog _log;
+
+
         public class RainbowAnimation : MonoBehaviour
         {
             public float speed = 1f; // Speed of the color change
@@ -525,5 +527,8 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             }
         }
+
+
+
     }
 }
