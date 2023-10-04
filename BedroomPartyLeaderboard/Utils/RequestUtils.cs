@@ -48,6 +48,7 @@ namespace BedroomPartyLeaderboard.Utils
                 _log.Info("Got Leaderboard Data");
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 LeaderboardData.BPLeaderboard leaderboardData = JsonConvert.DeserializeObject<LeaderboardData.BPLeaderboard>(jsonResponse);
+                _log.Info(jsonResponse);
                 scorecount = leaderboardData.scoreCount;
                 totalPages = Mathf.CeilToInt((float)scorecount / 10);
                 data = leaderboardData.scores;
@@ -204,7 +205,6 @@ namespace BedroomPartyLeaderboard.Utils
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.goodToast}>Successfully signed in!</color>", true, false, 10000));
             _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
 
-            SharedCoroutineStarter.instance.StartCoroutine(UIUtils.GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a, string b) => _panelView.playerAvatar.sprite = a, (string a, string b) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
             _panelView.playerAvatarLoading.gameObject.SetActive(false);
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _leaderboardView.SetSeasonList(1));
@@ -212,6 +212,7 @@ namespace BedroomPartyLeaderboard.Utils
 
             await Constants.WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
+            SharedCoroutineStarter.instance.StartCoroutine(UIUtils.GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a, string b) => _panelView.playerAvatar.sprite = a, (string a, string b) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
             _log.Info("Successfully handled auth UI");
             return;
         }

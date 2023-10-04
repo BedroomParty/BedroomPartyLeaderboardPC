@@ -73,7 +73,7 @@ namespace BedroomPartyLeaderboard.Utils
         {
             try
             {
-                string formattedAcc = $" - (<color=#ffd42a>{entry.acc:0.00}%</color>)";
+                string formattedAcc = $" - (<color=#FF69B4>{entry.acc:0.00}%</color>)";
                 string formattedCombo = (bool)entry.fullCombo
                     ? $" - <color={Constants.goodToast}> FC </color>"
                     : $" - <color={Constants.badToast}>x{entry.badCutCount + entry.missCount} </color>";
