@@ -64,8 +64,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
             int pauses = ExtraSongDataHolder.pauses;
             int maxCombo = levelCompletionResults.maxCombo;
-            float rightHandAccuracy = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.rightHandAccuracy);
-            float leftHandAccuracy = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.leftHandAccuracy);
+            float rightHandAverageScore = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.rightHandAverageScore);
+            float leftHandAverageScore = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.leftHandAverageScore);
             int perfectStreak = ExtraSongDataHolder.perfectStreak;
 
             float rightHandTimeDependency = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.rightHandTimeDependency);
@@ -74,7 +74,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             float fcAcc = ExtraSongDataHolder.GetFcAcc();
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
-            string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, rightHandAccuracy, leftHandAccuracy, perfectStreak, rightHandTimeDependency, leftHandTimeDependency, fcAcc);
+            string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, rightHandAverageScore, leftHandAverageScore, perfectStreak, rightHandTimeDependency, leftHandTimeDependency, fcAcc);
             _requestUtils.SetBeatMapData(mapId, json);
             _log.Info("End Score Postfix");
         }
@@ -97,8 +97,8 @@ namespace BedroomPartyLeaderboard.AffinityPatches
                 { "maxCombo", maxCombo },
                 { "rightHandTimeDependency", rightHandTimeDependency },
                 { "leftHandTimeDependency", leftHandTimeDependency },
-                { "rightHandAccuracy", avgAccRight },
-                { "leftHandAccuracy", avgAccLeft},
+                { "rightHandAverageScore", avgAccRight },
+                { "leftHandAverageScore", avgAccLeft},
                 { "perfectStreak", perfectStreak },
                 { "fcAccuracy", fcAcc }
             };

@@ -28,8 +28,8 @@ namespace BedroomPartyLeaderboard.Utils
             [JsonProperty("maxCombo")] public int? maxCombo = null;
             [JsonProperty("rightHandTimeDependency")] public float? rightHandTimeDependency = null;
             [JsonProperty("leftHandTimeDependency")] public float? leftHandTimeDependency = null;
-            [JsonProperty("rightHandAccuracy")] public float? rightHandAccuracy = null;
-            [JsonProperty("leftHandAccuracy")] public float? leftHandAccuracy = null;
+            [JsonProperty("rightHandAverageScore")] public float? rightHandAverageScore = null;
+            [JsonProperty("leftHandAverageScore")] public float? leftHandAverageScore = null;
             [JsonProperty("perfectStreak")] public int? perfectStreak = null;
             [JsonProperty("fcAccuracy")] public float? fcAcc = null;
         }

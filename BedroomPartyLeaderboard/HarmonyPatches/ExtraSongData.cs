@@ -38,13 +38,13 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         {
             if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorA)
             {
-                ExtraSongDataHolder.leftHandAccuracy.Add(____cutScoreBuffer.cutScore);
+                ExtraSongDataHolder.leftHandAverageScore.Add(____cutScoreBuffer.cutScore);
                 ExtraSongDataHolder.leftHandTimeDependency.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
 
             }
             else if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorB)
             {
-                ExtraSongDataHolder.rightHandAccuracy.Add(____cutScoreBuffer.cutScore);
+                ExtraSongDataHolder.rightHandAverageScore.Add(____cutScoreBuffer.cutScore);
                 ExtraSongDataHolder.rightHandTimeDependency.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
             }
 

@@ -5,8 +5,8 @@ namespace BedroomPartyLeaderboard.Utils
     internal static class ExtraSongDataHolder
     {
         internal static int pauses;
-        internal static List<int> rightHandAccuracy = new();
-        internal static List<int> leftHandAccuracy = new();
+        internal static List<int> rightHandAverageScore = new();
+        internal static List<int> leftHandAverageScore = new();
         internal static List<float> rightHandTimeDependency = new();
         internal static List<float> leftHandTimeDependency = new();
 
@@ -15,8 +15,8 @@ namespace BedroomPartyLeaderboard.Utils
         internal static void reset()
         {
             pauses = 0;
-            rightHandAccuracy.Clear();
-            leftHandAccuracy.Clear();
+            rightHandAverageScore.Clear();
+            leftHandAverageScore.Clear();
             rightHandTimeDependency.Clear();
             leftHandTimeDependency.Clear();
             perfectStreak = 0;
@@ -62,9 +62,9 @@ namespace BedroomPartyLeaderboard.Utils
 
         internal static float GetFcAcc()
         {
-            int blocksHit = leftHandAccuracy.Count + rightHandAccuracy.Count;
+            int blocksHit = leftHandAverageScore.Count + rightHandAverageScore.Count;
             if (blocksHit == 0) return 0.0f;
-            float averagehitscore = ((float)GetTotalFromList(leftHandAccuracy) + (float)GetTotalFromList(rightHandAccuracy)) / (float)blocksHit;
+            float averagehitscore = ((float)GetTotalFromList(leftHandAverageScore) + (float)GetTotalFromList(rightHandAverageScore)) / (float)blocksHit;
             float fcAcc = averagehitscore / 115 * 100;
             return fcAcc;
         }
