@@ -271,19 +271,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 textHoverEffect.daStyle = FontStyles.Underline;
                 textHoverEffect.origStyle = FontStyles.Normal;
             }
-            if(currentEntries == null || currentEntries.Count == 0)
-            {
-                leaderboardTableView.SetScores(null, -1);
-                _uiUtils.ByeImages();
-            }
-            else
-            {
-                for (int i = currentEntries.Count; i < 10; i++)
-                {
-                    _ImageHolders[i].profileloading.gameObject.SetActive(false);
-                    _ImageHolders[i].profileImage.sprite = null;
-                }
-            }
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = new Color(0, 0, 0, 0);
         }
 
@@ -388,6 +375,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 _log.Info("Getting leaderboard data");
                 _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
                 {
+                    currentEntries = result.Item2;
                     totalPages = result.Item3;
                     _uiUtils.HelloIMGLoader();
                     UpdatePageButtons();

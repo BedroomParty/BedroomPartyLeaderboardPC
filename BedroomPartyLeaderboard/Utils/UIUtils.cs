@@ -393,11 +393,19 @@ namespace BedroomPartyLeaderboard.Utils
 
             private async Task ThisFuckingSucks(string url)
             {
-                await Constants.WaitUntil(() => profileImage.IsActive());
-                UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                try
                 {
-                    profileImage.StartCoroutine(GetSpriteAvatar(url, OnAvatarYay, OnAvatarNay, cancellationTokenSource.Token));
-                });
+                    await Constants.WaitUntil(() => profileImage.IsActive());
+                    if (cancellationTokenSource.IsCancellationRequested) return;
+                    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                    {
+                        profileImage.StartCoroutine(GetSpriteAvatar(url, OnAvatarYay, OnAvatarNay, cancellationTokenSource.Token));
+                    });
+                }
+                catch(OperationCanceledException e)
+                {
+
+                }
             }
 
             private void OnAvatarYay(Sprite a, string url)
