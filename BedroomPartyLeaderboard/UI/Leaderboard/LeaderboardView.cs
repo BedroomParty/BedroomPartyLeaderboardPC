@@ -336,6 +336,8 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             cancellationTokenSource = new CancellationTokenSource();
             cancellationToken = cancellationTokenSource.Token;
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (!_authenticationManager.IsAuthed) return;
             try
             {
@@ -403,7 +405,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                             leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, Buttonholders), LeaderboardDataUtils.GetUserScorePos(result.Item2, _authenticationManager._localPlayerInfo.userID));
                             currentEntries = result.Item2;
                             _uiUtils.RichMyText(leaderboardTableView);
-                            _uiUtils.SetProfiles(result.Item2);
+                            _uiUtils.SetProfiles(result.Item2, cancellationToken);
                             _log.Info("Finished setting leaderboard");
                         }
                     }
