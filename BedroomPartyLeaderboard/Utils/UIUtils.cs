@@ -76,25 +76,36 @@ namespace BedroomPartyLeaderboard.Utils
             _leaderboardView._ImageHolders.ForEach(holder => holder.profileloading.SetActive(false));
         }
 
-        public void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard)
+        public void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard, CancellationToken cancellationToken)
         {
-            for (int i = 0; i < leaderboard.Count; i++)
+            try
             {
-                if (leaderboard[i] == null || leaderboard[i].userName == "null")
+                for (int i = 0; i < leaderboard.Count; i++)
                 {
-                    _leaderboardView._ImageHolders[i].profileImage.sprite = null;
-                    _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
-                    return;
+                    if (leaderboard[i] == null || leaderboard[i].userName == "null")
+                    {
+                        _leaderboardView._ImageHolders[i].profileImage.sprite = null;
+                        _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                        return;
+                    }
+                    _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
+                    _leaderboardView._ImageHolders[i].setProfileImage($"http://api.thebedroom.party/user/{leaderboard[i].userID}/avatar", cancellationToken);
                 }
-                _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
-                _leaderboardView._ImageHolders[i].setProfileImage($"http://api.thebedroom.party/user/{leaderboard[i].userID}/avatar");
+                for (int i = leaderboard.Count; i <= 10; i++)
+                {
+                    _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                    _leaderboardView._ImageHolders[i].profileImage.sprite = null;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                for (int i = leaderboard.Count; i <= 10; i++)
+                {
+                    _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                    _leaderboardView._ImageHolders[i].profileImage.sprite = null;
+                }
             }
 
-            for (int i = leaderboard.Count; i <= 10; i++)
-            {
-                _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
-                _leaderboardView._ImageHolders[i].profileImage.sprite = null;
-            }
         }
 
         internal static IEnumerator GetSpriteAvatar(string url, Action<Sprite, string> onSuccess, Action<string, string> onFailure, CancellationToken cancellationToken)
@@ -102,6 +113,7 @@ namespace BedroomPartyLeaderboard.Utils
             var handler = new DownloadHandlerTexture();
             var www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
             www.downloadHandler = handler;
+            cancellationToken.ThrowIfCancellationRequested();
             yield return www.SendWebRequest();
 
             while (!www.isDone)
@@ -346,8 +358,6 @@ namespace BedroomPartyLeaderboard.Utils
 
             public bool isLoading;
 
-            private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
             public ImageHolder(int index)
             {
                 this.index = index;
@@ -359,8 +369,9 @@ namespace BedroomPartyLeaderboard.Utils
             [UIObject("profileloading")]
             public GameObject profileloading;
 
-            public void setProfileImage(string url)
+            public void setProfileImage(string url, CancellationToken cancellationToken)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 profileloading.gameObject.SetActive(true);
                 if (SpriteCache.TryGetSprite(url, out Sprite sprite))
                 {
@@ -371,17 +382,8 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 try
                 {
-                    if (isLoading)
-                    {
-                        CancelDownload();
-                    }
-
-                    isLoading = true;
                     profileloading.SetActive(true);
-
-                    cancellationTokenSource = new CancellationTokenSource();
-
-                    Task.Run(() => ThisFuckingSucks(url));
+                    Task.Run(() => ThisFuckingSucks(url, cancellationToken));
                 }
                 catch (OperationCanceledException)
                 {
@@ -389,22 +391,22 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             }
 
-
-
-            private async Task ThisFuckingSucks(string url)
+            private async Task ThisFuckingSucks(string url, CancellationToken cancellationToken)
             {
                 try
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     await Constants.WaitUntil(() => profileImage.IsActive());
-                    if (cancellationTokenSource.IsCancellationRequested) return;
+                    if (cancellationToken.IsCancellationRequested) return;
                     UnityMainThreadTaskScheduler.Factory.StartNew(() =>
                     {
-                        profileImage.StartCoroutine(GetSpriteAvatar(url, OnAvatarYay, OnAvatarNay, cancellationTokenSource.Token));
+                        profileImage.StartCoroutine(GetSpriteAvatar(url, OnAvatarYay, OnAvatarNay, cancellationToken));
                     });
                 }
                 catch (OperationCanceledException e)
                 {
-
+                    profileloading.gameObject.SetActive(false);
+                    profileImage.sprite = null;
                 }
             }
 
@@ -421,14 +423,6 @@ namespace BedroomPartyLeaderboard.Utils
                 profileImage.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png");
                 profileloading.gameObject.SetActive(false);
                 isLoading = false;
-            }
-
-            private void CancelDownload()
-            {
-                if (cancellationTokenSource != null && !cancellationTokenSource.Token.IsCancellationRequested)
-                {
-                    cancellationTokenSource.Cancel();
-                }
             }
         }
 
