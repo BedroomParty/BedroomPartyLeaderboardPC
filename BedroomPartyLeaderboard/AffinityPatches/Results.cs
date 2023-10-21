@@ -54,6 +54,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             _log.Info("Begin Score Postfix");
             if (BS_Utils.Gameplay.ScoreSubmission.Disabled) return;
             if (!difficultyBeatmap.level.levelID.Contains("custom")) return;
+            if (levelCompletionResults.levelEndStateType != LevelCompletionResults.LevelEndStateType.Cleared) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             int modifiedScore = levelCompletionResults.modifiedScore;
             int multipliedScore = levelCompletionResults.multipliedScore;
