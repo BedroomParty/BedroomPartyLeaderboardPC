@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using ModestTree;
+using System;
+using System.Collections.Generic;
 
 namespace BedroomPartyLeaderboard.Utils
 {
@@ -9,7 +11,7 @@ namespace BedroomPartyLeaderboard.Utils
         internal static List<int> leftHandAverageScore = new();
         internal static List<float> rightHandTimeDependency = new();
         internal static List<float> leftHandTimeDependency = new();
-
+        internal static List<Tuple<int, int>> totalBlocksHit = new();
         internal static int perfectStreak = 0;
 
         internal static void reset()
@@ -60,14 +62,29 @@ namespace BedroomPartyLeaderboard.Utils
             return sum;
         }
 
-        internal static float GetFcAcc()
+
+        internal static int GetMaxScoreForScoringType(int scoringType)
         {
-            int blocksHit = leftHandAverageScore.Count + rightHandAverageScore.Count;
-            if (blocksHit == 0) return 0.0f;
-            float averagehitscore = ((float)GetTotalFromList(leftHandAverageScore) + (float)GetTotalFromList(rightHandAverageScore)) / (float)blocksHit;
-            float fcAcc = averagehitscore / 115 * 100;
-            return fcAcc;
+            return scoringType switch
+            {
+                1 or 2 or 3 => 115,
+                4 => 70,
+                5 => 20,
+                _ => 0,
+            };
         }
 
+        internal static float GetFcAcc(float multiplier)
+        {
+            if (totalBlocksHit.IsEmpty()) return 0.0f;
+            float realScore = 0, maxScore = 0;
+            foreach (var p in totalBlocksHit)
+            {
+                realScore += p.Item1 * multiplier;
+                maxScore += GetMaxScoreForScoringType(p.Item2);
+            }
+            float fcAcc = (float)realScore / (float)maxScore * 100.0f;
+            return fcAcc;
+        }
     }
 }

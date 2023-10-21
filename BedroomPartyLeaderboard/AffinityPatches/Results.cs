@@ -1,5 +1,6 @@
 ﻿using BedroomPartyLeaderboard.UI.Leaderboard;
 using BedroomPartyLeaderboard.Utils;
+using IPA.Utilities;
 using IPA.Utilities.Async;
 using Newtonsoft.Json.Linq;
 using SiraUtil.Affinity;
@@ -18,6 +19,11 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         [Inject] private readonly UIUtils _uiUtils;
         [Inject] private readonly PlayerUtils _playerUtils;
         [Inject] private readonly SiraLog _log;
+
+        float GetModifierScoreMultiplier(LevelCompletionResults results, GameplayModifiersModelSO modifiersModel)
+        {
+            return modifiersModel.GetTotalMultiplier(modifiersModel.CreateModifierParamsList(results.gameplayModifiers), results.energy);
+        }
 
         public static string GetModifiersString(LevelCompletionResults levelCompletionResults)
         {
@@ -47,6 +53,7 @@ namespace BedroomPartyLeaderboard.AffinityPatches
         {
             _log.Info("Begin Score Postfix");
             if (BS_Utils.Gameplay.ScoreSubmission.Disabled) return;
+            if (!difficultyBeatmap.level.levelID.Contains("custom")) return;
             if (levelCompletionResults.levelEndStateType != LevelCompletionResults.LevelEndStateType.Cleared) return;
             float maxScore = ScoreModel.ComputeMaxMultipliedScoreForBeatmap(transformedBeatmapData);
             int modifiedScore = levelCompletionResults.modifiedScore;
@@ -71,8 +78,9 @@ namespace BedroomPartyLeaderboard.AffinityPatches
 
             float rightHandTimeDependency = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.rightHandTimeDependency);
             float leftHandTimeDependency = ExtraSongDataHolder.GetAverageFromList(ExtraSongDataHolder.leftHandTimeDependency);
-
-            float fcAcc = ExtraSongDataHolder.GetFcAcc();
+            float fcAcc;
+            if (fc) fcAcc = acc;
+            else fcAcc = ExtraSongDataHolder.GetFcAcc(GetModifierScoreMultiplier(levelCompletionResults, platformLeaderboardsModel.GetField<GameplayModifiersModelSO, PlatformLeaderboardsModel>("_gameplayModifiersModel")));
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() => _requestUtils.HandleLBUpload());
             string json = getLBUploadJSON(balls, _authenticationManager._localPlayerInfo.userID, badCut, misses, fc, acc, mods, multipliedScore, modifiedScore, pauses, maxCombo, rightHandAverageScore, leftHandAverageScore, perfectStreak, rightHandTimeDependency, leftHandTimeDependency, fcAcc);

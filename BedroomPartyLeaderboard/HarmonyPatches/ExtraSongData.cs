@@ -40,12 +40,13 @@ namespace BedroomPartyLeaderboard.AffinityPatches
             {
                 ExtraSongDataHolder.leftHandAverageScore.Add(____cutScoreBuffer.cutScore);
                 ExtraSongDataHolder.leftHandTimeDependency.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
-
+                ExtraSongDataHolder.totalBlocksHit.Add(new Tuple<int, int>(____cutScoreBuffer.cutScore, (int)____cutScoreBuffer.noteCutInfo.noteData.scoringType));
             }
             else if (____cutScoreBuffer.noteCutInfo.noteData.colorType == ColorType.ColorB)
             {
                 ExtraSongDataHolder.rightHandAverageScore.Add(____cutScoreBuffer.cutScore);
                 ExtraSongDataHolder.rightHandTimeDependency.Add(Math.Abs(____cutScoreBuffer.noteCutInfo.cutNormal.z));
+                ExtraSongDataHolder.totalBlocksHit.Add(new Tuple<int, int>(____cutScoreBuffer.cutScore, (int)____cutScoreBuffer.noteCutInfo.noteData.scoringType));
             }
 
             if (____cutScoreBuffer.cutScore == 115)

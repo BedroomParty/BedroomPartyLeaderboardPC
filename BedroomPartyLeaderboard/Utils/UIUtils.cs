@@ -383,12 +383,12 @@ namespace BedroomPartyLeaderboard.Utils
 
                     Task.Run(() => ThisFuckingSucks(url));
                 }
-                catch(OperationCanceledException)
+                catch (OperationCanceledException)
                 {
                     isLoading = false;
                 }
             }
-            
+
 
 
             private async Task ThisFuckingSucks(string url)
@@ -402,7 +402,7 @@ namespace BedroomPartyLeaderboard.Utils
                         profileImage.StartCoroutine(GetSpriteAvatar(url, OnAvatarYay, OnAvatarNay, cancellationTokenSource.Token));
                     });
                 }
-                catch(OperationCanceledException e)
+                catch (OperationCanceledException e)
                 {
 
                 }
