@@ -237,7 +237,7 @@ namespace BedroomPartyLeaderboard.Utils
                 nameText.rectTransform.anchoredPosition = newPosition;
 
                 cell.interactable = true;
-                ButtonHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
+                EntryHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
                 CellClicker clicky = cell.gameObject.AddComponent<CellClicker>();
                 clicky.onClick = buttonHolder.infoClick;
                 clicky.index = cell.idx;
@@ -426,21 +426,17 @@ namespace BedroomPartyLeaderboard.Utils
             }
         }
 
-        internal class ButtonHolder
+        internal class EntryHolder
         {
             public int index;
             public Action<LeaderboardData.LeaderboardEntry> onClick;
 
-            public ButtonHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
+            public EntryHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
             {
                 this.index = index;
                 onClick = endmylife;
             }
 
-            [UIComponent("infoButton")]
-            public Button infoButton;
-
-            [UIAction("infoClick")]
             public void infoClick()
             {
                 onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);

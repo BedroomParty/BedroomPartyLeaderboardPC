@@ -5,23 +5,39 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Zenject;
 
 namespace BedroomPartyLeaderboard.Utils
 {
     internal class PlayerUtils
     {
+        [Inject] private HeadsetUtils headsetUtils;
+
         public Task<PlayerInfo> GetPlayerInfoAsync()
         {
-            TaskCompletionSource<PlayerInfo> taskCompletionSource = new();
+            TaskCompletionSource<PlayerInfo> taskCompletionSource = new TaskCompletionSource<PlayerInfo>();
+
             string playerId = "";
             string playerName = "";
-            string authKey = "";
 
+            string authKey;
+
+            playerId = "";
+            playerName = "";
             if (NullCheckFilePath(Constants.API_KEY_PATH))
             {
-                string[] sillyvar = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
-                authKey = sillyvar[0];
-                playerId = sillyvar[1];
+                try
+                {
+                    string[] keyData = Constants.Base64Decode(File.ReadAllText(Constants.API_KEY_PATH)).Split(',');
+
+                    authKey = keyData[0];
+                    playerId = keyData[1];
+                }
+                catch (Exception ex)
+                {
+                    taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", "", 0));
+                    return taskCompletionSource.Task;
+                }
             }
             else
             {
@@ -29,7 +45,7 @@ namespace BedroomPartyLeaderboard.Utils
                 return taskCompletionSource.Task;
             }
 
-            if (playerId == "" || authKey == "")
+            if (string.IsNullOrEmpty(playerId) || string.IsNullOrEmpty(authKey))
             {
                 taskCompletionSource.SetResult(new PlayerInfo(playerName, playerId, null, "", "", 0));
                 return taskCompletionSource.Task;
@@ -38,6 +54,7 @@ namespace BedroomPartyLeaderboard.Utils
             taskCompletionSource.SetResult(new PlayerInfo("", playerId, authKey, "", "", 0));
             return taskCompletionSource.Task;
         }
+
 
         private bool NullCheckFilePath(string path)
         {
@@ -63,11 +80,13 @@ namespace BedroomPartyLeaderboard.Utils
 
         public string GetLoginString(string userID)
         {
+            headsetUtils.GetHMDInfo(out string hmd, out HeadsetUtils.HMD hmd1);
             JObject user = new()
             {
                 { "id", userID },
                 { "gameVersion", "v" + IPA.Utilities.UnityGame.GameVersion.StringValue.Split('_')[0] },
-                { "pluginVersion", "PC v" + PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion.ToString() }
+                { "pluginVersion", "PC v" + PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion.ToString() },
+                { "hmd",  (int)hmd1 }
             };
             return user.ToString();
         }
@@ -126,7 +145,9 @@ namespace BedroomPartyLeaderboard.Utils
         [JsonProperty("discordID")] public string discordID;
         [JsonProperty("username")] public string username;
         [JsonProperty("avatar")] public string avatarLink;
+        [JsonProperty("description")] public string userDescription;
         [JsonProperty("sessionKey")] public string sessionKey;
         [JsonProperty("sessionKeyExpires")] public long sessionKeyExpires;
+        [JsonProperty("updateAvailable")] public bool updateAvailable;
     }
 }

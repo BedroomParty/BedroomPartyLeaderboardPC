@@ -448,6 +448,7 @@
     <Compile Include="UI\Leaderboard\PanelView.cs" />
     <Compile Include="UI\Leaderboard\ScoreInfoModal.cs" />
     <Compile Include="UI\Leaderboard\SeasonListItem.cs" />
+    <Compile Include="Utils\HeadsetUtils.cs" />
     <Compile Include="Utils\LeaderboardDataUtils.cs" />
     <Compile Include="Utils\Constants.cs" />
     <Compile Include="Utils\ExternalPlayerInfo.cs" />

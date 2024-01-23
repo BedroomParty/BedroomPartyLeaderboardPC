@@ -10,6 +10,8 @@ namespace BedroomPartyLeaderboard
     {
         internal static IPALogger Log { get; private set; }
 
+        internal static bool isDev = false;
+
         [Init]
         public Plugin(Zenjector zenjector)
         {

@@ -182,13 +182,11 @@ namespace BedroomPartyLeaderboard.Utils
             _log.Info("Successfully handled upload UI");
         }
 
-
         internal async Task HandleLBAuth()
         {
             _log.Info("Handling Auth UI");
             if (!_authenticationManager.IsAuthed)
             {
-
                 UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Authenticating...", true, true, 0));
                 try
                 {
@@ -202,15 +200,21 @@ namespace BedroomPartyLeaderboard.Utils
                 }
             }
 
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.goodToast}>Successfully signed in!</color>", true, false, 10000));
-            _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
-
-            _panelView.playerAvatarLoading.gameObject.SetActive(false);
-
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => _leaderboardView.SetSeasonList(1));
-            UnityMainThreadTaskScheduler.Factory.StartNew(() => Task.Run(() => _uiUtils.assignStaff()));
-
             await Constants.WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
+
+            UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+            {
+                _uiUtils.SetToast($"<color={Constants.goodToast}>Successfully signed in!</color>", true, false, 10000);
+                _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
+                _panelView.playerAvatarLoading.gameObject.SetActive(false);
+                _leaderboardView.SetSeasonList(1);
+                if (_authenticationManager._updateAvailable)
+                {
+                    _panelView.notiImage.gameObject.SetActive(true);
+                }
+                Task.Run(() => _uiUtils.assignStaff());
+            });
+
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);
             SharedCoroutineStarter.instance.StartCoroutine(UIUtils.GetSpriteAvatar($"{Constants.USER_URL_API(_authenticationManager._localPlayerInfo.userID)}/avatar", (Sprite a, string b) => _panelView.playerAvatar.sprite = a, (string a, string b) => _panelView.playerAvatar.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), new CancellationToken()));
             _log.Info("Successfully handled auth UI");

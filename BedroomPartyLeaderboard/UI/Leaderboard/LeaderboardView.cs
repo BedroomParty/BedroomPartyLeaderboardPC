@@ -67,7 +67,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [Inject] internal List<ImageHolder> _ImageHolders;
 
         [UIValue("buttonHolders")]
-        [Inject] internal List<ButtonHolder> Buttonholders;
+        [Inject] internal List<EntryHolder> Buttonholders;
 
         [UIComponent("scoreInfoModal")]
         [Inject] internal readonly ScoreInfoModal scoreInfoModal;
@@ -182,11 +182,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             versionText.text = $"You are running BPLB v{PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion} on BS version {UnityGame.GameVersion.ToString().Split('_')[0]}";
         }
 
-        private void FuckOffButtons()
-        {
-            Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
-        }
-
         [UIAction("openLBWebView")]
         internal void openLBWebView()
         {
@@ -277,7 +272,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            if (!_plvc) return;
+            if (!_plvc || !_plvc.isActivated) return;
             _plvc.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
             if (!_plvc.isActivated) return;
             page = 0;
@@ -341,18 +336,17 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             if (!_authenticationManager.IsAuthed) return;
             try
             {
+                if (!_plvc) return;
                 _log.Info("Setting leaderboard");
                 scoreInfoModal.hidethefucker();
                 SetErrorState(false, "");
                 leaderboardTableView.SetScores(null, -1);
                 loadingLB.gameObject.SetActive(true);
-                FuckOffButtons();
                 _uiUtils.ByeImages();
 
                 SetErrorState(false, "");
                 leaderboardTableView.SetScores(null, -1);
                 loadingLB.gameObject.SetActive(true);
-                FuckOffButtons();
                 _uiUtils.ByeImages();
 
                 string mapId = difficultyBeatmap.level.levelID.Substring(13);
