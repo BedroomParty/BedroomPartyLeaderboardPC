@@ -7,7 +7,7 @@ namespace BedroomPartyLeaderboard.Utils
 {
     internal static class LeaderboardDataUtils
     {
-        internal static List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page, List<ButtonHolder> buttonHolders)
+        internal static List<ScoreData> CreateLeaderboardData(List<LeaderboardData.LeaderboardEntry> leaderboard, int page, List<EntryHolder> buttonHolders)
         {
             List<ScoreData> tableData = new();
             for (int i = 0; i < leaderboard.Count; i++)
@@ -15,8 +15,7 @@ namespace BedroomPartyLeaderboard.Utils
                 int score = (int)leaderboard[i].modifiedScore;
                 int rank = (((page + 1) * 10) - (10 - i)) + 1;
                 tableData.Add(CreateLeaderboardEntryData(leaderboard[i], (int)score, (int)rank));
-                LeaderboardView.buttonEntryArray[i] = leaderboard[i];
-                buttonHolders[i].infoButton.gameObject.SetActive(false);
+                LeaderboardView.lbEntryArray[i] = leaderboard[i];
             }
             return tableData;
         }

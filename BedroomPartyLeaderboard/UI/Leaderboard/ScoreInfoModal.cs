@@ -84,6 +84,8 @@ namespace BedroomPartyLeaderboard.UI
         [UIComponent("perfectStreak")]
         private readonly TextMeshProUGUI perfectStreak;
 
+        private string userDescriptionCurrently = "";
+
         [UIParams]
         public BSMLParserParams parserParams;
 

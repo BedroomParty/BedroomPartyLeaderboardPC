@@ -10,7 +10,7 @@
 		<stack>
 			<horizontal>
 				<text id="headerText"
-					  text="BEDROOM PARTY"
+					  text="BLOQ PARTY"
 					  font-size="6"
 					  align="Midline"
 					  italics="true"
@@ -187,12 +187,5 @@
 			</macro.as-host>
 			<button id="retryButton" text="Retry" on-click="Retry" active="false" anchor-pos-x="-5" align="Center"/>
 		</leaderboard>
-	</vertical>
-	<vertical anchor-pos-x="47" anchor-pos-y="5.4" spacing="-19.4">
-		<macro.for-each hosts="buttonHolders">
-			<horizontal min-height="8" child-expand-height="true" child-align="MiddleCenter">
-				<button-with-icon active="false" id="infoButton" on-click="infoClick" icon ="BedroomPartyLeaderboard.Images.info.png" hover-hint="Info" pref-width="10" pref-height="7"/>
-			</horizontal>
-		</macro.for-each>
 	</vertical>
 </bg>

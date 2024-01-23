@@ -13,6 +13,7 @@ namespace BedroomPartyLeaderboard.Utils
 
         internal class LeaderboardEntry
         {
+#nullable enable
             [JsonProperty("rank")] public int? rank = null;
             [JsonProperty("id")] public string? userID = null;
             [JsonProperty("username")] public string? userName = null;
@@ -32,6 +33,7 @@ namespace BedroomPartyLeaderboard.Utils
             [JsonProperty("leftHandAverageScore")] public float? leftHandAverageScore = null;
             [JsonProperty("perfectStreak")] public int? perfectStreak = null;
             [JsonProperty("fcAccuracy")] public float? fcAcc = null;
+            [JsonProperty("hmd")] public int? hmd = null;
         }
     }
 }

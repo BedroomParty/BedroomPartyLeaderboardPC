@@ -13,13 +13,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
-using Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using Zenject;
-
+using Tweening;
 namespace BedroomPartyLeaderboard.Utils
 {
     internal class UIUtils
@@ -29,7 +28,6 @@ namespace BedroomPartyLeaderboard.Utils
         [Inject] private readonly TweeningService _tweeningService;
         [Inject] private readonly AuthenticationManager _authenticationManager;
         [Inject] private readonly SiraLog _log;
-
 
         public class RainbowAnimation : MonoBehaviour
         {
@@ -68,12 +66,12 @@ namespace BedroomPartyLeaderboard.Utils
 
         internal void HelloIMGLoader()
         {
-            _leaderboardView._ImageHolders.ForEach(holder => holder.profileloading.SetActive(true));
+            _leaderboardView._ImageHolders.ForEach(holder => holder.loadingIndicator.SetActive(true));
         }
 
         internal void ByeIMGLoader()
         {
-            _leaderboardView._ImageHolders.ForEach(holder => holder.profileloading.SetActive(false));
+            _leaderboardView._ImageHolders.ForEach(holder => holder.loadingIndicator.SetActive(false));
         }
 
         public void SetProfiles(List<LeaderboardData.LeaderboardEntry> leaderboard, CancellationToken cancellationToken)
@@ -85,7 +83,7 @@ namespace BedroomPartyLeaderboard.Utils
                     if (leaderboard[i] == null || leaderboard[i].userName == "null")
                     {
                         _leaderboardView._ImageHolders[i].profileImage.sprite = null;
-                        _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                        _leaderboardView._ImageHolders[i].loadingIndicator.gameObject.SetActive(false);
                         return;
                     }
                     _leaderboardView._ImageHolders[i].profileImage.gameObject.SetActive(true);
@@ -93,7 +91,7 @@ namespace BedroomPartyLeaderboard.Utils
                 }
                 for (int i = leaderboard.Count; i <= 10; i++)
                 {
-                    _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                    _leaderboardView._ImageHolders[i].loadingIndicator.gameObject.SetActive(false);
                     _leaderboardView._ImageHolders[i].profileImage.sprite = null;
                 }
             }
@@ -101,7 +99,7 @@ namespace BedroomPartyLeaderboard.Utils
             {
                 for (int i = leaderboard.Count; i <= 10; i++)
                 {
-                    _leaderboardView._ImageHolders[i].profileloading.gameObject.SetActive(false);
+                    _leaderboardView._ImageHolders[i].loadingIndicator.gameObject.SetActive(false);
                     _leaderboardView._ImageHolders[i].profileImage.sprite = null;
                 }
             }
@@ -217,15 +215,15 @@ namespace BedroomPartyLeaderboard.Utils
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
             {
                 cell.showSeparator = true;
-                TextMeshProUGUI nameText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText");
-                TextMeshProUGUI rankText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText");
-                TextMeshProUGUI scoreText = cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText");
+                TextMeshProUGUI nameText = cell.Get<TextMeshProUGUI>("_playerNameText");
+                TextMeshProUGUI rankText = cell.Get<TextMeshProUGUI>("_rankText");
+                TextMeshProUGUI scoreText = cell.Get<TextMeshProUGUI>("_scoreText");
                 nameText.richText = true;
                 rankText.richText = true;
                 scoreText.richText = true;
                 rankText.text = $"<size=120%><u>{rankText.text}</u></size>";
-                ImageView seperator = cell.GetField<Image, LeaderboardTableCell>("_separatorImage") as ImageView;
-                seperator.color = Constants.BP_COLOR2;
+                ImageView seperator = cell.Get<Image>("_separatorImage") as ImageView;
+                seperator.color = Constants.BP_COLOR2;  
                 seperator.color0 = Color.white;
                 seperator.color1 = new Color(1, 1, 1, 0);
                 if (!obtainedAnchor)
@@ -237,7 +235,7 @@ namespace BedroomPartyLeaderboard.Utils
                 nameText.rectTransform.anchoredPosition = newPosition;
 
                 cell.interactable = true;
-                ButtonHolder buttonHolder = _leaderboardView.Buttonholders[cell.idx];
+                EntryHolder buttonHolder = _leaderboardView.EntryHolders[cell.idx];
                 CellClicker clicky = cell.gameObject.AddComponent<CellClicker>();
                 clicky.onClick = buttonHolder.infoClick;
                 clicky.index = cell.idx;
@@ -352,11 +350,14 @@ namespace BedroomPartyLeaderboard.Utils
         }
 
 
-        public class ImageHolder
+        internal class ImageHolder
         {
             private readonly int index;
 
-            public bool isLoading;
+            public bool isLoading = false;
+
+
+            internal Sprite nullSprite = BeatSaberMarkupLanguage.Utilities.ImageResources.BlankSprite;
 
             public ImageHolder(int index)
             {
@@ -364,93 +365,162 @@ namespace BedroomPartyLeaderboard.Utils
             }
 
             [UIComponent("profileImage")]
-            public ImageView profileImage;
+            public ImageView profileImage = null;
 
-            [UIObject("profileloading")]
-            public GameObject profileloading;
+            [UIObject("loadingIndicator")]
+            public GameObject loadingIndicator = null;
 
-            public void setProfileImage(string url, CancellationToken cancellationToken)
+            [UIAction("#post-parse")]
+            public void Parsed()
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                profileloading.gameObject.SetActive(true);
-                if (SpriteCache.TryGetSprite(url, out Sprite sprite))
-                {
-                    profileImage.sprite = sprite;
-                    profileloading.gameObject.SetActive(false);
-                    isLoading = false;
-                    return;
-                }
-                try
-                {
-                    profileloading.SetActive(true);
-                    Task.Run(() => ThisFuckingSucks(url, cancellationToken));
-                }
-                catch (OperationCanceledException)
-                {
-                    isLoading = false;
-                }
+                profileImage.sprite = nullSprite;
+                profileImage.gameObject.SetActive(true);
+                loadingIndicator.gameObject.SetActive(false);
             }
 
-            private async Task ThisFuckingSucks(string url, CancellationToken cancellationToken)
+            public void setProfileImage(string url, CancellationToken cancellationToken)
             {
                 try
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await Constants.WaitUntil(() => profileImage.IsActive());
-                    if (cancellationToken.IsCancellationRequested) return;
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+                    if (SpriteCache.cachedSprites.ContainsKey(url))
                     {
-                        profileImage.StartCoroutine(GetSpriteAvatar(url, OnAvatarYay, OnAvatarNay, cancellationToken));
-                    });
+                        profileImage.gameObject.SetActive(true);
+                        profileImage.sprite = SpriteCache.cachedSprites[url];
+                        loadingIndicator.gameObject.SetActive(false);
+                        return;
+                    }
+                    loadingIndicator.gameObject.SetActive(true);
+                    SharedCoroutineStarter.instance.StartCoroutine(GetSpriteAvatar(url, OnAvatarDownloadSuccess, OnAvatarDownloadFailure, cancellationToken));
                 }
-                catch (OperationCanceledException e)
+                catch (OperationCanceledException)
                 {
-                    profileloading.gameObject.SetActive(false);
-                    profileImage.sprite = null;
+                    OnAvatarDownloadFailure("Cancelled", cancellationToken);
+                }
+                finally
+                {
+                    SpriteCache.MaintainSpriteCache();
                 }
             }
 
-            private void OnAvatarYay(Sprite a, string url)
+            internal static IEnumerator GetSpriteAvatar(string url, Action<Sprite, string, CancellationToken> onSuccess, Action<string, CancellationToken> onFailure, CancellationToken cancellationToken)
             {
-                profileImage.sprite = a;
-                profileloading.gameObject.SetActive(false);
-                isLoading = false;
-                SpriteCache.AddSprite(url, a);
+                var handler = new DownloadHandlerTexture();
+                var www = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
+                www.downloadHandler = handler;
+                yield return www.SendWebRequest();
+
+                while (!www.isDone)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        onFailure?.Invoke("Cancelled", cancellationToken);
+                        yield break;
+                    }
+                    yield return null;
+                }
+                if (www.isNetworkError || www.isHttpError)
+                {
+                    onFailure?.Invoke(www.error, cancellationToken);
+                    yield break;
+                }
+                if (!string.IsNullOrEmpty(www.error))
+                {
+                    onFailure?.Invoke(www.error, cancellationToken);
+                    yield break;
+                }
+
+                Sprite sprite = Sprite.Create(handler.texture, new Rect(0, 0, handler.texture.width, handler.texture.height), Vector2.one * 0.5f);
+                onSuccess?.Invoke(sprite, url, cancellationToken);
+                yield break;
             }
 
-            private void OnAvatarNay(string a, string url)
+            internal void OnAvatarDownloadSuccess(Sprite a, string url, CancellationToken cancellationToken)
             {
-                profileImage.sprite = Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png");
-                profileloading.gameObject.SetActive(false);
-                isLoading = false;
+                SpriteCache.AddSpriteToCache(url, a);
+                if (cancellationToken != null)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                }
+                profileImage.gameObject.SetActive(true);
+                profileImage.sprite = a;
+                loadingIndicator.gameObject.SetActive(false);
+            }
+
+            internal void OnAvatarDownloadFailure(string error, CancellationToken cancellationToken)
+            {
+                if (cancellationToken != null)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                }
+                ClearSprite();
+            }
+
+            public void ClearSprite()
+            {
+                if (profileImage != null)
+                {
+                    profileImage.sprite = nullSprite;
+                }
+                if (loadingIndicator != null)
+                {
+                    loadingIndicator.gameObject.SetActive(false);
+                }
             }
         }
 
-        internal class ButtonHolder
+        internal static class SpriteCache
+        {
+            internal static Dictionary<string, Sprite> cachedSprites = new Dictionary<string, Sprite>();
+            private static int MaxSpriteCacheSize = 150;
+            internal static Queue<string> spriteCacheQueue = new Queue<string>();
+            internal static void MaintainSpriteCache()
+            {
+                while (cachedSprites.Count > MaxSpriteCacheSize)
+                {
+                    string oldestUrl = spriteCacheQueue.Dequeue();
+                    cachedSprites.Remove(oldestUrl);
+                }
+            }
+
+            internal static void AddSpriteToCache(string url, Sprite sprite)
+            {
+                if (cachedSprites.ContainsKey(url))
+                {
+                    return;
+                }
+                cachedSprites.Add(url, sprite);
+                spriteCacheQueue.Enqueue(url);
+            }
+        }
+
+        internal class EntryHolder
         {
             public int index;
             public Action<LeaderboardData.LeaderboardEntry> onClick;
 
-            public ButtonHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
+            public EntryHolder(int index, Action<LeaderboardData.LeaderboardEntry> endmylife)
             {
                 this.index = index;
                 onClick = endmylife;
             }
 
-            [UIComponent("infoButton")]
-            public Button infoButton;
-
-            [UIAction("infoClick")]
             public void infoClick()
             {
-                onClick?.Invoke(LeaderboardView.buttonEntryArray[index]);
+                onClick?.Invoke(LeaderboardView.lbEntryArray[index]);
             }
         }
 
 
         internal class TweeningService
         {
-            [Inject] private TimeTweeningManager _tweeningManager;
+            [Inject] private Tweening.TimeTweeningManager _tweeningManager;
             private HashSet<Transform> activeRotationTweens = new HashSet<Transform>();
 
             public void RotateTransform(Transform transform, float rotationAmount, float time, Action callback = null)
@@ -502,35 +572,5 @@ namespace BedroomPartyLeaderboard.Utils
                 _tweeningManager.AddTween(tween, text);
             }
         }
-
-        public static class SpriteCache
-        {
-            private static Dictionary<string, Sprite> spriteDictionary = new();
-            private static Sprite[] sprites;
-
-            public static void AddSprite(string spriteName, Sprite sprite)
-            {
-                if (!spriteDictionary.ContainsKey(spriteName))
-                {
-                    spriteDictionary[spriteName] = sprite;
-                }
-            }
-
-            public static bool TryGetSprite(string spriteName, out Sprite sprite)
-            {
-                if (spriteDictionary.TryGetValue(spriteName, out sprite))
-                {
-                    return true;
-                }
-                else
-                {
-                    sprite = null;
-                    return false;
-                }
-            }
-        }
-
-
-
     }
 }

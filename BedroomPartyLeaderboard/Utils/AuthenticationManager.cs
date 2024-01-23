@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using BedroomPartyLeaderboard.UI.Leaderboard;
+using IPA.Loader;
+using Newtonsoft.Json;
 using SiraUtil.Logging;
 using System;
 using System.Net;
@@ -13,9 +15,13 @@ namespace BedroomPartyLeaderboard.Utils
     {
         [Inject] private readonly PlayerUtils _playerUtils;
         [Inject] private readonly SiraLog _log;
+        [Inject] private readonly PanelView _panelView;
         internal PlayerUtils.PlayerInfo _localPlayerInfo;
+        internal bool _updateAvailable;
         private bool _isAuthed = false;
         internal bool _currentlyAuthing = false;
+
+
 
         public bool IsAuthed => _isAuthed;
 
@@ -46,6 +52,8 @@ namespace BedroomPartyLeaderboard.Utils
                 {
                     try
                     {
+                        _log.Info("Attempting to authenticate");
+                        _log.Info(_localPlayerInfo.authKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _localPlayerInfo.authKey);
                         httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
@@ -56,7 +64,7 @@ namespace BedroomPartyLeaderboard.Utils
                         _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                         string responseContent = await response.Content.ReadAsStringAsync();
-
+                        _log.Info(responseContent);
                         PlayerResponse playerResponse = JsonConvert.DeserializeObject<PlayerResponse>(responseContent);
                         if (playerResponse != null)
                         {
@@ -65,10 +73,13 @@ namespace BedroomPartyLeaderboard.Utils
                             _localPlayerInfo.userID = playerResponse.gameID;
                             _localPlayerInfo.discordID = playerResponse.discordID;
                             _localPlayerInfo.sessionExpiry = playerResponse.sessionKeyExpires;
-                        }
-                        else
-                        {
-                            throw new Exception("Error Authenticating, RESTART GAME.");
+
+                            if (playerResponse.updateAvailable)
+                            {
+                                _updateAvailable = true;
+                                _panelView.notiImage.gameObject.SetActive(true);
+                                _log.Notice("Plugin has an update available");
+                            }
                         }
                         if (_isAuthed)
                         {

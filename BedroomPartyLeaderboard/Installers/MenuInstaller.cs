@@ -15,6 +15,7 @@ namespace BedroomPartyLeaderboard.Installers
         {
             Container.BindInterfacesAndSelfTo<LeaderboardView>().FromNewComponentAsViewController().AsSingle();
             Container.BindInterfacesAndSelfTo<PanelView>().FromNewComponentAsViewController().AsSingle();
+            Container.Bind<HeadsetUtils>().AsSingle();
             Container.BindInterfacesTo<LeaderboardUtils>().AsSingle();
             Container.Bind<PlayerUtils>().AsSingle();
             Container.Bind<AuthenticationManager>().AsSingle();
@@ -27,9 +28,9 @@ namespace BedroomPartyLeaderboard.Installers
             List<ImageHolder> Imageholder = Enumerable.Range(0, 10).Select(x => new ImageHolder(x)).ToList();
             Container.Bind<List<ImageHolder>>().FromInstance(Imageholder).AsSingle().WhenInjectedInto<LeaderboardView>();
             ScoreInfoModal scoreInfoModal = new();
-            List<ButtonHolder> buttonholder = Enumerable.Range(0, 10).Select(x => new ButtonHolder(x, scoreInfoModal.setScoreModalText)).ToList();
+            List<EntryHolder> buttonholder = Enumerable.Range(0, 10).Select(x => new EntryHolder(x, scoreInfoModal.setScoreModalText)).ToList();
             Container.Bind<ScoreInfoModal>().FromInstance(scoreInfoModal).AsSingle().WhenInjectedInto<LeaderboardView>();
-            Container.Bind<List<ButtonHolder>>().FromInstance(buttonholder).AsSingle().WhenInjectedInto<LeaderboardView>();
+            Container.Bind<List<EntryHolder>>().FromInstance(buttonholder).AsSingle().WhenInjectedInto<LeaderboardView>();
             Container.QueueForInject(scoreInfoModal);
         }
     }

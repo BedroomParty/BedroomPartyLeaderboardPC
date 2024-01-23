@@ -44,7 +44,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
 
         private List<LeaderboardData.LeaderboardEntry> currentEntries;
         private string currentSongLinkLBWebView = string.Empty;
-        internal static LeaderboardData.LeaderboardEntry[] buttonEntryArray = new LeaderboardData.LeaderboardEntry[10];
+        internal static LeaderboardData.LeaderboardEntry[] lbEntryArray = new LeaderboardData.LeaderboardEntry[10];
         internal string sortMethod = "top";
         internal int season = 0;
 
@@ -66,8 +66,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIValue("imageHolders")]
         [Inject] internal List<ImageHolder> _ImageHolders;
 
-        [UIValue("buttonHolders")]
-        [Inject] internal List<ButtonHolder> Buttonholders;
+        [Inject] internal List<EntryHolder> EntryHolders;
 
         [UIComponent("scoreInfoModal")]
         [Inject] internal readonly ScoreInfoModal scoreInfoModal;
@@ -150,7 +149,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 down_button.interactable = false;
                 return;
             }
-            up_button.interactable = page > 1;
+            up_button.interactable = page > 0;
             down_button.interactable = page < totalPages - 1;
         }
 
@@ -180,11 +179,11 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             ImageSkew(ref _imgView) = 0.18f;
             ImageGradient(ref _imgView) = true;
             versionText.text = $"You are running BPLB v{PluginManager.GetPlugin("BedroomPartyLeaderboard").HVersion} on BS version {UnityGame.GameVersion.ToString().Split('_')[0]}";
-        }
 
-        private void FuckOffButtons()
-        {
-            Buttonholders.ForEach(Buttonholders => Buttonholders.infoButton.gameObject.SetActive(false));
+            if (_authenticationManager._updateAvailable)
+            {
+                _panelView.notiImage.gameObject.SetActive(true);
+            }
         }
 
         [UIAction("openLBWebView")]
@@ -215,7 +214,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
         [UIValue("leaderboardIcons")]
         private List<IconSegmentedControl.DataItem> leaderboardIcons => new()
                 {
-                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Globe.png"), "Bedroom Party"),
+                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Globe.png"), "Bloq Party"),
                     new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BedroomPartyLeaderboard.Images.Player.png"), "Around you")
                 };
 
@@ -291,9 +290,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
             foreach (LeaderboardTableCell cell in tableView.GetComponentsInChildren<LeaderboardTableCell>())
             {
                 if (!(cell.gameObject.activeSelf && leaderboardTransform.gameObject.activeSelf)) continue;
-                _tweeningService.FadeText(cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_playerNameText"), false, 0.3f);
-                _tweeningService.FadeText(cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_rankText"), false, 0.3f);
-                _tweeningService.FadeText(cell.GetField<TextMeshProUGUI, LeaderboardTableCell>("_scoreText"), false, 0.3f);
+                _tweeningService.FadeText(cell.Get<TextMeshProUGUI>("_playerNameText"), false, 0.3f);
+                _tweeningService.FadeText(cell.Get<TextMeshProUGUI>("_rankText"), false, 0.3f);
+                _tweeningService.FadeText(cell.Get<TextMeshProUGUI>("_scoreText"), false, 0.3f);
             }
         }
 
@@ -346,13 +345,6 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 SetErrorState(false, "");
                 leaderboardTableView.SetScores(null, -1);
                 loadingLB.gameObject.SetActive(true);
-                FuckOffButtons();
-                _uiUtils.ByeImages();
-
-                SetErrorState(false, "");
-                leaderboardTableView.SetScores(null, -1);
-                loadingLB.gameObject.SetActive(true);
-                FuckOffButtons();
                 _uiUtils.ByeImages();
 
                 string mapId = difficultyBeatmap.level.levelID.Substring(13);
@@ -362,17 +354,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                 string balls = mapId + "_" + mapType + difficulty.ToString(); // BeatMap Allocated Level Label String
                 currentSongLinkLBWebView = $"https://thebedroom.party/leaderboard/{mapId}";
 
-                await Task.Delay(200);
+                await Task.Delay(300);
 
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    SetErrorState(false, "");
-                    loadingLB.gameObject.SetActive(true);
-                    _uiUtils.ByeIMGLoader();
-                    leaderboardTableView.SetScores(null, -1);
-                    FadeOut(leaderboardTableView);
-                    return;
-                }
+                cancellationToken.ThrowIfCancellationRequested();
 
                 _log.Info("Getting leaderboard data");
                 _requestUtils.GetBeatMapData((mapId, difficulty, mapType), page, result =>
@@ -393,16 +377,9 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                         }
                         else
                         {
-                            if (cancellationToken.IsCancellationRequested)
-                            {
-                                SetErrorState(false, "");
-                                loadingLB.gameObject.SetActive(true);
-                                _uiUtils.ByeIMGLoader();
-                                leaderboardTableView.SetScores(null, -1);
-                                return;
-                            }
+                            cancellationToken.ThrowIfCancellationRequested();
                             loadingLB.gameObject.SetActive(false);
-                            leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, Buttonholders), LeaderboardDataUtils.GetUserScorePos(result.Item2, _authenticationManager._localPlayerInfo.userID));
+                            leaderboardTableView.SetScores(LeaderboardDataUtils.CreateLeaderboardData(result.Item2, page, EntryHolders), LeaderboardDataUtils.GetUserScorePos(result.Item2, _authenticationManager._localPlayerInfo.userID));
                             currentEntries = result.Item2;
                             _uiUtils.RichMyText(leaderboardTableView);
                             _uiUtils.SetProfiles(result.Item2, cancellationToken);
@@ -418,14 +395,7 @@ namespace BedroomPartyLeaderboard.UI.Leaderboard
                         _uiUtils.ByeIMGLoader();
                     }
                 });
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    SetErrorState(false, "");
-                    loadingLB.gameObject.SetActive(true);
-                    _uiUtils.ByeIMGLoader();
-                    leaderboardTableView.SetScores(null, -1);
-                    return;
-                }
+                cancellationToken.ThrowIfCancellationRequested();
             }
             catch (OperationCanceledException)
             {
