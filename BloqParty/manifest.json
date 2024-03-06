@@ -2,14 +2,14 @@
   "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
   "id": "BloqParty",
   "name": "BloqParty",
-  "author": "Speecil",
+  "author": "Speecil, Marmott, Nuggo",
   "version": "0.1.0",
   "description": "A Leaderboard of All Time",
-  "gameVersion": "1.28.0",
+  "gameVersion": "1.29.0",
   "dependsOn": {
     "BSIPA": "^4.2.2",
     "LeaderboardCore": "^1.2.3",
-    "BeatSaberMarkupLanguage": "^1.6.9",
+    "BeatSaberMarkupLanguage": "^1.6.10",
     "SiraUtil": "^3.1.2",
     "BS Utils": "^1.12.2"
   }
