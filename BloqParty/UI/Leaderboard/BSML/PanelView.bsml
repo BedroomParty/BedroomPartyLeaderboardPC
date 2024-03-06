@@ -16,10 +16,10 @@
 			<horizontal pref-height="10">
 				<vertical spacing="6" child-expand-width="false" child-control-width="false" child-align="MiddleCenter">
 					<horizontal pref-height="6" pad="1" spacing="1" horizontal-fit="PreferredSize">
-						<!-- FIX ON CLICK WORDS FDIKJLSJHFD-->				<clickable-text id="playerUsername" font-size="6" text="Loading..." rich-text="false" align="Center" on-click="playerUsernameCLICK" word-wrapping="false"/>
+						<clickable-text id="playerUsername" font-size="6" text="Loading..." rich-text="false" align="Center" on-click="PlayerUsernameClick" word-wrapping="false"/>
 					</horizontal>
 					<horizontal pref-height="4" pad="1" spacing="2" horizontal-fit="PreferredSize">
-						<stack active="true" ignore-layout="true" anchor-pos-y="1.5" horizontal-fit="PreferredSize">
+						<stack active="false" ignore-layout="true" anchor-pos-y="1.5" horizontal-fit="PreferredSize">
 							<text id="seasonText" font-size="4.5" text="(Open Beta)" rich-text="true" align="Center" on-click="seasonTextCLICK" word-wrapping="false"/>
 						</stack>
 						<horizontal active="false" ignore-layout="true" anchor-pos-y="1.5" anchor-pos-x="-16" preferred-width="70" spacing="0.5" child-align="MiddleRight">

@@ -7,6 +7,6 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~F:BloqParty.UI.Leaderboard.LeaderboardView._playerUtils")]
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~F:BloqParty.UI.Leaderboard.LeaderboardView._leaderboardData")]
-[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:BloqParty.UI.Leaderboard.LeaderboardView.downloadPlaylistCLICK")]
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:BloqParty.UI.Leaderboard.LeaderboardView.openWebLeaderboardCLICK")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:BloqParty.UI.Leaderboard.LeaderboardView.DownloadPlaylistSelect")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:BloqParty.UI.Leaderboard.LeaderboardView.OpenLeaderboardSelect")]
 [assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~F:BloqParty.UI.Leaderboard.LeaderboardView.versionText")]

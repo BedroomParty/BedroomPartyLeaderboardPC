@@ -17,8 +17,6 @@ namespace BloqParty.Utils
 {
     internal class RequestUtils
     {
-#pragma warning disable CS4014
-        [Inject] private readonly LeaderboardData _leaderboardData;
         [Inject] private readonly LeaderboardView _leaderboardView;
         [Inject] private readonly PanelView _panelView;
         [Inject] private readonly UIUtils _uiUtils;
@@ -41,14 +39,13 @@ namespace BloqParty.Utils
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _log.Info("No Scores Found (Response code not 200)");
+                    _log.Info($"No Scores Found (Response Code {response.StatusCode})");
                     callback((false, data, 0));
                     return;
                 }
                 _log.Info("Got Leaderboard Data");
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 LeaderboardData.BPLeaderboard leaderboardData = JsonConvert.DeserializeObject<LeaderboardData.BPLeaderboard>(jsonResponse);
-                _log.Info(jsonResponse);
                 scorecount = leaderboardData.scoreCount;
                 totalPages = Mathf.CeilToInt((float)scorecount / 10);
                 data = leaderboardData.scores;
@@ -142,18 +139,11 @@ namespace BloqParty.Utils
         internal async Task HandleLBUpload()
         {
             _log.Info("Handling Upload UI");
-            Action<bool, string> uploadCompletedCallback = (isSuccessful, message) =>
-            {
-                if (isSuccessful)
-                {
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast(message, true, false, 5500));
-                }
-                else
-                {
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast(message, true, false, 7500));
-                }
-            };
 
+            Action<bool, string> uploadCompletedCallback = (bool isSuccessful, string message) =>
+            {
+                UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast(message, true, false, isSuccessful ? 5500 : 7500));
+            };
 
             UploadCompleted += uploadCompletedCallback;
 
@@ -161,7 +151,7 @@ namespace BloqParty.Utils
 
             if (isUploading)
             {
-                UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Uploading Score...", true, true, 0));
+                await UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Uploading Score...", true, true, 0));
                 try
                 {
                     await Constants.WaitUntil(() => !isUploading, timeout: 60000);
@@ -169,7 +159,7 @@ namespace BloqParty.Utils
                 catch (TimeoutException)
                 {
                     _log.Error("Failed to upload score (TIMEOUT)");
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.badToast}>Failed to upload... (TIMEOUT)</color>", true, false, 7500));
+                    await UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast($"<color={Constants.badToast}>Failed to upload... (TIMEOUT)</color>", true, false, 7500));
                 }
                 finally
                 {
@@ -187,7 +177,7 @@ namespace BloqParty.Utils
             _log.Info("Handling Auth UI");
             if (!_authenticationManager.IsAuthed)
             {
-                UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Authenticating...", true, true, 0));
+                await UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("Authenticating...", true, true, 0));
                 try
                 {
                     await Constants.WaitUntil(() => _authenticationManager.IsAuthed, timeout: 60000);
@@ -196,15 +186,15 @@ namespace BloqParty.Utils
                 {
                     _log.Error("Failed to auth (TIMEOUT)");
                     _leaderboardView.SetErrorState(true, "Failed to Auth");
-                    UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("", false, false, 0));
+                    await UnityMainThreadTaskScheduler.Factory.StartNew(() => _uiUtils.SetToast("", false, false, 0));
                 }
             }
 
             await Constants.WaitUntil(() => _leaderboardView.currentDifficultyBeatmap != null);
 
-            UnityMainThreadTaskScheduler.Factory.StartNew(() =>
+            await UnityMainThreadTaskScheduler.Factory.StartNew(async () =>
             {
-                _uiUtils.SetToast($"<color={Constants.goodToast}>Successfully signed in!</color>", true, false, 10000);
+                await _uiUtils.SetToast($"<color={Constants.goodToast}>Successfully signed in!</color>", true, false, 10000);
                 _panelView.playerUsername.text = _authenticationManager._localPlayerInfo.username;
                 _panelView.playerAvatarLoading.gameObject.SetActive(false);
                 _leaderboardView.SetSeasonList(1);
@@ -212,7 +202,7 @@ namespace BloqParty.Utils
                 {
                     _panelView.notiImage.gameObject.SetActive(true);
                 }
-                Task.Run(() => _uiUtils.assignStaff());
+                await Task.Run(() => _uiUtils.assignStaff());
             });
 
             _leaderboardView.OnLeaderboardSet(_leaderboardView.currentDifficultyBeatmap);

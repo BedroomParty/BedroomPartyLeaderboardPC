@@ -81,19 +81,16 @@ namespace BloqParty.UI.Leaderboard
         [UIObject("loadingLB")]
         private readonly GameObject loadingLB;
 
-        [UIComponent("versionText")]
-        private readonly TextMeshProUGUI versionText;
+        [UIValue("versionText")]
+        private readonly string versionText = $"You are running BloqParty v{PluginManager.GetPlugin("BloqParty").HVersion} on Beat Saber v{UnityGame.GameVersion.ToString().Split('_')[0]}";
 
-        [UIAction("downloadPlaylistCLICK")]
-        private void downloadPlaylistCLICK()
-        {
-            Application.OpenURL($"https://thebedroom.party/playlist/{season}");
-        }
+        [UIAction("DownloadPlaylistSelect")]
+        private void DownloadPlaylistSelect() => Application.OpenURL($"{Constants.BASE_WEB_URL}/{season}");
 
-        [UIAction("openWebLeaderboardCLICK")]
-        private void openWebLeaderboardCLICK()
+        [UIAction("OpenLeaderboardSelect")]
+        private void OpenLeaderboardSelect()
         {
-            Application.OpenURL($"https://thebedroom.party/leaderboard/{season}");
+            Application.OpenURL($"{Constants.BASE_WEB_URL}/leaderboard/{season}");
         }
 
         private int currentSeason;
@@ -179,11 +176,10 @@ namespace BloqParty.UI.Leaderboard
             _imgView.color1 = Constants.BP_COLOR;
             ImageSkew(ref _imgView) = 0.18f;
             ImageGradient(ref _imgView) = true;
-            versionText.text = $"You are running BPLB v{PluginManager.GetPlugin("BloqParty").HVersion} on BS version {UnityGame.GameVersion.ToString().Split('_')[0]}";
         }
 
-        [UIAction("openLBWebView")]
-        internal void openLBWebView()
+        [UIAction("OpenLeaderboardPage")]
+        internal void OpenLeaderboardPage()
         {
             if (!(string.IsNullOrEmpty(currentSongLinkLBWebView) || currentSongLinkLBWebView.Contains(" ")))
             {
@@ -191,11 +187,8 @@ namespace BloqParty.UI.Leaderboard
             }
         }
 
-        [UIAction("openBUGWebView")]
-        internal void openBUGWebView()
-        {
-            Application.OpenURL(Constants.BUG_REPORT_LINK);
-        }
+        [UIAction("OpenBugPage")]
+        internal void OpenBugPage() => Application.OpenURL(Constants.BUG_REPORT_LINK);
 
         [UIAction("OnIconSelected")]
         private void OnIconSelected(SegmentedControl segmentedControl, int index)
@@ -209,10 +202,10 @@ namespace BloqParty.UI.Leaderboard
 
         [UIValue("leaderboardIcons")]
         private List<IconSegmentedControl.DataItem> leaderboardIcons => new()
-                {
-                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BloqParty.Images.globe.png"), "Bloq Party"),
-                    new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BloqParty.Images.player.png"), "Around you")
-                };
+        {
+            new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BloqParty.Images.globe.png"), "Bloq Party"),
+            new IconSegmentedControl.DataItem(Utilities.FindSpriteInAssembly("BloqParty.Images.player.png"), "Around you")
+        };
 
         internal void SetErrorState(bool active, string reason)
         {

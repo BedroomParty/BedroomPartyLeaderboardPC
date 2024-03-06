@@ -48,15 +48,13 @@ namespace BloqParty.UI.Leaderboard
             _leaderboardView.showInfoModal();
         }
 
-        [UIAction("playerUsernameCLICK")]
-        public void playerUsernameCLICK()
+        [UIAction("PlayerUsernameClick")]
+        public void PlayerUsernameClick()
         {
             if (string.IsNullOrEmpty(_authenticationManager._localPlayerInfo.userID))
-            {
                 return;
-            }
 
-            Application.OpenURL($"https://thebedroom.party/?user={_authenticationManager._localPlayerInfo.userID}");
+            Application.OpenURL($"{Constants.BASE_WEB_URL}/?user={_authenticationManager._localPlayerInfo.userID}");
         }
 
         [UIAction("seasonTextCLICK")]

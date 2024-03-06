@@ -10,7 +10,11 @@ namespace BloqParty
     {
         internal static IPALogger Log { get; private set; }
 
-        internal static bool isDev = false;
+#if DEBUG
+        internal const bool isDev = true;
+#else
+        internal const bool isDev = false;
+#endif
 
         [Init]
         public Plugin(Zenjector zenjector)

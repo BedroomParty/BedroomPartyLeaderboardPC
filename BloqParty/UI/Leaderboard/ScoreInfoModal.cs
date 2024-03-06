@@ -87,11 +87,8 @@ namespace BloqParty.UI
         [UIParams]
         public BSMLParserParams parserParams;
 
-        [UIAction("usernameScoreTextCLICK")]
-        public void usernameScoreTextCLICK()
-        {
-            Application.OpenURL(Constants.USER_URL_WEB(currentEntry.userID));
-        }
+        [UIAction("ScoreUsernameSelect")]
+        public void ScoreUsernameSelect() => Application.OpenURL(Constants.USER_URL_WEB(currentEntry.userID));
         public void hidethefucker()
         {
             parserParams.EmitEvent("hideScoreInfo");
@@ -99,8 +96,8 @@ namespace BloqParty.UI
 
         private bool isMoreInfo = false;
 
-        [UIAction("moreInfoButtonCLICK")]
-        public void moreInfoButtonCLICK()
+        [UIAction("MoreInfoClick")]
+        public void MoreInfoClick()
         {
             isMoreInfo = !isMoreInfo;
             moreInfoButton.gameObject.SetActive(!isMoreInfo);
