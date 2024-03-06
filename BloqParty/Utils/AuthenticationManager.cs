@@ -63,7 +63,6 @@ namespace BloqParty.Utils
                         _isAuthed = response.StatusCode == HttpStatusCode.OK;
 
                         string responseContent = await response.Content.ReadAsStringAsync();
-                        _log.Info(responseContent);
                         PlayerResponse playerResponse = JsonConvert.DeserializeObject<PlayerResponse>(responseContent);
                         if (playerResponse != null)
                         {
