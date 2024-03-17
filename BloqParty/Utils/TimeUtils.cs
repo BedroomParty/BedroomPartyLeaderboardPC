@@ -15,7 +15,7 @@ namespace BloqParty.Utils
 
         public static TimeSpan GetRelativeTime(string timeSet)
         {
-            DateTime dateTime = long.Parse(timeSet).AsUnixTime();
+            DateTime dateTime = DateTime.Parse(timeSet);
             return DateTime.UtcNow - dateTime;
         }
 
